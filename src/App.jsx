@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+
 const ARC_CHAIN_ID = "0x4cef52";
 const ARC_CHAIN_CONFIG = {
   chainId: ARC_CHAIN_ID, chainName: "Arc Testnet",
@@ -9,165 +10,111 @@ const ARC_CHAIN_CONFIG = {
 const USDC_ADDRESS  = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
 const MERCHANT_ADDR = "0x4932B6c1970131321B79d8Be02A1791A09554bf5";
 
-const CATALOGUE = { 
-  men: {
-    label:"Men", icon:"👔",
-    categories:{
-      shirts:{ label:"Shirts & Tops", items:[
-        {id:"m-s1",name:"Oxford Button-Down",price:42,desc:"Egyptian cotton, spread collar",
-         img:"https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=400&q=80"},
-        {id:"m-s2",name:"Linen Crew Tee",price:28,desc:"Stonewashed linen, relaxed fit",
-         img:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80"},
-        {id:"m-s3",name:"Flannel Overshirt",price:65,desc:"Brushed flannel, double chest pocket",
-         img:"https://images.unsplash.com/photo-1588359348347-9bc6cbbb689e?w=400&q=80"},
-      ]},
-      trousers:{ label:"Trousers", items:[
-        {id:"m-t1",name:"Slim Chino",price:58,desc:"Stretch cotton, tapered leg",
-         img:"https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&q=80"},
-        {id:"m-t2",name:"Cargo Pants",price:72,desc:"Ripstop canvas, utility pockets",
-         img:"https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&q=80"},
-        {id:"m-t3",name:"Dress Trouser",price:85,desc:"Wool-blend, flat-front cut",
-         img:"https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&q=80"},
-      ]},
-      belts:{ label:"Belts", items:[
-        {id:"m-b1",name:"Leather Classic",price:35,desc:"Full-grain Italian leather",
-         img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80"},
-        {id:"m-b2",name:"Woven Canvas Belt",price:22,desc:"Military-style, brass buckle",
-         img:"https://images.unsplash.com/photo-1625496492751-47e1f4a25c15?w=400&q=80"},
-      ]},
-      caps:{ label:"Headwear", items:[
-        {id:"m-c1",name:"Snapback Cap",price:25,desc:"6-panel, structured brim",
-         img:"https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400&q=80"},
-        {id:"m-c2",name:"Bucket Hat",price:20,desc:"Waxed cotton, packable",
-         img:"https://images.unsplash.com/photo-1556306535-0f09a537f0a3?w=400&q=80"},
-        {id:"m-c3",name:"Beanie Knit",price:18,desc:"Merino wool, ribbed cuff",
-         img:"https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=400&q=80"},
-      ]},
-      shoes:{ label:"Footwear", items:[
-        {id:"m-sh1",name:"White Leather Sneaker",price:110,desc:"Tumbled leather, cupsole",
-         img:"https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&q=80"},
-        {id:"m-sh2",name:"Chelsea Boot",price:145,desc:"Suede upper, elastic gusset",
-         img:"https://images.unsplash.com/photo-1638247025967-b4e38f787b76?w=400&q=80"},
-        {id:"m-sh3",name:"Loafer Slip-On",price:98,desc:"Horsebit detail, leather lining",
-         img:"https://images.unsplash.com/photo-1631984564919-1f6e59f72f73?w=400&q=80"},
-      ]},
-    }
-  },
-  women:{
-    label:"Women", icon:"👗",
-    categories:{
-      shirts:{ label:"Tops & Blouses", items:[
-        {id:"w-s1",name:"Silk Blouse",price:68,desc:"Mulberry silk, relaxed drape",
-         img:"https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=400&q=80"},
-        {id:"w-s2",name:"Crop Cami",price:32,desc:"Ribbed modal, adjustable straps",
-         img:"https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=400&q=80"},
-        {id:"w-s3",name:"Wrap Cardigan",price:55,desc:"Cashmere blend, tie-waist",
-         img:"https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&q=80"},
-      ]},
-      trousers:{ label:"Bottoms", items:[
-        {id:"w-t1",name:"High-Rise Flare",price:75,desc:"Stretch denim, wide flare hem",
-         img:"https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&q=80"},
-        {id:"w-t2",name:"Midi Skirt",price:60,desc:"Satin lining, A-line silhouette",
-         img:"https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=400&q=80"},
-        {id:"w-t3",name:"Tailored Wide-Leg",price:88,desc:"Crepe fabric, pleat front",
-         img:"https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400&q=80"},
-      ]},
-      belts:{ label:"Belts", items:[
-        {id:"w-b1",name:"Gold Chain Belt",price:38,desc:"Brass links, adjustable fit",
-         img:"https://images.unsplash.com/photo-1624623278313-a930126a11c3?w=400&q=80"},
-        {id:"w-b2",name:"Slim Patent",price:30,desc:"Patent leather, pin buckle",
-         img:"https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&q=80"},
-      ]},
-      caps:{ label:"Headwear", items:[
-        {id:"w-c1",name:"Wide Brim Sun Hat",price:40,desc:"Raffia weave, ribbon band",
-         img:"https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400&q=80"},
-        {id:"w-c2",name:"Classic Beret",price:28,desc:"Felted wool, French-style",
-         img:"https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400&q=80"},
-        {id:"w-c3",name:"Knit Pom Beanie",price:22,desc:"Chunky knit, removable pom",
-         img:"https://images.unsplash.com/photo-1510598155236-d3e2e31d3e0c?w=400&q=80"},
-      ]},
-      shoes:{ label:"Footwear", items:[
-        {id:"w-sh1",name:"Block Heel Mule",price:120,desc:"Suede upper, 7cm block heel",
-         img:"https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80"},
-        {id:"w-sh2",name:"Platform Sneaker",price:95,desc:"Leather & canvas, 4cm platform",
-         img:"https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&q=80"},
-        {id:"w-sh3",name:"Kitten Heel Pump",price:138,desc:"Satin finish, pointed toe",
-         img:"https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=400&q=80"},
-      ]},
-    }
-  },
-  children:{
-    label:"Children", icon:"🧒",
-    categories:{
-      shirts:{ label:"Tops & Tees", items:[
-        {id:"k-s1",name:"Dino Print Tee",price:18,desc:"100% organic cotton, crew neck",
-         img:"https://images.unsplash.com/photo-1519278409-1f56ab241a7d?w=400&q=80"},
-        {id:"k-s2",name:"Rainbow Hoodie",price:32,desc:"Brushed fleece, kangaroo pocket",
-         img:"https://images.unsplash.com/photo-1503944168849-8bf86875bbd8?w=400&q=80"},
-        {id:"k-s3",name:"Striped Long Sleeve",price:22,desc:"Soft jersey, ribbed cuffs",
-         img:"https://images.unsplash.com/photo-1471286174890-9c112ffca5b4?w=400&q=80"},
-      ]},
-      trousers:{ label:"Bottoms", items:[
-        {id:"k-t1",name:"Elastic Joggers",price:25,desc:"French terry, elastic waist",
-         img:"https://images.unsplash.com/photo-1519689373023-dd07c7988603?w=400&q=80"},
-        {id:"k-t2",name:"Denim Shortalls",price:40,desc:"Stretch denim, adjustable straps",
-         img:"https://images.unsplash.com/photo-1468820153901-27f1c5dcafd4?w=400&q=80"},
-        {id:"k-t3",name:"Cargo Shorts",price:28,desc:"Ripstop, velcro side pockets",
-         img:"https://images.unsplash.com/photo-1577253313708-cab167d2c474?w=400&q=80"},
-      ]},
-      belts:{ label:"Belts", items:[
-        {id:"k-b1",name:"Cartoon Buckle Belt",price:12,desc:"Woven, fun character buckle",
-         img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80"},
-      ]},
-      caps:{ label:"Headwear", items:[
-        {id:"k-c1",name:"Dino Baseball Cap",price:15,desc:"Cotton twill, embroidered dino",
-         img:"https://images.unsplash.com/photo-1534215754734-18e55d13e346?w=400&q=80"},
-        {id:"k-c2",name:"Sun Protection Hat",price:20,desc:"UPF 50+, wide brim",
-         img:"https://images.unsplash.com/photo-1556306535-0f09a537f0a3?w=400&q=80"},
-      ]},
-      shoes:{ label:"Footwear", items:[
-        {id:"k-sh1",name:"Light-Up Sneakers",price:55,desc:"LED outsole, velcro close",
-         img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80"},
-        {id:"k-sh2",name:"Velcro Sandals",price:38,desc:"Quick-dry, adjustable strap",
-         img:"https://images.unsplash.com/photo-1603487742131-4160ec999306?w=400&q=80"},
-        {id:"k-sh3",name:"Rain Boots",price:42,desc:"Natural rubber, easy-pull tab",
-         img:"https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=400&q=80"},
-      ]},
-    }
-  },
+const CATALOGUE = {
+  men: { label:"Men", icon:"👔", categories:{
+    shirts:  { label:"Shirts & Tops", emoji:"👕", items:[
+      {id:"m-s1",name:"Oxford Button-Down",price:42,oldPrice:58,desc:"Egyptian cotton, spread collar",img:"https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=400&q=80"},
+      {id:"m-s2",name:"Linen Crew Tee",price:28,oldPrice:38,desc:"Stonewashed linen, relaxed fit",img:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80"},
+      {id:"m-s3",name:"Flannel Overshirt",price:65,oldPrice:80,desc:"Brushed flannel, double chest pocket",img:"https://images.unsplash.com/photo-1588359348347-9bc6cbbb689e?w=400&q=80"},
+    ]},
+    trousers:{ label:"Trousers", emoji:"👖", items:[
+      {id:"m-t1",name:"Slim Chino",price:58,oldPrice:75,desc:"Stretch cotton, tapered leg",img:"https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&q=80"},
+      {id:"m-t2",name:"Cargo Pants",price:72,oldPrice:90,desc:"Ripstop canvas, utility pockets",img:"https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&q=80"},
+      {id:"m-t3",name:"Dress Trouser",price:85,oldPrice:105,desc:"Wool-blend, flat-front cut",img:"https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&q=80"},
+    ]},
+    belts:   { label:"Belts", emoji:"🪢", items:[
+      {id:"m-b1",name:"Leather Classic",price:35,oldPrice:45,desc:"Full-grain Italian leather",img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80"},
+      {id:"m-b2",name:"Woven Canvas Belt",price:22,oldPrice:30,desc:"Military-style, brass buckle",img:"https://images.unsplash.com/photo-1625496492751-47e1f4a25c15?w=400&q=80"},
+    ]},
+    caps:    { label:"Headwear", emoji:"🧢", items:[
+      {id:"m-c1",name:"Snapback Cap",price:25,oldPrice:32,desc:"6-panel, structured brim",img:"https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400&q=80"},
+      {id:"m-c2",name:"Bucket Hat",price:20,oldPrice:28,desc:"Waxed cotton, packable",img:"https://images.unsplash.com/photo-1556306535-0f09a537f0a3?w=400&q=80"},
+      {id:"m-c3",name:"Beanie Knit",price:18,oldPrice:25,desc:"Merino wool, ribbed cuff",img:"https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=400&q=80"},
+    ]},
+    shoes:   { label:"Footwear", emoji:"👟", items:[
+      {id:"m-sh1",name:"White Leather Sneaker",price:110,oldPrice:140,desc:"Tumbled leather, cupsole",img:"https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&q=80"},
+      {id:"m-sh2",name:"Chelsea Boot",price:145,oldPrice:180,desc:"Suede upper, elastic gusset",img:"https://images.unsplash.com/photo-1638247025967-b4e38f787b76?w=400&q=80"},
+      {id:"m-sh3",name:"Loafer Slip-On",price:98,oldPrice:120,desc:"Horsebit detail, leather lining",img:"https://images.unsplash.com/photo-1631984564919-1f6e59f72f73?w=400&q=80"},
+    ]},
+  }},
+  women: { label:"Women", icon:"👗", categories:{
+    shirts:  { label:"Tops & Blouses", emoji:"👚", items:[
+      {id:"w-s1",name:"Silk Blouse",price:68,oldPrice:85,desc:"Mulberry silk, relaxed drape",img:"https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=400&q=80"},
+      {id:"w-s2",name:"Crop Cami",price:32,oldPrice:42,desc:"Ribbed modal, adjustable straps",img:"https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=400&q=80"},
+      {id:"w-s3",name:"Wrap Cardigan",price:55,oldPrice:70,desc:"Cashmere blend, tie-waist",img:"https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&q=80"},
+    ]},
+    trousers:{ label:"Bottoms", emoji:"👗", items:[
+      {id:"w-t1",name:"High-Rise Flare",price:75,oldPrice:95,desc:"Stretch denim, wide flare hem",img:"https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&q=80"},
+      {id:"w-t2",name:"Midi Skirt",price:60,oldPrice:78,desc:"Satin lining, A-line silhouette",img:"https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=400&q=80"},
+      {id:"w-t3",name:"Tailored Wide-Leg",price:88,oldPrice:110,desc:"Crepe fabric, pleat front",img:"https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400&q=80"},
+    ]},
+    belts:   { label:"Belts", emoji:"🪢", items:[
+      {id:"w-b1",name:"Gold Chain Belt",price:38,oldPrice:50,desc:"Brass links, adjustable fit",img:"https://images.unsplash.com/photo-1624623278313-a930126a11c3?w=400&q=80"},
+      {id:"w-b2",name:"Slim Patent",price:30,oldPrice:40,desc:"Patent leather, pin buckle",img:"https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&q=80"},
+    ]},
+    caps:    { label:"Headwear", emoji:"🎩", items:[
+      {id:"w-c1",name:"Wide Brim Sun Hat",price:40,oldPrice:52,desc:"Raffia weave, ribbon band",img:"https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400&q=80"},
+      {id:"w-c2",name:"Classic Beret",price:28,oldPrice:36,desc:"Felted wool, French-style",img:"https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400&q=80"},
+      {id:"w-c3",name:"Knit Pom Beanie",price:22,oldPrice:30,desc:"Chunky knit, removable pom",img:"https://images.unsplash.com/photo-1510598155236-d3e2e31d3e0c?w=400&q=80"},
+    ]},
+    shoes:   { label:"Footwear", emoji:"👠", items:[
+      {id:"w-sh1",name:"Block Heel Mule",price:120,oldPrice:150,desc:"Suede upper, 7cm block heel",img:"https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80"},
+      {id:"w-sh2",name:"Platform Sneaker",price:95,oldPrice:120,desc:"Leather & canvas, 4cm platform",img:"https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&q=80"},
+      {id:"w-sh3",name:"Kitten Heel Pump",price:138,oldPrice:170,desc:"Satin finish, pointed toe",img:"https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=400&q=80"},
+    ]},
+  }},
+  children: { label:"Children", icon:"🧒", categories:{
+    shirts:  { label:"Tops & Tees", emoji:"👕", items:[
+      {id:"k-s1",name:"Dino Print Tee",price:18,oldPrice:25,desc:"100% organic cotton, crew neck",img:"https://images.unsplash.com/photo-1519278409-1f56ab241a7d?w=400&q=80"},
+      {id:"k-s2",name:"Rainbow Hoodie",price:32,oldPrice:42,desc:"Brushed fleece, kangaroo pocket",img:"https://images.unsplash.com/photo-1503944168849-8bf86875bbd8?w=400&q=80"},
+      {id:"k-s3",name:"Striped Long Sleeve",price:22,oldPrice:30,desc:"Soft jersey, ribbed cuffs",img:"https://images.unsplash.com/photo-1471286174890-9c112ffca5b4?w=400&q=80"},
+    ]},
+    trousers:{ label:"Bottoms", emoji:"👖", items:[
+      {id:"k-t1",name:"Elastic Joggers",price:25,oldPrice:32,desc:"French terry, elastic waist",img:"https://images.unsplash.com/photo-1519689373023-dd07c7988603?w=400&q=80"},
+      {id:"k-t2",name:"Denim Shortalls",price:40,oldPrice:52,desc:"Stretch denim, adjustable straps",img:"https://images.unsplash.com/photo-1468820153901-27f1c5dcafd4?w=400&q=80"},
+      {id:"k-t3",name:"Cargo Shorts",price:28,oldPrice:36,desc:"Ripstop, velcro side pockets",img:"https://images.unsplash.com/photo-1577253313708-cab167d2c474?w=400&q=80"},
+    ]},
+    belts:   { label:"Belts", emoji:"🪢", items:[
+      {id:"k-b1",name:"Cartoon Buckle Belt",price:12,oldPrice:18,desc:"Woven, fun character buckle",img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80"},
+    ]},
+    caps:    { label:"Headwear", emoji:"🧢", items:[
+      {id:"k-c1",name:"Dino Baseball Cap",price:15,oldPrice:22,desc:"Cotton twill, embroidered dino",img:"https://images.unsplash.com/photo-1534215754734-18e55d13e346?w=400&q=80"},
+      {id:"k-c2",name:"Sun Protection Hat",price:20,oldPrice:28,desc:"UPF 50+, wide brim",img:"https://images.unsplash.com/photo-1556306535-0f09a537f0a3?w=400&q=80"},
+    ]},
+    shoes:   { label:"Footwear", emoji:"👟", items:[
+      {id:"k-sh1",name:"Light-Up Sneakers",price:55,oldPrice:70,desc:"LED outsole, velcro close",img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80"},
+      {id:"k-sh2",name:"Velcro Sandals",price:38,oldPrice:50,desc:"Quick-dry, adjustable strap",img:"https://images.unsplash.com/photo-1603487742131-4160ec999306?w=400&q=80"},
+      {id:"k-sh3",name:"Rain Boots",price:42,oldPrice:55,desc:"Natural rubber, easy-pull tab",img:"https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=400&q=80"},
+    ]},
+  }},
 };
 
-const ALL_PRODUCTS = [];
-for(const [sk,sec] of Object.entries(CATALOGUE))
-  for(const [ck,cat] of Object.entries(sec.categories))
+const ALL_PRODUCTS=[];
+for(const[sk,sec]of Object.entries(CATALOGUE))
+  for(const[ck,cat]of Object.entries(sec.categories))
     for(const item of cat.items)
-      ALL_PRODUCTS.push({...item,section:sk,sectionLabel:sec.label,category:ck,categoryLabel:cat.label});
+      ALL_PRODUCTS.push({...item,section:sk,sectionLabel:sec.label,category:ck,categoryLabel:cat.label,emoji:cat.emoji});
 
 const AGENT_TOOLS=[
   {name:"search_products",description:"Search catalogue by section, category, price or keywords.",
-   input_schema:{type:"object",properties:{
-     section:{type:"string",enum:["men","women","children","all"]},
-     category:{type:"string"},maxPrice:{type:"number"},minPrice:{type:"number"},
-     keywords:{type:"array",items:{type:"string"}},
-   }}},
+   input_schema:{type:"object",properties:{section:{type:"string",enum:["men","women","children","all"]},category:{type:"string"},maxPrice:{type:"number"},minPrice:{type:"number"},keywords:{type:"array",items:{type:"string"}}}}},
   {name:"add_to_cart",description:"Add product to cart by ID.",
    input_schema:{type:"object",required:["productId"],properties:{productId:{type:"string"},quantity:{type:"number"}}}},
-  {name:"view_cart",description:"View cart contents and total.",
-   input_schema:{type:"object",properties:{}}},
-  {name:"remove_from_cart",description:"Remove a product from cart.",
-   input_schema:{type:"object",required:["productId"],properties:{productId:{type:"string"}}}},
-  {name:"initiate_checkout",description:"Open USDC checkout modal on Arc.",
-   input_schema:{type:"object",properties:{}}},
+  {name:"view_cart",description:"View cart and total.",input_schema:{type:"object",properties:{}}},
+  {name:"remove_from_cart",description:"Remove product from cart.",input_schema:{type:"object",required:["productId"],properties:{productId:{type:"string"}}}},
+  {name:"initiate_checkout",description:"Open USDC checkout on Arc.",input_schema:{type:"object",properties:{}}},
 ];
 
 const fmt   = n=>`${Number(n).toFixed(2)} USDC`;
 const trunc = a=>a?`${a.slice(0,6)}…${a.slice(-4)}`:"";
+const disc  = (p,op)=>Math.round(((op-p)/op)*100);
 
+/* ── Toasts ─────────────────────────────────────────────────────────────── */
 function Toasts({list}){
   return(
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9000] flex flex-col gap-2 items-center pointer-events-none">
+    <div style={{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",zIndex:9999,display:"flex",flexDirection:"column",gap:8,alignItems:"center",pointerEvents:"none"}}>
       {list.map(t=>(
-        <div key={t.id} className={`px-5 py-2.5 rounded-full text-sm font-medium text-white shadow-xl whitespace-nowrap ${t.type==="agent"?"bg-amber-700":t.type==="error"?"bg-red-700":"bg-stone-900"}`}>
+        <div key={t.id} style={{background:t.type==="agent"?"#c47d2a":t.type==="error"?"#b91c1c":"#1c1917",color:"#fff",padding:"9px 22px",borderRadius:40,fontSize:13,fontFamily:"'Jost',sans-serif",boxShadow:"0 4px 20px rgba(0,0,0,0.2)",whiteSpace:"nowrap",animation:"toastIn .3s ease"}}>
           {t.msg}
         </div>
       ))}
@@ -175,36 +122,62 @@ function Toasts({list}){
   );
 }
 
-function ProductCard({item,onAdd,agentPick}){
-  const [added,setAdded]=useState(false);
-  const [imgErr,setImgErr]=useState(false);
+/* ── Edit Modal ─────────────────────────────────────────────────────────── */
+function EditModal({item,onClose,onSave}){
+  const [qty,setQty]=useState(1);
+  const [size,setSize]=useState("M");
+  const [color,setColor]=useState("Default");
+  const sizes=["XS","S","M","L","XL","XXL"];
+  const colors=["Default","Black","White","Navy","Grey","Beige"];
   return(
-    <div className={`group bg-white rounded-2xl overflow-hidden border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${agentPick?"border-amber-400 shadow-amber-100 shadow-md":"border-stone-200 shadow-sm"}`}>
-      <div className="relative overflow-hidden bg-stone-100 h-52">
-        {!imgErr?(
-          <img src={item.img} alt={item.name} onError={()=>setImgErr(true)}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"/>
-        ):(
-          <div className="w-full h-full flex items-center justify-center text-5xl bg-stone-100">👕</div>
-        )}
-        {agentPick&&(
-          <div className="absolute top-2.5 left-2.5 bg-amber-600 text-white text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full">
-            AI Pick
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",zIndex:3000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
+      <div style={{background:"#fff",borderRadius:16,width:440,maxWidth:"100%",overflow:"hidden",boxShadow:"0 20px 60px rgba(0,0,0,0.25)",animation:"modalIn .25s ease"}}>
+        {/* Header */}
+        <div style={{display:"flex",alignItems:"center",gap:12,padding:"16px 20px",borderBottom:"1px solid #f0ede8"}}>
+          <div style={{width:56,height:56,borderRadius:10,overflow:"hidden",background:"#f5f3f0",flexShrink:0}}>
+            <img src={item.img} alt={item.name} style={{width:"100%",height:"100%",objectFit:"cover"}} onError={e=>e.target.style.display="none"}/>
           </div>
-        )}
-      </div>
-      <div className="p-4">
-        <h3 className="font-semibold text-stone-900 text-sm leading-tight mb-1">{item.name}</h3>
-        <p className="text-stone-400 text-xs leading-relaxed mb-3">{item.desc}</p>
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="font-mono font-semibold text-stone-900 text-sm">{fmt(item.price)}</p>
-            <p className="text-[10px] text-stone-400 tracking-wide uppercase mt-0.5">Arc · USDC</p>
+          <div style={{flex:1}}>
+            <p style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontWeight:600,color:"#1c1917",margin:0,lineHeight:1.3}}>{item.name}</p>
+            <p style={{fontFamily:"'DM Mono',monospace",fontSize:13,color:"#c47d2a",margin:"4px 0 0"}}>{fmt(item.price)}</p>
           </div>
-          <button
-            onClick={()=>{onAdd(item);setAdded(true);setTimeout(()=>setAdded(false),1300);}}
-            className={`text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-all duration-300 ${added?"bg-amber-600 text-white":"bg-stone-900 hover:bg-stone-700 text-white"}`}>
-            {added?"✓ Added":"Add"}
+          <button onClick={onClose} style={{background:"#f5f3f0",border:"none",borderRadius:"50%",width:32,height:32,cursor:"pointer",fontSize:14,color:"#78716c",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+        </div>
+        {/* Body */}
+        <div style={{padding:"18px 20px"}}>
+          {/* Size */}
+          <div style={{marginBottom:16}}>
+            <p style={{fontFamily:"'Jost',sans-serif",fontSize:12,fontWeight:700,color:"#78716c",letterSpacing:1.2,textTransform:"uppercase",marginBottom:8}}>Size</p>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+              {sizes.map(s=>(
+                <button key={s} onClick={()=>setSize(s)} style={{padding:"6px 14px",borderRadius:8,border:`1.5px solid ${size===s?"#1c1917":"#e7e4e0"}`,background:size===s?"#1c1917":"#fff",color:size===s?"#fff":"#44403c",fontFamily:"'Jost',sans-serif",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all .15s"}}>
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Color */}
+          <div style={{marginBottom:16}}>
+            <p style={{fontFamily:"'Jost',sans-serif",fontSize:12,fontWeight:700,color:"#78716c",letterSpacing:1.2,textTransform:"uppercase",marginBottom:8}}>Color</p>
+            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+              {colors.map(c=>(
+                <button key={c} onClick={()=>setColor(c)} style={{padding:"6px 14px",borderRadius:8,border:`1.5px solid ${color===c?"#1c1917":"#e7e4e0"}`,background:color===c?"#1c1917":"#fff",color:color===c?"#fff":"#44403c",fontFamily:"'Jost',sans-serif",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all .15s"}}>
+                  {c}
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Qty */}
+          <div style={{marginBottom:20}}>
+            <p style={{fontFamily:"'Jost',sans-serif",fontSize:12,fontWeight:700,color:"#78716c",letterSpacing:1.2,textTransform:"uppercase",marginBottom:8}}>Quantity</p>
+            <div style={{display:"flex",alignItems:"center",gap:0,border:"1px solid #e7e4e0",borderRadius:10,overflow:"hidden",width:"fit-content"}}>
+              <button onClick={()=>setQty(q=>Math.max(1,q-1))} style={{width:40,height:40,border:"none",background:"#f5f3f0",cursor:"pointer",fontSize:16,color:"#44403c",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
+              <span style={{width:44,textAlign:"center",fontFamily:"'DM Mono',monospace",fontSize:14,fontWeight:600,color:"#1c1917"}}>{qty}</span>
+              <button onClick={()=>setQty(q=>q+1)} style={{width:40,height:40,border:"none",background:"#f5f3f0",cursor:"pointer",fontSize:16,color:"#44403c",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
+            </div>
+          </div>
+          <button onClick={()=>onSave({...item,qty,size,color})} style={{width:"100%",background:"#1c1917",color:"#fff",border:"none",borderRadius:10,padding:"13px",fontSize:12,fontWeight:700,cursor:"pointer",letterSpacing:1.5,textTransform:"uppercase",fontFamily:"'Jost',sans-serif",boxShadow:"0 4px 16px rgba(0,0,0,0.2)"}}>
+            Add to Cart — {fmt(item.price*qty)}
           </button>
         </div>
       </div>
@@ -212,61 +185,118 @@ function ProductCard({item,onAdd,agentPick}){
   );
 }
 
+/* ── Product Card (Jumia style) ─────────────────────────────────────────── */
+function ProductCard({item,onAdd,onEdit,agentPick}){
+  const [imgErr,setImgErr]=useState(false);
+  const [wishlist,setWishlist]=useState(false);
+  const pct=disc(item.price,item.oldPrice);
+  return(
+    <div style={{background:"#fff",border:"1px solid #e7e4e0",borderRadius:4,overflow:"hidden",cursor:"pointer",position:"relative",transition:"box-shadow .2s",fontFamily:"'Jost',sans-serif"}}
+      onMouseEnter={e=>e.currentTarget.style.boxShadow="0 4px 20px rgba(0,0,0,0.1)"}
+      onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
+      {/* Discount badge */}
+      <div style={{position:"absolute",top:8,left:8,background:"#c41e3a",color:"#fff",fontSize:10,fontWeight:700,padding:"3px 8px",borderRadius:3,zIndex:2,letterSpacing:0.5}}>
+        -{pct}%
+      </div>
+      {/* Wishlist */}
+      <button onClick={()=>setWishlist(w=>!w)} style={{position:"absolute",top:8,right:8,background:"rgba(255,255,255,0.9)",border:"none",borderRadius:"50%",width:30,height:30,cursor:"pointer",zIndex:2,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,boxShadow:"0 1px 4px rgba(0,0,0,0.1)"}}>
+        {wishlist?"❤️":"🤍"}
+      </button>
+      {/* AI Pick badge */}
+      {agentPick&&<div style={{position:"absolute",top:40,left:8,background:"#c47d2a",color:"#fff",fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,zIndex:2,letterSpacing:0.8,textTransform:"uppercase"}}>AI Pick</div>}
+      {/* Image */}
+      <div style={{height:180,background:"#f9f7f5",display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}}>
+        {!imgErr?(
+          <img src={item.img} alt={item.name} onError={()=>setImgErr(true)} style={{width:"100%",height:"100%",objectFit:"cover",transition:"transform .4s"}}
+            onMouseEnter={e=>e.target.style.transform="scale(1.06)"}
+            onMouseLeave={e=>e.target.style.transform="scale(1)"}/>
+        ):(
+          <span style={{fontSize:52}}>{item.emoji||"👕"}</span>
+        )}
+      </div>
+      {/* Info */}
+      <div style={{padding:"10px 12px 12px"}}>
+        <p style={{fontFamily:"'Jost',sans-serif",fontSize:13,fontWeight:500,color:"#1c1917",margin:"0 0 4px",lineHeight:1.3,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.name}</p>
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:2}}>
+          <span style={{fontFamily:"'DM Mono',monospace",fontSize:14,fontWeight:700,color:"#c41e3a"}}>{fmt(item.price)}</span>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}>
+          <span style={{fontFamily:"'DM Mono',monospace",fontSize:11,color:"#a8a29e",textDecoration:"line-through"}}>{fmt(item.oldPrice)}</span>
+          <span style={{fontSize:10,color:"#78716c"}}>{item.desc}</span>
+        </div>
+        {/* Buttons */}
+        <div style={{display:"flex",gap:6}}>
+          <button onClick={()=>onAdd(item)} style={{flex:1,background:"#f97316",color:"#fff",border:"none",borderRadius:4,padding:"8px 0",fontSize:11,fontWeight:700,cursor:"pointer",letterSpacing:0.8,textTransform:"uppercase",transition:"background .15s"}}
+            onMouseEnter={e=>e.currentTarget.style.background="#ea6c0a"}
+            onMouseLeave={e=>e.currentTarget.style.background="#f97316"}>
+            Add to Cart
+          </button>
+          <button onClick={()=>onEdit(item)} style={{width:36,background:"#f5f3f0",border:"1px solid #e7e4e0",borderRadius:4,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",transition:"background .15s",flexShrink:0}}
+            title="Edit options"
+            onMouseEnter={e=>e.currentTarget.style.background="#e7e4e0"}
+            onMouseLeave={e=>e.currentTarget.style.background="#f5f3f0"}>
+            ✏️
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Cart Drawer ─────────────────────────────────────────────────────────── */
 function CartDrawer({cart,onRemove,onCheckout,onClose,wallet}){
   const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
   return(
     <>
-      <div onClick={onClose} className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[1100]"/>
-      <aside className="fixed top-0 right-0 w-96 h-full bg-white z-[1200] flex flex-col shadow-2xl animate-[drawerIn_.28s_ease]">
-        <div className="flex items-center justify-between p-6 border-b border-stone-100">
+      <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.4)",zIndex:1100,backdropFilter:"blur(2px)"}}/>
+      <aside style={{position:"fixed",top:0,right:0,width:380,height:"100%",background:"#fff",zIndex:1200,display:"flex",flexDirection:"column",boxShadow:"-8px 0 40px rgba(0,0,0,0.12)",animation:"drawerIn .28s ease",fontFamily:"'Jost',sans-serif"}}>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 20px",borderBottom:"1px solid #f0ede8"}}>
           <div>
-            <h2 className="font-serif text-xl font-semibold text-stone-900">Shopping Bag</h2>
-            <p className="text-xs text-stone-400 mt-0.5">{cart.reduce((s,i)=>s+i.qty,0)} items</p>
+            <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:"#1c1917",margin:0}}>Your Cart</h2>
+            <p style={{fontSize:11,color:"#a8a29e",margin:"3px 0 0"}}>{cart.reduce((s,i)=>s+i.qty,0)} items</p>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 flex items-center justify-center text-sm transition-colors">✕</button>
+          <button onClick={onClose} style={{background:"#f5f3f0",border:"none",borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:14,color:"#78716c",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
         </div>
-        <div className="flex-1 overflow-y-auto p-5 space-y-3">
+        <div style={{flex:1,overflowY:"auto",padding:"14px 20px"}}>
           {cart.length===0?(
-            <div className="text-center pt-20">
-              <p className="text-4xl mb-3 opacity-20">🛒</p>
-              <p className="text-sm text-stone-400">Your bag is empty</p>
+            <div style={{textAlign:"center",paddingTop:80}}>
+              <p style={{fontSize:44,marginBottom:10,opacity:0.2}}>🛒</p>
+              <p style={{fontSize:13,color:"#a8a29e"}}>Your cart is empty</p>
             </div>
           ):cart.map(item=>(
-            <div key={item.id} className="flex gap-3 p-3 bg-stone-50 rounded-xl border border-stone-100">
-              <div className="w-14 h-14 rounded-lg overflow-hidden bg-stone-100 flex-shrink-0">
-                <img src={item.img} alt={item.name} onError={e=>e.target.style.display="none"} className="w-full h-full object-cover"/>
+            <div key={item.id+item.size+item.color} style={{display:"flex",gap:10,marginBottom:12,padding:10,background:"#faf9f7",borderRadius:8,border:"1px solid #f0ede8"}}>
+              <div style={{width:52,height:52,borderRadius:6,overflow:"hidden",background:"#f0ede8",flexShrink:0}}>
+                <img src={item.img} alt={item.name} style={{width:"100%",height:"100%",objectFit:"cover"}} onError={e=>e.target.style.display="none"}/>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-stone-900 truncate">{item.name}</p>
-                <p className="text-xs text-stone-400 mt-0.5">Qty {item.qty} · {fmt(item.price)}</p>
+              <div style={{flex:1,minWidth:0}}>
+                <p style={{fontFamily:"'Jost',sans-serif",fontSize:13,fontWeight:600,color:"#1c1917",margin:0,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.name}</p>
+                <p style={{fontSize:11,color:"#a8a29e",margin:"2px 0 0"}}>Qty {item.qty}{item.size?` · ${item.size}`:""}{item.color&&item.color!=="Default"?` · ${item.color}`:""}</p>
               </div>
-              <div className="text-right flex-shrink-0">
-                <p className="font-mono text-xs font-semibold text-stone-900">{fmt(item.price*item.qty)}</p>
-                <button onClick={()=>onRemove(item.id)} className="text-[10px] text-stone-400 hover:text-red-500 underline mt-1 block transition-colors">remove</button>
+              <div style={{textAlign:"right",flexShrink:0}}>
+                <p style={{fontFamily:"'DM Mono',monospace",fontSize:12,fontWeight:600,color:"#1c1917",margin:0}}>{fmt(item.price*item.qty)}</p>
+                <button onClick={()=>onRemove(item.id)} style={{background:"none",border:"none",color:"#a8a29e",cursor:"pointer",fontSize:10,marginTop:4,padding:0,textDecoration:"underline"}}>remove</button>
               </div>
             </div>
           ))}
         </div>
         {cart.length>0&&(
-          <div className="p-5 border-t border-stone-100 space-y-3">
-            <div className="space-y-1.5">
-              {[["Subtotal",fmt(total)],["Gas (USDC)","~0.001"]].map(([k,v])=>(
-                <div key={k} className="flex justify-between text-xs text-stone-400">
-                  <span>{k}</span><span className="font-mono">{v}</span>
-                </div>
-              ))}
-              <div className="flex justify-between text-base font-semibold text-stone-900 border-t border-stone-100 pt-2 mt-1">
-                <span>Total</span><span className="font-mono">{fmt(total)}</span>
+          <div style={{padding:"14px 20px 22px",borderTop:"1px solid #f0ede8"}}>
+            {[["Subtotal",fmt(total)],["Gas (USDC)","~0.001"]].map(([k,v])=>(
+              <div key={k} style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"#a8a29e",marginBottom:4}}>
+                <span>{k}</span><span style={{fontFamily:"'DM Mono',monospace"}}>{v}</span>
               </div>
+            ))}
+            <div style={{display:"flex",justifyContent:"space-between",fontSize:16,fontWeight:700,color:"#1c1917",borderTop:"1px solid #f0ede8",paddingTop:10,marginTop:6,marginBottom:14,fontFamily:"'Playfair Display',serif"}}>
+              <span>Total</span><span style={{fontFamily:"'DM Mono',monospace",fontSize:14}}>{fmt(total)}</span>
             </div>
-            <div className="flex items-center gap-2.5 bg-stone-900 rounded-xl p-3">
-              <div className="w-7 h-7 bg-amber-600 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0">◎</div>
+            <div style={{background:"#1c1917",borderRadius:10,padding:"9px 13px",marginBottom:12,display:"flex",alignItems:"center",gap:10}}>
+              <div style={{width:26,height:26,background:"#c47d2a",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:800,color:"#fff",flexShrink:0}}>◎</div>
               <div>
-                <p className="text-[9px] font-bold text-amber-400 tracking-widest uppercase">Arc Blockchain · USDC</p>
-                <p className="text-[9px] text-stone-500 mt-0.5">Sub-second finality · Circle L1</p>
+                <p style={{fontSize:9,fontWeight:700,color:"#c47d2a",letterSpacing:1.5,textTransform:"uppercase",margin:0}}>Arc Blockchain · USDC</p>
+                <p style={{fontSize:9,color:"#57534e",margin:"2px 0 0"}}>Sub-second finality · Circle L1</p>
               </div>
             </div>
-            <button onClick={onCheckout} className="w-full bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs tracking-widest uppercase py-3.5 rounded-xl transition-colors shadow-lg shadow-stone-900/20">
+            <button onClick={onCheckout} style={{width:"100%",background:"#f97316",color:"#fff",border:"none",borderRadius:10,padding:"13px",fontSize:12,fontWeight:700,cursor:"pointer",letterSpacing:1.5,textTransform:"uppercase",fontFamily:"'Jost',sans-serif",boxShadow:"0 4px 16px rgba(249,115,22,0.3)"}}>
               {wallet?"Pay with USDC on Arc →":"Connect Wallet to Pay →"}
             </button>
           </div>
@@ -276,127 +306,87 @@ function CartDrawer({cart,onRemove,onCheckout,onClose,wallet}){
   );
 }
 
-// ── Checkout Modal with Rabby + MetaMask fix ────────────────────────────────
+/* ── Checkout Modal ──────────────────────────────────────────────────────── */
 function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
   const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
   const [step,setStep]=useState("review");
   const [txHash,setTxHash]=useState("");
-
-  const pay = async () => {
-    if (!window.ethereum) {
-      addToast("No wallet detected. Please install Rabby or MetaMask", "error");
-      return;
-    }
+  const pay=async()=>{
+    if(!window.ethereum){addToast("No wallet detected","error");return;}
     setStep("signing");
-    try {
-      // Step 1 — check which chain we are on
-      const currentChain = await window.ethereum.request({ method: "eth_chainId" });
-
-      // Step 2 — only switch if not already on Arc
-      if (currentChain !== ARC_CHAIN_ID) {
-        try {
-          // Try adding the chain first (works for both Rabby and MetaMask)
-          await window.ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [ARC_CHAIN_CONFIG],
-          });
-        } catch (addErr) {
-          // If add fails, try switching directly
-          try {
-            await window.ethereum.request({
-              method: "wallet_switchEthereumChain",
-              params: [{ chainId: ARC_CHAIN_ID }],
-            });
-          } catch (switchErr) {
-            if (switchErr.code === 4001) {
-              addToast("Please approve the network switch in your wallet", "error");
-            } else {
-              addToast("Please add Arc Testnet manually in your wallet settings", "error");
-            }
-            setStep("review");
-            return;
+    try{
+      const currentChain=await window.ethereum.request({method:"eth_chainId"});
+      if(currentChain!==ARC_CHAIN_ID){
+        try{await window.ethereum.request({method:"wallet_addEthereumChain",params:[ARC_CHAIN_CONFIG]});}
+        catch(e){
+          try{await window.ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:ARC_CHAIN_ID}]});}
+          catch(se){
+            addToast(se.code===4001?"Please approve the network switch":"Add Arc Testnet manually in your wallet","error");
+            setStep("review");return;
           }
         }
       }
-
-      // Step 3 — send the USDC transaction
-      const amt = Math.round(total * 1e6);
-      const data = "0xa9059cbb" +
-        MERCHANT_ADDR.slice(2).padStart(64, "0") +
-        amt.toString(16).padStart(64, "0");
-
-      const hash = await window.ethereum.request({
-        method: "eth_sendTransaction",
-        params: [{ from: wallet, to: USDC_ADDRESS, data, gas: "0x186A0" }],
-      });
-
-      setTxHash(hash);
-      setStep("success");
-      onSuccess();
-      addToast("Payment confirmed on Arc!", "success");
-
-    } catch (err) {
-      if (err.code === 4001 || err.message?.includes("denied") || err.message?.includes("rejected")) {
-        addToast("Transaction cancelled", "error");
-      } else {
-        addToast("Error: " + (err.message || "Unknown error"), "error");
-      }
+      const amt=Math.round(total*1e6);
+      const data="0xa9059cbb"+MERCHANT_ADDR.slice(2).padStart(64,"0")+amt.toString(16).padStart(64,"0");
+      const hash=await window.ethereum.request({method:"eth_sendTransaction",params:[{from:wallet,to:USDC_ADDRESS,data,gas:"0x186A0"}]});
+      setTxHash(hash);setStep("success");onSuccess();addToast("Payment confirmed on Arc!","success");
+    }catch(err){
+      addToast(err.code===4001||err.message?.includes("denied")?"Transaction cancelled":"Error: "+(err.message||"Unknown"),"error");
       setStep("review");
     }
   };
-
   return(
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[2000] flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl w-[460px] max-w-full p-8 relative shadow-2xl animate-[modalIn_.3s_ease]">
-        <button onClick={onClose} className="absolute top-4 right-4 w-7 h-7 bg-stone-100 hover:bg-stone-200 rounded-full text-stone-500 flex items-center justify-center text-xs transition-colors">✕</button>
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.65)",zIndex:2000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,backdropFilter:"blur(4px)"}}>
+      <div style={{background:"#fff",borderRadius:16,width:460,maxWidth:"100%",padding:30,position:"relative",boxShadow:"0 32px 80px rgba(0,0,0,0.3)",animation:"modalIn .3s ease",fontFamily:"'Jost',sans-serif"}}>
+        <button onClick={onClose} style={{position:"absolute",top:12,right:12,background:"#f5f3f0",border:"none",borderRadius:8,width:30,height:30,cursor:"pointer",fontSize:13,color:"#78716c",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
         {step==="review"&&<>
-          <h2 className="font-serif text-2xl font-semibold text-stone-900 mb-1">Order Summary</h2>
-          <p className="text-xs text-stone-400 tracking-wide mb-5">Review before paying with USDC on Arc</p>
-          <div className="bg-stone-50 rounded-xl border border-stone-100 divide-y divide-stone-100 mb-5 max-h-36 overflow-y-auto">
+          <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#1c1917",margin:"0 0 3px"}}>Order Summary</h2>
+          <p style={{fontSize:11,color:"#a8a29e",margin:"0 0 16px",letterSpacing:0.3}}>Review before paying with USDC on Arc</p>
+          <div style={{background:"#faf9f7",borderRadius:10,border:"1px solid #f0ede8",marginBottom:16,maxHeight:140,overflowY:"auto"}}>
             {cart.map(i=>(
-              <div key={i.id} className="flex justify-between items-center px-4 py-2 text-sm">
-                <span className="text-stone-700">{i.name} <span className="text-stone-400">×{i.qty}</span></span>
-                <span className="font-mono text-xs text-stone-600">{fmt(i.price*i.qty)}</span>
+              <div key={i.id} style={{display:"flex",justifyContent:"space-between",padding:"6px 14px",borderBottom:"1px solid #f0ede8",fontSize:13,color:"#1c1917"}}>
+                <span>{i.name} <span style={{color:"#a8a29e"}}>×{i.qty}</span></span>
+                <span style={{fontFamily:"'DM Mono',monospace",fontSize:11}}>{fmt(i.price*i.qty)}</span>
               </div>
             ))}
           </div>
-          <div className="bg-stone-900 rounded-xl p-4 mb-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0">◎</div>
+          <div style={{background:"#1c1917",borderRadius:12,padding:"14px 16px",marginBottom:18}}>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+              <div style={{width:30,height:30,background:"#c47d2a",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"#fff",fontWeight:800,flexShrink:0}}>◎</div>
               <div>
-                <p className="text-sm font-semibold text-white">Arc Blockchain · USDC</p>
-                <p className="text-[9px] text-stone-500 tracking-widest uppercase mt-0.5">Circle L1 · EVM Compatible · Rabby & MetaMask</p>
+                <p style={{fontFamily:"'Playfair Display',serif",fontSize:14,fontWeight:700,color:"#fff",margin:0}}>Arc Blockchain · USDC</p>
+                <p style={{fontSize:9,color:"#57534e",letterSpacing:1.2,textTransform:"uppercase",margin:"2px 0 0"}}>Circle L1 · Rabby & MetaMask supported</p>
               </div>
             </div>
-            {[["Wallet",trunc(wallet)||"Not connected"],["Network","Arc Testnet"],["Gas","~0.001 USDC"]].map(([k,v])=>(
-              <div key={k} className="flex justify-between text-xs py-0.5">
-                <span className="text-stone-500">{k}</span><span className="font-mono text-stone-300">{v}</span>
+            {[["Wallet",trunc(wallet)||"Not connected"],["Network","Arc Testnet (5042002)"],["Gas","~0.001 USDC"]].map(([k,v])=>(
+              <div key={k} style={{display:"flex",justifyContent:"space-between",fontSize:11,marginBottom:3}}>
+                <span style={{color:"#57534e"}}>{k}</span><span style={{fontFamily:"'DM Mono',monospace",color:"#a8a29e"}}>{v}</span>
               </div>
             ))}
-            <div className="flex justify-between text-base font-semibold text-white border-t border-stone-700 pt-3 mt-2">
-              <span>Total</span><span className="font-mono text-amber-400">{fmt(total)}</span>
+            <div style={{display:"flex",justifyContent:"space-between",fontFamily:"'Playfair Display',serif",fontWeight:700,fontSize:16,color:"#fff",borderTop:"1px solid #292524",paddingTop:8,marginTop:6}}>
+              <span>Total</span><span style={{fontFamily:"'DM Mono',monospace",fontSize:13,color:"#c47d2a"}}>{fmt(total)}</span>
             </div>
           </div>
-          <div className="flex gap-3">
-            <button onClick={onClose} className="flex-1 bg-stone-100 hover:bg-stone-200 text-stone-600 text-xs font-bold tracking-widest uppercase py-3 rounded-xl transition-colors">Cancel</button>
-            <button onClick={pay} className="flex-[2] bg-stone-900 hover:bg-stone-800 text-white text-xs font-bold tracking-widest uppercase py-3 rounded-xl transition-colors shadow-lg">Pay {fmt(total)}</button>
+          <div style={{display:"flex",gap:10}}>
+            <button onClick={onClose} style={{flex:1,background:"#f5f3f0",border:"1px solid #e7e4e0",borderRadius:10,padding:"11px",fontSize:11,cursor:"pointer",color:"#78716c",letterSpacing:1.5,textTransform:"uppercase"}}>Cancel</button>
+            <button onClick={pay} style={{flex:2,background:"#f97316",color:"#fff",border:"none",borderRadius:10,padding:"11px",fontSize:11,fontWeight:700,cursor:"pointer",letterSpacing:1.5,textTransform:"uppercase",boxShadow:"0 4px 14px rgba(249,115,22,0.35)"}}>Pay {fmt(total)}</button>
           </div>
         </>}
         {step==="signing"&&(
-          <div className="text-center py-12">
-            <div className="text-4xl mb-4 inline-block animate-spin">⚡</div>
-            <h3 className="font-serif text-xl font-semibold text-stone-900 mb-2">Signing Transaction</h3>
-            <p className="text-sm text-stone-400">Approve in your wallet</p>
-            <p className="text-xs text-amber-600 tracking-widest uppercase mt-2">Arc finality &lt;1 second</p>
+          <div style={{textAlign:"center",padding:"44px 0"}}>
+            <div style={{fontSize:40,marginBottom:14,animation:"spin 1s linear infinite",display:"inline-block"}}>⚡</div>
+            <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#1c1917",marginBottom:6}}>Signing Transaction</h3>
+            <p style={{fontSize:12,color:"#a8a29e"}}>Approve in your wallet</p>
+            <p style={{fontSize:10,color:"#c47d2a",letterSpacing:1.5,textTransform:"uppercase",marginTop:6}}>Arc finality &lt;1 second</p>
           </div>
         )}
         {step==="success"&&(
-          <div className="text-center py-10">
-            <div className="w-16 h-16 bg-stone-900 rounded-full mx-auto mb-4 flex items-center justify-center text-amber-400 text-2xl">✓</div>
-            <h3 className="font-serif text-2xl font-semibold text-stone-900 mb-2">Payment Confirmed</h3>
-            <p className="text-sm text-stone-400 mb-4">Settled on Arc Blockchain</p>
-            {txHash&&<p className="text-[9px] font-mono text-stone-400 bg-stone-50 rounded-lg p-2 break-all mb-4 border border-stone-100">{txHash}</p>}
-            <button onClick={onClose} className="bg-stone-900 text-white text-xs font-bold tracking-widest uppercase px-8 py-3 rounded-xl hover:bg-stone-800 transition-colors">Continue Shopping</button>
+          <div style={{textAlign:"center",padding:"34px 0"}}>
+            <div style={{width:56,height:56,background:"#1c1917",borderRadius:"50%",margin:"0 auto 16px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,color:"#c47d2a"}}>✓</div>
+            <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:24,fontWeight:700,color:"#1c1917",marginBottom:5}}>Payment Confirmed</h3>
+            <p style={{fontSize:12,color:"#a8a29e",marginBottom:16}}>Settled on Arc Blockchain</p>
+            {txHash&&<p style={{fontSize:9,fontFamily:"'DM Mono',monospace",color:"#a8a29e",background:"#faf9f7",borderRadius:8,padding:"8px 12px",wordBreak:"break-all",marginBottom:16,border:"1px solid #f0ede8"}}>{txHash}</p>}
+            <button onClick={onClose} style={{background:"#1c1917",color:"#fff",border:"none",borderRadius:10,padding:"11px 28px",fontSize:11,fontWeight:700,cursor:"pointer",letterSpacing:1.5,textTransform:"uppercase"}}>Continue Shopping</button>
           </div>
         )}
       </div>
@@ -404,6 +394,7 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
   );
 }
 
+/* ── AI Agent Chat ────────────────────────────────────────────────────────── */
 function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClose}){
   const [msgs,setMsgs]=useState([{role:"assistant",text:"Hi! I'm your ArcWear AI agent 👋\n\nTell me what you're looking for — an outfit, a budget, an occasion — and I'll search, add items to your cart, and handle USDC checkout on Arc."}]);
   const [input,setInput]=useState("");
@@ -430,26 +421,19 @@ function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClo
       setCart(prev=>{const ex=prev.find(x=>x.id===p.id);if(ex)return prev.map(x=>x.id===p.id?{...x,qty:x.qty+(inp.quantity||1)}:x);return[...prev,{...p,qty:inp.quantity||1}];});
       setActiveSection(p.section);
       addToast(`✓ Agent added ${p.name}`,"agent");
-      return{success:true,added:p.name,price:p.price};
+      return{success:true,added:p.name};
     }
     if(name==="remove_from_cart"){setCart(p=>p.filter(x=>x.id!==inp.productId));return{success:true};}
-    if(name==="view_cart"){
-      const c=cartRef.current;
-      return{items:c.map(i=>({id:i.id,name:i.name,qty:i.qty,price:i.price})),total:c.reduce((s,i)=>s+i.price*i.qty,0).toFixed(2)};
-    }
+    if(name==="view_cart"){const c=cartRef.current;return{items:c.map(i=>({id:i.id,name:i.name,qty:i.qty,price:i.price})),total:c.reduce((s,i)=>s+i.price*i.qty,0).toFixed(2)};}
     if(name==="initiate_checkout"){setTimeout(()=>setCheckoutOpen(true),600);return{success:true};}
     return{error:"Unknown"};
   };
 
   const runAgent=async(apiMsgs)=>{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        model:"claude-sonnet-4-20250514",max_tokens:1000,
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,
         system:"You are ArcWear's AI shopping agent. Help users find and purchase clothing via USDC on Arc blockchain. Always use tools to act. When recommending outfits, search and add multiple items. Summarise additions with USDC totals. Sections: men, women, children. Categories: shirts, trousers, belts, caps, shoes.",
-        tools:AGENT_TOOLS,messages:apiMsgs,
-      }),
-    });
+        tools:AGENT_TOOLS,messages:apiMsgs})});
     const data=await res.json();
     let text="";const toolBlocks=[];
     for(const b of data.content||[]){if(b.type==="text")text+=b.text;if(b.type==="tool_use")toolBlocks.push(b);}
@@ -476,64 +460,62 @@ function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClo
 
   return(
     <>
-      <div onClick={onClose} className="fixed inset-0 z-[1300] bg-black/20 backdrop-blur-[2px]"/>
-      <div className="fixed bottom-6 right-6 w-96 h-[560px] bg-white rounded-2xl shadow-2xl z-[1400] flex flex-col overflow-hidden animate-[agentIn_.35s_cubic-bezier(.16,1,.3,1)]">
-        <div className="bg-stone-900 px-4 py-3 flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="w-9 h-9 bg-gradient-to-br from-amber-600 to-amber-400 rounded-xl flex items-center justify-center text-sm font-bold text-white">◎</div>
-              <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-400 rounded-full border-2 border-stone-900"/>
+      <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:1300,background:"rgba(0,0,0,0.2)"}}/>
+      <div style={{position:"fixed",bottom:24,right:24,width:385,height:565,background:"#fff",borderRadius:20,boxShadow:"0 24px 72px rgba(0,0,0,0.2)",zIndex:1400,display:"flex",flexDirection:"column",overflow:"hidden",animation:"agentIn .35s cubic-bezier(.16,1,.3,1)",fontFamily:"'Jost',sans-serif"}}>
+        {/* Header */}
+        <div style={{background:"#1c1917",padding:"12px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <div style={{position:"relative"}}>
+              <div style={{width:34,height:34,background:"linear-gradient(135deg,#c47d2a,#e8a849)",borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:800,color:"#fff"}}>◎</div>
+              <div style={{position:"absolute",bottom:-1,right:-1,width:10,height:10,background:"#22c55e",borderRadius:"50%",border:"2px solid #1c1917"}}/>
             </div>
             <div>
-              <p className="text-sm font-semibold text-white leading-none">ArcWear Agent</p>
-              <p className="text-[9px] text-amber-400 tracking-widest uppercase mt-0.5">AI · USDC · Arc Blockchain</p>
+              <p style={{fontSize:14,fontWeight:700,color:"#fff",margin:0,lineHeight:1}}>ArcWear Agent</p>
+              <p style={{fontSize:8,color:"#c47d2a",letterSpacing:1.5,textTransform:"uppercase",margin:"2px 0 0"}}>AI · USDC · Arc Blockchain</p>
             </div>
           </div>
-          <button onClick={onClose} className="w-6 h-6 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-400 flex items-center justify-center text-xs transition-colors">✕</button>
+          <button onClick={onClose} style={{background:"rgba(255,255,255,0.08)",border:"none",borderRadius:8,color:"#78716c",width:26,height:26,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
         </div>
+        {/* Tool ticker */}
         {tools.length>0&&(
-          <div className="bg-stone-50 border-b border-stone-100 px-4 py-1.5 flex gap-2 items-center flex-shrink-0">
-            <span className="text-amber-500 text-[8px] font-bold animate-pulse">●</span>
-            {tools.map((t,i)=><span key={i} className="bg-amber-50 border border-amber-200 text-amber-700 rounded-full px-2.5 py-0.5 text-[9px] font-bold tracking-wide uppercase">⚡ {t.replace(/_/g," ")}</span>)}
+          <div style={{background:"#faf9f7",borderBottom:"1px solid #f0ede8",padding:"5px 14px",display:"flex",gap:6,alignItems:"center",flexShrink:0}}>
+            <span style={{fontSize:8,color:"#c47d2a",fontWeight:700,animation:"pulse .8s infinite"}}>●</span>
+            {tools.map((t,i)=><span key={i} style={{background:"#fef3c7",border:"1px solid #fde68a",borderRadius:20,padding:"2px 9px",fontSize:8,color:"#92400e",letterSpacing:1,textTransform:"uppercase",fontWeight:700}}>⚡ {t.replace(/_/g," ")}</span>)}
           </div>
         )}
-        <div className="flex-1 overflow-y-scroll p-4 space-y-3 agent-scroll">
+        {/* Messages */}
+        <div style={{flex:1,overflowY:"scroll",padding:"13px 14px",display:"flex",flexDirection:"column",gap:10,scrollbarWidth:"thin",scrollbarColor:"#c8c0b5 #f5f3f0"}}>
           {msgs.map((m,i)=>(
-            <div key={i} className={`flex gap-2 items-end ${m.role==="user"?"flex-row-reverse":""}`}>
-              {m.role==="assistant"&&(
-                <div className="w-7 h-7 bg-gradient-to-br from-amber-600 to-amber-400 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0">◎</div>
-              )}
-              <div className={`px-3.5 py-2.5 rounded-2xl max-w-[80%] text-sm leading-relaxed whitespace-pre-wrap break-words ${m.role==="user"?"bg-stone-900 text-white rounded-br-sm":"bg-stone-50 border border-stone-100 text-stone-800 rounded-bl-sm"}`}>
+            <div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start",gap:8,alignItems:"flex-end"}}>
+              {m.role==="assistant"&&<div style={{width:26,height:26,background:"linear-gradient(135deg,#c47d2a,#e8a849)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"#fff",fontWeight:800,flexShrink:0}}>◎</div>}
+              <div style={{background:m.role==="user"?"#1c1917":"#faf9f7",color:m.role==="user"?"#fff":"#1c1917",border:m.role==="user"?"none":"1px solid #f0ede8",borderRadius:m.role==="user"?"16px 16px 4px 16px":"4px 16px 16px 16px",padding:"10px 13px",maxWidth:"80%",fontSize:13,lineHeight:1.6,whiteSpace:"pre-wrap",wordBreak:"break-word"}}>
                 {m.text}
               </div>
-              {m.role==="user"&&<div className="w-7 h-7 bg-stone-200 rounded-lg flex items-center justify-center text-xs font-semibold text-stone-600 flex-shrink-0">U</div>}
+              {m.role==="user"&&<div style={{width:26,height:26,background:"#e7e4e0",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,color:"#78716c",fontWeight:700,flexShrink:0}}>U</div>}
             </div>
           ))}
           {loading&&(
-            <div className="flex gap-2 items-end">
-              <div className="w-7 h-7 bg-gradient-to-br from-amber-600 to-amber-400 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0">◎</div>
-              <div className="bg-stone-50 border border-stone-100 rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1.5">
-                {[0,1,2].map(i=><div key={i} style={{animationDelay:`${i*0.18}s`}} className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce"/>)}
+            <div style={{display:"flex",gap:8,alignItems:"flex-end"}}>
+              <div style={{width:26,height:26,background:"linear-gradient(135deg,#c47d2a,#e8a849)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"#fff",fontWeight:800}}>◎</div>
+              <div style={{background:"#faf9f7",border:"1px solid #f0ede8",borderRadius:"4px 16px 16px 16px",padding:"10px 14px",display:"flex",gap:5}}>
+                {[0,1,2].map(i=><div key={i} style={{width:7,height:7,background:"#c47d2a",borderRadius:"50%",animation:`bounce 1.1s ${i*0.18}s infinite`}}/>)}
               </div>
             </div>
           )}
           <div ref={bottomRef}/>
         </div>
+        {/* Chips */}
         {msgs.length<=1&&(
-          <div className="px-4 pb-2 flex flex-wrap gap-1.5 flex-shrink-0">
-            {CHIPS.map((c,i)=>(
-              <button key={i} onClick={()=>setInput(c)} className="bg-stone-50 hover:border-amber-400 border border-stone-200 rounded-full px-3 py-1 text-[10px] text-stone-600 cursor-pointer transition-colors">
-                {c}
-              </button>
-            ))}
+          <div style={{padding:"0 13px 10px",display:"flex",flexWrap:"wrap",gap:5,flexShrink:0}}>
+            {CHIPS.map((c,i)=><button key={i} onClick={()=>setInput(c)} style={{background:"#faf9f7",border:"1px solid #e7e4e0",borderRadius:20,padding:"4px 11px",fontSize:10,color:"#78716c",cursor:"pointer",fontFamily:"'Jost',sans-serif"}}>{c}</button>)}
           </div>
         )}
-        <div className="p-3 border-t border-stone-100 flex gap-2 flex-shrink-0">
-          <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()}
-            placeholder="Ask about outfits, budgets, styles…"
-            className="flex-1 bg-stone-50 border border-stone-200 focus:border-amber-400 focus:outline-none rounded-xl px-3 py-2 text-sm text-stone-900 placeholder-stone-400 transition-colors"/>
-          <button onClick={send} disabled={loading||!input.trim()}
-            className={`px-4 rounded-xl text-xs font-bold tracking-widest uppercase text-white transition-colors ${loading||!input.trim()?"bg-stone-300 cursor-not-allowed":"bg-stone-900 hover:bg-stone-700"}`}>
+        {/* Input */}
+        <div style={{padding:"9px 13px 14px",borderTop:"1px solid #f0ede8",display:"flex",gap:8,flexShrink:0}}>
+          <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="Ask about outfits, budgets, styles…"
+            style={{flex:1,background:"#faf9f7",border:"1px solid #e7e4e0",borderRadius:10,padding:"9px 13px",fontSize:12,color:"#1c1917",outline:"none",fontFamily:"'Jost',sans-serif"}}
+            onFocus={e=>e.target.style.borderColor="#c47d2a"} onBlur={e=>e.target.style.borderColor="#e7e4e0"}/>
+          <button onClick={send} disabled={loading||!input.trim()} style={{background:loading||!input.trim()?"#e7e4e0":"#1c1917",color:"#fff",border:"none",borderRadius:10,padding:"0 16px",fontSize:10,fontWeight:700,cursor:loading||!input.trim()?"not-allowed":"pointer",letterSpacing:1.2,textTransform:"uppercase"}}>
             {loading?"…":"Send"}
           </button>
         </div>
@@ -542,6 +524,7 @@ function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClo
   );
 }
 
+/* ── Main App ─────────────────────────────────────────────────────────────── */
 export default function ArcWear(){
   const [section,setSection]    =useState("men");
   const [activeCat,setActiveCat]=useState(null);
@@ -552,6 +535,7 @@ export default function ArcWear(){
   const [wallet,setWallet]      =useState(null);
   const [toasts,setToasts]      =useState([]);
   const [scrolled,setScrolled]  =useState(false);
+  const [editItem,setEditItem]  =useState(null);
 
   useEffect(()=>{
     const h=()=>setScrolled(window.scrollY>50);
@@ -566,17 +550,20 @@ export default function ArcWear(){
   };
 
   const connectWallet=async()=>{
-    if(!window.ethereum){addToast("Install Rabby or MetaMask to connect","error");return;}
-    try{
-      const a=await window.ethereum.request({method:"eth_requestAccounts"});
-      setWallet(a[0]);
-      addToast(`Connected: ${trunc(a[0])}`,"success");
-    }catch{addToast("Connection cancelled","error");}
+    if(!window.ethereum){addToast("Install Rabby or MetaMask","error");return;}
+    try{const a=await window.ethereum.request({method:"eth_requestAccounts"});setWallet(a[0]);addToast(`Connected: ${trunc(a[0])}`,"success");}
+    catch{addToast("Connection cancelled","error");}
   };
 
   const addToCart=item=>{
     setCart(prev=>{const ex=prev.find(x=>x.id===item.id);if(ex)return prev.map(x=>x.id===item.id?{...x,qty:x.qty+1}:x);return[...prev,{...item,qty:1}];});
-    addToast(`${item.name} added to bag`,"success");
+    addToast(`${item.name} added`,"success");
+  };
+
+  const addToCartWithOptions=item=>{
+    setCart(prev=>{const ex=prev.find(x=>x.id===item.id&&x.size===item.size&&x.color===item.color);if(ex)return prev.map(x=>x.id===item.id&&x.size===item.size&&x.color===item.color?{...x,qty:x.qty+item.qty}:x);return[...prev,item];});
+    addToast(`${item.name} (${item.size}, ${item.color}) added`,"success");
+    setEditItem(null);
   };
 
   const cartCount=cart.reduce((s,i)=>s+i.qty,0);
@@ -585,103 +572,130 @@ export default function ArcWear(){
   const displayCats=activeCat?cats.filter(([k])=>k===activeCat):cats;
 
   return(
-    <div className="min-h-screen bg-[#F8F5F0]">
+    <div style={{minHeight:"100vh",background:"#fff",fontFamily:"'Jost',sans-serif"}}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap');
-        .font-serif { font-family: 'Playfair Display', serif !important; }
-        .font-mono  { font-family: 'DM Mono', monospace !important; }
-        @keyframes toastIn   { from{transform:translateY(14px);opacity:0} to{transform:none;opacity:1} }
-        @keyframes drawerIn  { from{transform:translateX(100%)} to{transform:none} }
-        @keyframes modalIn   { from{transform:scale(.96);opacity:0} to{transform:none;opacity:1} }
-        @keyframes agentIn   { from{transform:scale(.93) translateY(18px);opacity:0} to{transform:none;opacity:1} }
-        @keyframes heroFade  { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
-        @keyframes glow      { 0%,100%{box-shadow:0 0 0 0 rgba(180,140,80,.5)} 60%{box-shadow:0 0 0 12px rgba(180,140,80,0)} }
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Jost:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+        *{box-sizing:border-box;margin:0;padding:0;}
+        @keyframes toastIn{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+        @keyframes drawerIn{from{transform:translateX(100%)}to{transform:none}}
+        @keyframes modalIn{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+        @keyframes agentIn{from{transform:scale(.94) translateY(16px);opacity:0}to{transform:none;opacity:1}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+        @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,.45)}60%{box-shadow:0 0 0 12px rgba(249,115,22,0)}}
         ::-webkit-scrollbar{width:4px}
-        ::-webkit-scrollbar-track{background:#F8F5F0}
-        ::-webkit-scrollbar-thumb{background:#D9D0C4;border-radius:4px}
-        .agent-scroll::-webkit-scrollbar{width:6px}
-        .agent-scroll::-webkit-scrollbar-track{background:#f1ede8;border-radius:6px;margin:6px 0}
-        .agent-scroll::-webkit-scrollbar-thumb{background:#b8a898;border-radius:6px;border:1px solid #f1ede8}
-        .agent-scroll::-webkit-scrollbar-thumb:hover{background:#9a7b4f}
-        .agent-scroll{scrollbar-width:thin;scrollbar-color:#b8a898 #f1ede8}
+        ::-webkit-scrollbar-track{background:#faf9f7}
+        ::-webkit-scrollbar-thumb{background:#d4cfc8;border-radius:4px}
       `}</style>
 
-      {/* NAVBAR */}
-      <nav className={`sticky top-0 z-[900] transition-all duration-300 ${scrolled?"bg-[#F8F5F0]/95 backdrop-blur-xl border-b border-stone-200 shadow-sm":"bg-[#F8F5F0]"}`}>
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-stone-900 rounded-xl flex items-center justify-center flex-shrink-0">
-              <span className="font-serif text-xs font-bold text-amber-500 tracking-wider">AW</span>
+      {/* ── TOP BAR ── */}
+      <div style={{background:"#1c1917",padding:"6px 0",textAlign:"center"}}>
+        <p style={{fontSize:11,color:"#fde68a",letterSpacing:0.5,fontFamily:"'Jost',sans-serif"}}>
+          🎉 Free shipping on orders over 150 USDC · Pay with USDC on Arc Blockchain
+        </p>
+      </div>
+
+      {/* ── NAVBAR ── */}
+      <nav style={{
+        position:"sticky",top:0,zIndex:900,
+        background: scrolled?"rgba(255,255,255,0.97)":"#fff",
+        backdropFilter: scrolled?"blur(12px)":"none",
+        borderBottom:"1px solid #e7e4e0",
+        boxShadow: scrolled?"0 2px 16px rgba(0,0,0,0.06)":"none",
+        transition:"all .3s",
+      }}>
+        <div style={{maxWidth:1280,margin:"0 auto",padding:"0 24px",height:64,display:"flex",alignItems:"center",justifyContent:"space-between",gap:16}}>
+          {/* Logo */}
+          <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
+            <div style={{width:36,height:36,background:"#1c1917",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <span style={{fontFamily:"'Playfair Display',serif",fontSize:12,fontWeight:700,color:"#c47d2a",letterSpacing:0.5}}>AW</span>
             </div>
             <div>
-              <p className="font-serif text-base font-bold text-stone-900 leading-none tracking-wide">ArcWear</p>
-              <p className="text-[7px] text-amber-600 font-semibold tracking-[2px] uppercase mt-0.5">Agentic · Arc Blockchain</p>
+              <p style={{fontFamily:"'Playfair Display',serif",fontSize:16,fontWeight:700,color:"#1c1917",lineHeight:1,letterSpacing:0.5}}>ArcWear</p>
+              <p style={{fontSize:7,color:"#c47d2a",fontWeight:600,letterSpacing:2,textTransform:"uppercase",marginTop:1}}>Agentic · Arc Blockchain</p>
             </div>
           </div>
-          <div className="flex gap-1 bg-stone-100 rounded-xl p-1">
+
+          {/* Section Tabs */}
+          <div style={{display:"flex",gap:1,background:"#f5f3f0",borderRadius:10,padding:3}}>
             {["men","women","children"].map(k=>{
               const s=CATALOGUE[k];
               return(
-                <button key={k} onClick={()=>{setSection(k);setActiveCat(null);}}
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${section===k?"bg-white text-stone-900 shadow-sm":"text-stone-500 hover:text-stone-700"}`}>
-                  <span className="text-sm">{s.icon}</span>{s.label}
+                <button key={k} onClick={()=>{setSection(k);setActiveCat(null);}} style={{
+                  background:section===k?"#fff":"transparent",
+                  color:section===k?"#1c1917":"#78716c",
+                  border:"none",cursor:"pointer",padding:"7px 16px",borderRadius:8,
+                  fontFamily:"'Jost',sans-serif",fontSize:12,fontWeight:600,
+                  boxShadow:section===k?"0 1px 8px rgba(0,0,0,0.08)":"none",
+                  transition:"all .2s",display:"flex",alignItems:"center",gap:5,
+                }}>
+                  <span style={{fontSize:14}}>{s.icon}</span>{s.label}
                 </button>
               );
             })}
           </div>
-          <div className="flex items-center gap-2">
+
+          {/* Actions */}
+          <div style={{display:"flex",gap:8,alignItems:"center"}}>
             {wallet?(
-              <div className="flex items-center gap-1.5 bg-white border border-stone-200 rounded-full px-3 py-1.5">
-                <div className="w-1.5 h-1.5 bg-green-400 rounded-full"/>
-                <span className="font-mono text-[9px] text-amber-600">{trunc(wallet)}</span>
+              <div style={{display:"flex",alignItems:"center",gap:5,background:"#faf9f7",border:"1px solid #e7e4e0",borderRadius:20,padding:"5px 10px"}}>
+                <div style={{width:6,height:6,background:"#22c55e",borderRadius:"50%"}}/>
+                <span style={{fontFamily:"'DM Mono',monospace",fontSize:9,color:"#c47d2a"}}>{trunc(wallet)}</span>
               </div>
             ):(
-              <button onClick={connectWallet}
-                className="flex items-center gap-1.5 bg-white hover:border-amber-400 border border-stone-200 rounded-full px-4 py-2 text-xs font-semibold text-stone-700 transition-all hover:shadow-sm">
+              <button onClick={connectWallet} style={{background:"#fff",color:"#1c1917",border:"1px solid #e7e4e0",borderRadius:20,padding:"7px 14px",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Jost',sans-serif",display:"flex",alignItems:"center",gap:5,transition:"border-color .15s"}}
+                onMouseEnter={e=>e.currentTarget.style.borderColor="#c47d2a"}
+                onMouseLeave={e=>e.currentTarget.style.borderColor="#e7e4e0"}>
                 <span>◎</span> Connect Wallet
               </button>
             )}
-            <button onClick={()=>setCartOpen(true)}
-              className="flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-white rounded-full px-4 py-2 text-xs font-bold tracking-wide transition-all shadow-lg shadow-stone-900/20">
-              🛍 Bag
-              {cartCount>0&&<span className="bg-amber-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[9px] font-black">{cartCount}</span>}
+            {/* CART with icon */}
+            <button onClick={()=>setCartOpen(true)} style={{background:"#f97316",color:"#fff",border:"none",borderRadius:20,padding:"8px 16px",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Jost',sans-serif",display:"flex",alignItems:"center",gap:6,boxShadow:"0 2px 12px rgba(249,115,22,0.3)",transition:"all .15s"}}
+              onMouseEnter={e=>{e.currentTarget.style.background="#ea6c0a";e.currentTarget.style.transform="translateY(-1px)";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="#f97316";e.currentTarget.style.transform="none";}}>
+              🛒 Cart
+              {cartCount>0&&<span style={{background:"#fff",color:"#f97316",borderRadius:"50%",width:18,height:18,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:800}}>{cartCount}</span>}
             </button>
           </div>
         </div>
       </nav>
 
-      {/* HERO */}
-      <section className="bg-stone-900 px-6 py-14 relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none" style={{background:"radial-gradient(circle at 18% 52%, rgba(154,123,79,0.14) 0%, transparent 58%), radial-gradient(circle at 82% 18%, rgba(196,164,124,0.07) 0%, transparent 50%)"}}/>
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between flex-wrap gap-8" style={{animation:"heroFade .6s ease both"}}>
-            <div className="max-w-lg">
-              <div className="inline-flex items-center gap-2 bg-amber-900/30 border border-amber-700/30 rounded-full px-3 py-1 mb-4">
-                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"/>
-                <span className="text-[9px] text-amber-400 font-bold tracking-[2px] uppercase">AI Agent · Live on Arc</span>
+      {/* ── HERO ── */}
+      <section style={{background:"#1c1917",padding:"44px 24px 38px",position:"relative",overflow:"hidden"}}>
+        <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(circle at 15% 50%, rgba(196,125,42,0.15) 0%, transparent 55%), radial-gradient(circle at 85% 20%, rgba(249,115,22,0.08) 0%, transparent 50%)",pointerEvents:"none"}}/>
+        <div style={{maxWidth:1280,margin:"0 auto",position:"relative"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:24}}>
+            <div style={{maxWidth:520}}>
+              <div style={{display:"inline-flex",alignItems:"center",gap:7,background:"rgba(249,115,22,0.15)",border:"1px solid rgba(249,115,22,0.25)",borderRadius:20,padding:"4px 12px",marginBottom:14}}>
+                <div style={{width:5,height:5,background:"#22c55e",borderRadius:"50%",animation:"pulse 2s infinite"}}/>
+                <span style={{fontSize:9,color:"#fb923c",fontWeight:700,letterSpacing:2,textTransform:"uppercase"}}>AI Agent · Live on Arc</span>
               </div>
-              <h1 className="font-serif text-4xl md:text-5xl font-bold text-white leading-tight mb-3">
+              <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(28px,4vw,48px)",fontWeight:700,color:"#fff",lineHeight:1.15,marginBottom:10}}>
                 Shop with ArcWear
               </h1>
-              <p className="text-stone-400 text-sm leading-relaxed mb-6">
+              <p style={{fontSize:13,color:"#78716c",lineHeight:1.65,marginBottom:22}}>
                 {sec.label}'s collection — shirts, trousers, belts, headwear & footwear · Pay with USDC on Arc Blockchain
               </p>
-              <div className="flex gap-3 flex-wrap">
-                <button onClick={()=>setAgent(true)}
-                  className="flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold tracking-wide shadow-lg shadow-amber-900/30 transition-all hover:-translate-y-0.5">
+              <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+                <button onClick={()=>setAgent(true)} style={{background:"#f97316",color:"#fff",border:"none",borderRadius:10,padding:"11px 22px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Jost',sans-serif",boxShadow:"0 6px 20px rgba(249,115,22,0.3)",display:"flex",alignItems:"center",gap:7,transition:"all .15s"}}
+                  onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"}
+                  onMouseLeave={e=>e.currentTarget.style.transform="none"}>
                   ◎ Shop with AI Agent
                 </button>
-                <button onClick={()=>document.getElementById("products")?.scrollIntoView({behavior:"smooth"})}
-                  className="text-stone-300 hover:text-white border border-stone-700 hover:border-stone-500 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all">
+                <button onClick={()=>document.getElementById("products")?.scrollIntoView({behavior:"smooth"})} style={{color:"#d4cfc8",border:"1px solid #44403c",background:"transparent",borderRadius:10,padding:"11px 22px",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Jost',sans-serif",transition:"all .15s"}}
+                  onMouseEnter={e=>e.currentTarget.style.borderColor="#78716c"}
+                  onMouseLeave={e=>e.currentTarget.style.borderColor="#44403c"}>
                   Browse Collection ↓
                 </button>
               </div>
             </div>
-            <div className="flex gap-6 flex-wrap" style={{animation:"heroFade .8s .12s ease both",opacity:0}}>
+            {/* Stats */}
+            <div style={{display:"flex",gap:20,flexWrap:"wrap"}}>
               {[["5","Categories"],["25+","Products"],["USDC","Payment"],["Arc","Blockchain"]].map(([v,l])=>(
-                <div key={l} className="text-center">
-                  <p className="font-serif text-2xl font-bold text-white">{v}</p>
-                  <p className="text-[9px] text-stone-500 tracking-[1.5px] uppercase mt-1">{l}</p>
+                <div key={l} style={{textAlign:"center"}}>
+                  <p style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#fff",lineHeight:1}}>{v}</p>
+                  <p style={{fontSize:9,color:"#57534e",letterSpacing:1.5,textTransform:"uppercase",marginTop:3}}>{l}</p>
                 </div>
               ))}
             </div>
@@ -689,80 +703,81 @@ export default function ArcWear(){
         </div>
       </section>
 
-      {/* FILTER BAR */}
-      <div className="bg-white border-b border-stone-100 sticky top-16 z-[800]">
-        <div className="max-w-7xl mx-auto px-6 h-12 flex items-center justify-between">
-          <div className="flex gap-2 overflow-x-auto py-2">
-            <button onClick={()=>setActiveCat(null)}
-              className={`px-3.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase border transition-all whitespace-nowrap ${!activeCat?"bg-stone-900 text-white border-stone-900":"bg-stone-50 text-stone-500 border-stone-200 hover:border-stone-400"}`}>
-              All
-            </button>
-            {cats.map(([k,cat])=>(
-              <button key={k} onClick={()=>setActiveCat(activeCat===k?null:k)}
-                className={`flex items-center gap-1 px-3.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase border transition-all whitespace-nowrap ${activeCat===k?"bg-stone-900 text-white border-stone-900":"bg-stone-50 text-stone-500 border-stone-200 hover:border-stone-400"}`}>
-                <span className="text-sm">{cat.emoji||"🏷"}</span>{cat.label}
+      {/* ── FILTER BAR ── */}
+      <div style={{background:"#fff",borderBottom:"1px solid #e7e4e0",position:"sticky",top:64,zIndex:800}}>
+        <div style={{maxWidth:1280,margin:"0 auto",padding:"0 24px",height:48,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+          <div style={{display:"flex",gap:6,overflowX:"auto",padding:"4px 0"}}>
+            {[["all","All"],["shirts","Shirts"],["trousers","Trousers"],["belts","Belts"],["caps","Headwear"],["shoes","Footwear"]].map(([k,label])=>(
+              <button key={k} onClick={()=>setActiveCat(k==="all"?null:k)}
+                style={{background:(k==="all"&&!activeCat)||(activeCat===k)?"#1c1917":"#f5f3f0",color:(k==="all"&&!activeCat)||(activeCat===k)?"#fff":"#78716c",border:`1px solid ${(k==="all"&&!activeCat)||(activeCat===k)?"#1c1917":"#e7e4e0"}`,borderRadius:20,padding:"4px 14px",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Jost',sans-serif",whiteSpace:"nowrap",transition:"all .15s"}}>
+                {label}
               </button>
             ))}
           </div>
-          <p className="text-xs text-stone-400 flex-shrink-0 ml-4">
+          <p style={{fontSize:11,color:"#a8a29e",flexShrink:0,marginLeft:12}}>
             {displayCats.reduce((s,[,c])=>s+c.items.length,0)} items
           </p>
         </div>
       </div>
 
-      {/* PRODUCTS */}
-      <main id="products" className="max-w-7xl mx-auto px-6 py-10 pb-24">
+      {/* ── PRODUCTS ── */}
+      <main id="products" style={{maxWidth:1280,margin:"0 auto",padding:"24px 24px 80px"}}>
         {displayCats.map(([catKey,cat])=>(
-          <section key={catKey} className="mb-12">
-            <div className="flex items-center gap-3 mb-5">
-              <span className="text-xl">{cat.emoji}</span>
-              <h2 className="font-serif text-xl font-semibold text-stone-900">{cat.label}</h2>
-              <div className="flex-1 h-px bg-stone-200"/>
-              <span className="text-xs text-stone-400">{cat.items.length} products</span>
+          <section key={catKey} style={{marginBottom:40}}>
+            {/* Section header */}
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14,paddingBottom:10,borderBottom:"2px solid #f5f3f0"}}>
+              <span style={{fontSize:20}}>{cat.emoji}</span>
+              <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:"#1c1917"}}>{cat.label}</h2>
+              <div style={{flex:1,height:1,background:"#f0ede8"}}/>
+              <span style={{fontSize:11,color:"#a8a29e"}}>{cat.items.length} products</span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
+            {/* Jumia-style grid */}
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(185px,1fr))",gap:1,border:"1px solid #e7e4e0",borderRadius:4,overflow:"hidden"}}>
               {cat.items.map(item=>(
-                <ProductCard key={item.id} item={{...item,categoryLabel:cat.label}} onAdd={addToCart} agentPick={false}/>
+                <ProductCard key={item.id} item={{...item,categoryLabel:cat.label}} onAdd={addToCart} onEdit={setEditItem} agentPick={false}/>
               ))}
             </div>
           </section>
         ))}
-        <div className="bg-stone-900 rounded-2xl p-8 flex items-center flex-wrap gap-6 mt-4 border border-stone-800">
-          <div className="flex-1 min-w-48">
-            <h3 className="font-serif text-lg font-semibold text-white mb-1.5">Powered by Arc Blockchain</h3>
-            <p className="text-xs text-stone-500 leading-relaxed">AI shopping agent · USDC stablecoin · Circle's Arc L1 · Sub-second settlement · Non-custodial</p>
+
+        {/* Arc Banner */}
+        <div style={{background:"#1c1917",borderRadius:12,padding:"24px 28px",display:"flex",alignItems:"center",flexWrap:"wrap",gap:20,marginTop:8,border:"1px solid #292524"}}>
+          <div style={{flex:1,minWidth:200}}>
+            <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:17,fontWeight:700,color:"#fff",marginBottom:5}}>Powered by Arc Blockchain</h3>
+            <p style={{fontSize:11,color:"#57534e",lineHeight:1.7,margin:0}}>AI shopping agent · USDC stablecoin · Circle's Arc L1 · Sub-second settlement · Non-custodial</p>
           </div>
-          <div className="flex gap-6 flex-wrap">
+          <div style={{display:"flex",gap:20,flexWrap:"wrap"}}>
             {[["◎","AI Agent","Autonomous"],["⚡","<1s","Finality"],["$","USDC","Stablecoin"],["🔒","Non","Custodial"]].map(([ic,a,b])=>(
-              <div key={b} className="text-center">
-                <p className="text-lg mb-1">{ic}</p>
-                <p className="text-xs font-semibold text-white">{a}</p>
-                <p className="text-[9px] text-stone-600 uppercase tracking-widest mt-0.5">{b}</p>
+              <div key={b} style={{textAlign:"center"}}>
+                <p style={{fontSize:18,marginBottom:4}}>{ic}</p>
+                <p style={{fontSize:11,fontWeight:700,color:"#fff"}}>{a}</p>
+                <p style={{fontSize:8,color:"#44403c",letterSpacing:1,textTransform:"uppercase",marginTop:2}}>{b}</p>
               </div>
             ))}
           </div>
         </div>
       </main>
 
-      {/* FLOATING BUTTONS */}
+      {/* ── FLOATING BUTTONS ── */}
       {!agentOpen&&(
-        <button onClick={()=>setAgent(true)}
-          className="fixed bottom-7 right-7 flex items-center gap-2.5 bg-stone-900 text-white border-2 border-amber-600 rounded-full px-5 py-3 text-xs font-bold tracking-wide z-[700] shadow-xl transition-transform hover:scale-105"
-          style={{animation:"glow 3s ease-in-out infinite"}}>
-          <div className="relative w-2 h-2">
-            <div className="w-2 h-2 bg-green-400 rounded-full"/>
-            <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-60"/>
+        <button onClick={()=>setAgent(true)} style={{position:"fixed",bottom:28,right:28,background:"#1c1917",color:"#fff",border:"2px solid #f97316",borderRadius:28,padding:"13px 20px",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:8,boxShadow:"0 8px 28px rgba(0,0,0,0.25)",zIndex:700,fontFamily:"'Jost',sans-serif",animation:"glow 3s ease-in-out infinite",transition:"transform .2s"}}
+          onMouseEnter={e=>e.currentTarget.style.transform="scale(1.04)"}
+          onMouseLeave={e=>e.currentTarget.style.transform="none"}>
+          <div style={{position:"relative",width:8,height:8}}>
+            <div style={{width:8,height:8,background:"#22c55e",borderRadius:"50%"}}/>
+            <div style={{position:"absolute",inset:0,background:"#22c55e",borderRadius:"50%",animation:"pulse 1.5s ease-out infinite",opacity:0.5}}/>
           </div>
           ◎ AI Agent
         </button>
       )}
       {scrolled&&(
-        <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})}
-          className="fixed bottom-7 left-7 w-10 h-10 bg-white border border-stone-200 rounded-full text-stone-700 flex items-center justify-center shadow-md z-[700] hover:-translate-y-0.5 hover:shadow-lg transition-all">
-          ↑
-        </button>
+        <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} style={{position:"fixed",bottom:28,left:28,background:"#fff",color:"#1c1917",border:"1px solid #e7e4e0",borderRadius:"50%",width:42,height:42,fontSize:16,cursor:"pointer",boxShadow:"0 4px 16px rgba(0,0,0,0.1)",zIndex:700,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}}
+          onMouseEnter={e=>e.currentTarget.style.boxShadow="0 6px 20px rgba(0,0,0,0.15)"}
+          onMouseLeave={e=>e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.1)"}>↑</button>
       )}
 
+      {/* Modals & Panels */}
+      {editItem&&<EditModal item={editItem} onClose={()=>setEditItem(null)} onSave={addToCartWithOptions}/>}
       {cartOpen&&<CartDrawer cart={cart} onRemove={id=>setCart(p=>p.filter(x=>x.id!==id))} onCheckout={()=>{if(!wallet){connectWallet();return;}setCartOpen(false);setCheckout(true);}} onClose={()=>setCartOpen(false)} wallet={wallet}/>}
       {checkout&&<CheckoutModal cart={cart} wallet={wallet} onClose={()=>setCheckout(false)} onSuccess={()=>{setCart([]);setCheckout(false);}} addToast={addToast}/>}
       {agentOpen&&<AgentChat cart={cart} setCart={setCart} setActiveSection={setSection} setCheckoutOpen={setCheckout} addToast={addToast} onClose={()=>setAgent(false)}/>}
