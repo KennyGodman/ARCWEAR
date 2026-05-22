@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-const ARC_CHAIN_ID = "0x4CEBE52";
+const ARC_CHAIN_ID = "0x4CEBE2";
 const ARC_CHAIN_CONFIG = {
   chainId: ARC_CHAIN_ID, chainName: "Arc Testnet",
   nativeCurrency: { name:"USDC", symbol:"USDC", decimals:6 },
