@@ -164,12 +164,11 @@ const AGENT_TOOLS=[
 const fmt   = n=>`${Number(n).toFixed(2)} USDC`;
 const trunc = a=>a?`${a.slice(0,6)}…${a.slice(-4)}`:"";
 
-// ── Toasts ─────────────────────────────────────────────────────────────────
 function Toasts({list}){
   return(
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9000] flex flex-col gap-2 items-center pointer-events-none">
       {list.map(t=>(
-        <div key={t.id} className={`px-5 py-2.5 rounded-full text-sm font-medium text-white shadow-xl animate-[toastIn_.3s_ease] whitespace-nowrap ${t.type==="agent"?"bg-amber-700":t.type==="error"?"bg-red-700":"bg-stone-900"}`}>
+        <div key={t.id} className={`px-5 py-2.5 rounded-full text-sm font-medium text-white shadow-xl whitespace-nowrap ${t.type==="agent"?"bg-amber-700":t.type==="error"?"bg-red-700":"bg-stone-900"}`}>
           {t.msg}
         </div>
       ))}
@@ -177,13 +176,11 @@ function Toasts({list}){
   );
 }
 
-// ── Product Card ────────────────────────────────────────────────────────────
 function ProductCard({item,onAdd,agentPick}){
   const [added,setAdded]=useState(false);
   const [imgErr,setImgErr]=useState(false);
   return(
     <div className={`group bg-white rounded-2xl overflow-hidden border transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${agentPick?"border-amber-400 shadow-amber-100 shadow-md":"border-stone-200 shadow-sm"}`}>
-      {/* Image */}
       <div className="relative overflow-hidden bg-stone-100 h-52">
         {!imgErr?(
           <img src={item.img} alt={item.name} onError={()=>setImgErr(true)}
@@ -196,9 +193,7 @@ function ProductCard({item,onAdd,agentPick}){
             AI Pick
           </div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"/>
       </div>
-      {/* Body */}
       <div className="p-4">
         <h3 className="font-semibold text-stone-900 text-sm leading-tight mb-1">{item.name}</h3>
         <p className="text-stone-400 text-xs leading-relaxed mb-3">{item.desc}</p>
@@ -218,14 +213,12 @@ function ProductCard({item,onAdd,agentPick}){
   );
 }
 
-// ── Cart Drawer ─────────────────────────────────────────────────────────────
 function CartDrawer({cart,onRemove,onCheckout,onClose,wallet}){
   const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
   return(
     <>
       <div onClick={onClose} className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[1100]"/>
       <aside className="fixed top-0 right-0 w-96 h-full bg-white z-[1200] flex flex-col shadow-2xl animate-[drawerIn_.28s_ease]">
-        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-stone-100">
           <div>
             <h2 className="font-serif text-xl font-semibold text-stone-900">Shopping Bag</h2>
@@ -233,7 +226,6 @@ function CartDrawer({cart,onRemove,onCheckout,onClose,wallet}){
           </div>
           <button onClick={onClose} className="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 flex items-center justify-center text-sm transition-colors">✕</button>
         </div>
-        {/* Items */}
         <div className="flex-1 overflow-y-auto p-5 space-y-3">
           {cart.length===0?(
             <div className="text-center pt-20">
@@ -256,7 +248,6 @@ function CartDrawer({cart,onRemove,onCheckout,onClose,wallet}){
             </div>
           ))}
         </div>
-        {/* Footer */}
         {cart.length>0&&(
           <div className="p-5 border-t border-stone-100 space-y-3">
             <div className="space-y-1.5">
@@ -286,38 +277,75 @@ function CartDrawer({cart,onRemove,onCheckout,onClose,wallet}){
   );
 }
 
-// ── Checkout Modal ──────────────────────────────────────────────────────────
+// ── Checkout Modal with Rabby + MetaMask fix ────────────────────────────────
 function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
   const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
   const [step,setStep]=useState("review");
   const [txHash,setTxHash]=useState("");
-  const pay=async()=>{
-    if(!window.ethereum){addToast("MetaMask not detected","error");return;}
+
+  const pay = async () => {
+    if (!window.ethereum) {
+      addToast("No wallet detected. Please install Rabby or MetaMask", "error");
+      return;
+    }
     setStep("signing");
-    try{
-     try {
-  await window.ethereum.request({
-    method: "wallet_addEthereumChain",
-    params: [ARC_CHAIN_CONFIG],
-  });
-} catch(e) {
-  try {
-    await window.ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: ARC_CHAIN_ID }],
-    });
-  } catch(switchErr) {
-    addToast("Please add Arc Testnet manually in MetaMask", "error");
-    setStep("review");
-    return;
-  } 
-}
-      const amt=Math.round(total*1e6);
-      const data="0xa9059cbb"+MERCHANT_ADDR.slice(2).padStart(64,"0")+amt.toString(16).padStart(64,"0");
-      const hash=await window.ethereum.request({method:"eth_sendTransaction",params:[{from:wallet,to:USDC_ADDRESS,data,gas:"0x186A0"}]});
-      setTxHash(hash);setStep("success");onSuccess();addToast("Payment confirmed on Arc!","success");
-    }catch(err){addToast(err.message?.includes("denied")?"Cancelled":"Error: "+(err.message||"Unknown"),"error");setStep("review");}
+    try {
+      // Step 1 — check which chain we are on
+      const currentChain = await window.ethereum.request({ method: "eth_chainId" });
+
+      // Step 2 — only switch if not already on Arc
+      if (currentChain !== ARC_CHAIN_ID) {
+        try {
+          // Try adding the chain first (works for both Rabby and MetaMask)
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [ARC_CHAIN_CONFIG],
+          });
+        } catch (addErr) {
+          // If add fails, try switching directly
+          try {
+            await window.ethereum.request({
+              method: "wallet_switchEthereumChain",
+              params: [{ chainId: ARC_CHAIN_ID }],
+            });
+          } catch (switchErr) {
+            if (switchErr.code === 4001) {
+              addToast("Please approve the network switch in your wallet", "error");
+            } else {
+              addToast("Please add Arc Testnet manually in your wallet settings", "error");
+            }
+            setStep("review");
+            return;
+          }
+        }
+      }
+
+      // Step 3 — send the USDC transaction
+      const amt = Math.round(total * 1e6);
+      const data = "0xa9059cbb" +
+        MERCHANT_ADDR.slice(2).padStart(64, "0") +
+        amt.toString(16).padStart(64, "0");
+
+      const hash = await window.ethereum.request({
+        method: "eth_sendTransaction",
+        params: [{ from: wallet, to: USDC_ADDRESS, data, gas: "0x186A0" }],
+      });
+
+      setTxHash(hash);
+      setStep("success");
+      onSuccess();
+      addToast("Payment confirmed on Arc!", "success");
+
+    } catch (err) {
+      if (err.code === 4001 || err.message?.includes("denied") || err.message?.includes("rejected")) {
+        addToast("Transaction cancelled", "error");
+      } else {
+        addToast("Error: " + (err.message || "Unknown error"), "error");
+      }
+      setStep("review");
+    }
   };
+
   return(
     <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-[2000] flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl w-[460px] max-w-full p-8 relative shadow-2xl animate-[modalIn_.3s_ease]">
@@ -338,7 +366,7 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
               <div className="w-8 h-8 bg-amber-600 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0">◎</div>
               <div>
                 <p className="text-sm font-semibold text-white">Arc Blockchain · USDC</p>
-                <p className="text-[9px] text-stone-500 tracking-widest uppercase mt-0.5">Circle L1 · EVM Compatible</p>
+                <p className="text-[9px] text-stone-500 tracking-widest uppercase mt-0.5">Circle L1 · EVM Compatible · Rabby & MetaMask</p>
               </div>
             </div>
             {[["Wallet",trunc(wallet)||"Not connected"],["Network","Arc Testnet"],["Gas","~0.001 USDC"]].map(([k,v])=>(
@@ -359,7 +387,7 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
           <div className="text-center py-12">
             <div className="text-4xl mb-4 inline-block animate-spin">⚡</div>
             <h3 className="font-serif text-xl font-semibold text-stone-900 mb-2">Signing Transaction</h3>
-            <p className="text-sm text-stone-400">Confirm in MetaMask</p>
+            <p className="text-sm text-stone-400">Approve in your wallet</p>
             <p className="text-xs text-amber-600 tracking-widest uppercase mt-2">Arc finality &lt;1 second</p>
           </div>
         )}
@@ -377,7 +405,6 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
   );
 }
 
-// ── AI Agent Chat ───────────────────────────────────────────────────────────
 function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClose}){
   const [msgs,setMsgs]=useState([{role:"assistant",text:"Hi! I'm your ArcWear AI agent 👋\n\nTell me what you're looking for — an outfit, a budget, an occasion — and I'll search, add items to your cart, and handle USDC checkout on Arc."}]);
   const [input,setInput]=useState("");
@@ -452,7 +479,6 @@ function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClo
     <>
       <div onClick={onClose} className="fixed inset-0 z-[1300] bg-black/20 backdrop-blur-[2px]"/>
       <div className="fixed bottom-6 right-6 w-96 h-[560px] bg-white rounded-2xl shadow-2xl z-[1400] flex flex-col overflow-hidden animate-[agentIn_.35s_cubic-bezier(.16,1,.3,1)]">
-        {/* Header */}
         <div className="bg-stone-900 px-4 py-3 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="relative">
@@ -466,14 +492,12 @@ function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClo
           </div>
           <button onClick={onClose} className="w-6 h-6 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-400 flex items-center justify-center text-xs transition-colors">✕</button>
         </div>
-        {/* Tool ticker */}
         {tools.length>0&&(
           <div className="bg-stone-50 border-b border-stone-100 px-4 py-1.5 flex gap-2 items-center flex-shrink-0">
             <span className="text-amber-500 text-[8px] font-bold animate-pulse">●</span>
             {tools.map((t,i)=><span key={i} className="bg-amber-50 border border-amber-200 text-amber-700 rounded-full px-2.5 py-0.5 text-[9px] font-bold tracking-wide uppercase">⚡ {t.replace(/_/g," ")}</span>)}
           </div>
         )}
-        {/* Messages */}
         <div className="flex-1 overflow-y-scroll p-4 space-y-3 agent-scroll">
           {msgs.map((m,i)=>(
             <div key={i} className={`flex gap-2 items-end ${m.role==="user"?"flex-row-reverse":""}`}>
@@ -496,7 +520,6 @@ function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClo
           )}
           <div ref={bottomRef}/>
         </div>
-        {/* Chips */}
         {msgs.length<=1&&(
           <div className="px-4 pb-2 flex flex-wrap gap-1.5 flex-shrink-0">
             {CHIPS.map((c,i)=>(
@@ -506,7 +529,6 @@ function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClo
             ))}
           </div>
         )}
-        {/* Input */}
         <div className="p-3 border-t border-stone-100 flex gap-2 flex-shrink-0">
           <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()}
             placeholder="Ask about outfits, budgets, styles…"
@@ -521,7 +543,6 @@ function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClo
   );
 }
 
-// ── Main App ────────────────────────────────────────────────────────────────
 export default function ArcWear(){
   const [section,setSection]    =useState("men");
   const [activeCat,setActiveCat]=useState(null);
@@ -546,9 +567,12 @@ export default function ArcWear(){
   };
 
   const connectWallet=async()=>{
-    if(!window.ethereum){addToast("Install MetaMask to connect","error");return;}
-    try{const a=await window.ethereum.request({method:"eth_requestAccounts"});setWallet(a[0]);addToast(`Connected: ${trunc(a[0])}`,"success");}
-    catch{addToast("Connection cancelled","error");}
+    if(!window.ethereum){addToast("Install Rabby or MetaMask to connect","error");return;}
+    try{
+      const a=await window.ethereum.request({method:"eth_requestAccounts"});
+      setWallet(a[0]);
+      addToast(`Connected: ${trunc(a[0])}`,"success");
+    }catch{addToast("Connection cancelled","error");}
   };
 
   const addToCart=item=>{
@@ -583,10 +607,9 @@ export default function ArcWear(){
         .agent-scroll{scrollbar-width:thin;scrollbar-color:#b8a898 #f1ede8}
       `}</style>
 
-      {/* ── NAVBAR ── */}
+      {/* NAVBAR */}
       <nav className={`sticky top-0 z-[900] transition-all duration-300 ${scrolled?"bg-[#F8F5F0]/95 backdrop-blur-xl border-b border-stone-200 shadow-sm":"bg-[#F8F5F0]"}`}>
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          {/* Logo */}
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-stone-900 rounded-xl flex items-center justify-center flex-shrink-0">
               <span className="font-serif text-xs font-bold text-amber-500 tracking-wider">AW</span>
@@ -596,8 +619,6 @@ export default function ArcWear(){
               <p className="text-[7px] text-amber-600 font-semibold tracking-[2px] uppercase mt-0.5">Agentic · Arc Blockchain</p>
             </div>
           </div>
-
-          {/* Section Tabs */}
           <div className="flex gap-1 bg-stone-100 rounded-xl p-1">
             {["men","women","children"].map(k=>{
               const s=CATALOGUE[k];
@@ -609,8 +630,6 @@ export default function ArcWear(){
               );
             })}
           </div>
-
-          {/* Actions */}
           <div className="flex items-center gap-2">
             {wallet?(
               <div className="flex items-center gap-1.5 bg-white border border-stone-200 rounded-full px-3 py-1.5">
@@ -632,7 +651,7 @@ export default function ArcWear(){
         </div>
       </nav>
 
-      {/* ── HERO ── */}
+      {/* HERO */}
       <section className="bg-stone-900 px-6 py-14 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none" style={{background:"radial-gradient(circle at 18% 52%, rgba(154,123,79,0.14) 0%, transparent 58%), radial-gradient(circle at 82% 18%, rgba(196,164,124,0.07) 0%, transparent 50%)"}}/>
         <div className="max-w-7xl mx-auto">
@@ -659,7 +678,6 @@ export default function ArcWear(){
                 </button>
               </div>
             </div>
-            {/* Stats */}
             <div className="flex gap-6 flex-wrap" style={{animation:"heroFade .8s .12s ease both",opacity:0}}>
               {[["5","Categories"],["25+","Products"],["USDC","Payment"],["Arc","Blockchain"]].map(([v,l])=>(
                 <div key={l} className="text-center">
@@ -672,7 +690,7 @@ export default function ArcWear(){
         </div>
       </section>
 
-      {/* ── FILTER BAR ── */}
+      {/* FILTER BAR */}
       <div className="bg-white border-b border-stone-100 sticky top-16 z-[800]">
         <div className="max-w-7xl mx-auto px-6 h-12 flex items-center justify-between">
           <div className="flex gap-2 overflow-x-auto py-2">
@@ -693,7 +711,7 @@ export default function ArcWear(){
         </div>
       </div>
 
-      {/* ── PRODUCTS ── */}
+      {/* PRODUCTS */}
       <main id="products" className="max-w-7xl mx-auto px-6 py-10 pb-24">
         {displayCats.map(([catKey,cat])=>(
           <section key={catKey} className="mb-12">
@@ -710,8 +728,6 @@ export default function ArcWear(){
             </div>
           </section>
         ))}
-
-        {/* Arc Banner */}
         <div className="bg-stone-900 rounded-2xl p-8 flex items-center flex-wrap gap-6 mt-4 border border-stone-800">
           <div className="flex-1 min-w-48">
             <h3 className="font-serif text-lg font-semibold text-white mb-1.5">Powered by Arc Blockchain</h3>
@@ -729,7 +745,7 @@ export default function ArcWear(){
         </div>
       </main>
 
-      {/* ── FLOATING BUTTONS ── */}
+      {/* FLOATING BUTTONS */}
       {!agentOpen&&(
         <button onClick={()=>setAgent(true)}
           className="fixed bottom-7 right-7 flex items-center gap-2.5 bg-stone-900 text-white border-2 border-amber-600 rounded-full px-5 py-3 text-xs font-bold tracking-wide z-[700] shadow-xl transition-transform hover:scale-105"
@@ -748,7 +764,6 @@ export default function ArcWear(){
         </button>
       )}
 
-      {/* Panels */}
       {cartOpen&&<CartDrawer cart={cart} onRemove={id=>setCart(p=>p.filter(x=>x.id!==id))} onCheckout={()=>{if(!wallet){connectWallet();return;}setCartOpen(false);setCheckout(true);}} onClose={()=>setCartOpen(false)} wallet={wallet}/>}
       {checkout&&<CheckoutModal cart={cart} wallet={wallet} onClose={()=>setCheckout(false)} onSuccess={()=>{setCart([]);setCheckout(false);}} addToast={addToast}/>}
       {agentOpen&&<AgentChat cart={cart} setCart={setCart} setActiveSection={setSection} setCheckoutOpen={setCheckout} addToast={addToast} onClose={()=>setAgent(false)}/>}
