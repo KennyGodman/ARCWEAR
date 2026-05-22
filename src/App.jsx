@@ -7,7 +7,7 @@ const ARC_CHAIN_CONFIG = {
   blockExplorerUrls: ["https://testnet.arcscan.app"],
 };
 const USDC_ADDRESS  = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
-const MERCHANT_ADDR = "0xDemoMerchantAddress000000000000000000001";
+const MERCHANT_ADDR = "0x4932B6c1970131321B79d8Be02A1791A09554bf5";
 
 const CATALOGUE = { 
   men: {
