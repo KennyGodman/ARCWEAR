@@ -1,16 +1,15 @@
 import { useState, useRef, useEffect } from "react";
-
-const ARC_CHAIN_ID = "0x52A";
+const ARC_CHAIN_ID = "0x4CEBE52";
 const ARC_CHAIN_CONFIG = {
   chainId: ARC_CHAIN_ID, chainName: "Arc Testnet",
   nativeCurrency: { name:"USDC", symbol:"USDC", decimals:6 },
-  rpcUrls: ["https://rpc.arc.testnet.circle.com"],
-  blockExplorerUrls: ["https://explorer.arc.testnet.circle.com"],
+  rpcUrls: ["https://rpc.testnet.arc.network"],
+  blockExplorerUrls: ["https://testnet.arcscan.app"],
 };
 const USDC_ADDRESS  = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
 const MERCHANT_ADDR = "0xDemoMerchantAddress000000000000000000001";
 
-const CATALOGUE = {
+const CATALOGUE = { 
   men: {
     label:"Men", icon:"👔",
     categories:{
