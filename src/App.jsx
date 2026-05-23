@@ -311,6 +311,8 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
   const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
   const [step,setStep]=useState("review");
   const [txHash,setTxHash]=useState("");
+  const [customerEmail,setCustomerEmail]=useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
   const pay=async()=>{
     if(!window.ethereum){addToast("No wallet detected","error");return;}
     setStep("signing");
@@ -330,6 +332,21 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
       const data="0xa9059cbb"+MERCHANT_ADDR.slice(2).padStart(64,"0")+amt.toString(16).padStart(64,"0");
       const hash=await window.ethereum.request({method:"eth_sendTransaction",params:[{from:wallet,to:USDC_ADDRESS,data,gas:"0x186A0"}]});
       setTxHash(hash);setStep("success");onSuccess();addToast("Payment confirmed on Arc!","success");
+      if(customerEmail){
+  try{
+    await fetch("/api/send-confirmation",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        customerEmail,
+        customerWallet:wallet,
+        items:cart,
+        total,
+        txHash:hash,
+      }),
+    });
+  }catch(e){console.log("Email error:",e);}
+}
     }catch(err){
       addToast(err.code===4001||err.message?.includes("denied")?"Transaction cancelled":"Error: "+(err.message||"Unknown"),"error");
       setStep("review");
@@ -342,6 +359,20 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
         {step==="review"&&<>
           <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#1c1917",margin:"0 0 3px"}}>Order Summary</h2>
           <p style={{fontSize:11,color:"#a8a29e",margin:"0 0 16px",letterSpacing:0.3}}>Review before paying with USDC on Arc</p>
+          <div style={{marginBottom:14}}>
+  <label style={{fontSize:11,color:"#78716c",display:"block",marginBottom:6,letterSpacing:0.5}}>
+    Email for order confirmation
+  </label>
+  <input
+    type="email"
+    value={customerEmail}
+    onChange={e=>setCustomerEmail(e.target.value)}
+    placeholder="you@email.com"
+    style={{width:"100%",background:"#faf9f7",border:"1px solid #e7e4e0",borderRadius:8,padding:"9px 12px",fontSize:12,color:"#1c1917",outline:"none",fontFamily:"'Jost',sans-serif"}}
+    onFocus={e=>e.target.style.borderColor="#c47d2a"}
+    onBlur={e=>e.target.style.borderColor="#e7e4e0"}
+  />
+</div>
           <div style={{background:"#faf9f7",borderRadius:10,border:"1px solid #f0ede8",marginBottom:16,maxHeight:140,overflowY:"auto"}}>
             {cart.map(i=>(
               <div key={i.id} style={{display:"flex",justifyContent:"space-between",padding:"6px 14px",borderBottom:"1px solid #f0ede8",fontSize:13,color:"#1c1917"}}>
