@@ -312,7 +312,7 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
   const [step,setStep]=useState("review");
   const [txHash,setTxHash]=useState("");
   const [customerEmail,setCustomerEmail]=useState("");
-  const [customerEmail, setCustomerEmail] = useState("");
+
   const pay=async()=>{
     if(!window.ethereum){addToast("No wallet detected","error");return;}
     setStep("signing");
@@ -331,27 +331,31 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
       const amt=Math.round(total*1e6);
       const data="0xa9059cbb"+MERCHANT_ADDR.slice(2).padStart(64,"0")+amt.toString(16).padStart(64,"0");
       const hash=await window.ethereum.request({method:"eth_sendTransaction",params:[{from:wallet,to:USDC_ADDRESS,data,gas:"0x186A0"}]});
-      setTxHash(hash);setStep("success");onSuccess();addToast("Payment confirmed on Arc!","success");
+      setTxHash(hash);
+      setStep("success");
+      onSuccess();
+      addToast("Payment confirmed on Arc!","success");
       if(customerEmail){
-  try{
-    await fetch("/api/send-confirmation",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        customerEmail,
-        customerWallet:wallet,
-        items:cart,
-        total,
-        txHash:hash,
-      }),
-    });
-  }catch(e){console.log("Email error:",e);}
-}
+        try{
+          await fetch("/api/send-confirmation",{
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body:JSON.stringify({
+              customerEmail,
+              customerWallet:wallet,
+              items:cart,
+              total,
+              txHash:hash,
+            }),
+          });
+        }catch(e){console.log("Email error:",e);}
+      }
     }catch(err){
       addToast(err.code===4001||err.message?.includes("denied")?"Transaction cancelled":"Error: "+(err.message||"Unknown"),"error");
       setStep("review");
     }
   };
+
   return(
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.65)",zIndex:2000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,backdropFilter:"blur(4px)"}}>
       <div style={{background:"#fff",borderRadius:16,width:460,maxWidth:"100%",padding:30,position:"relative",boxShadow:"0 32px 80px rgba(0,0,0,0.3)",animation:"modalIn .3s ease",fontFamily:"'Jost',sans-serif"}}>
@@ -359,20 +363,24 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
         {step==="review"&&<>
           <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#1c1917",margin:"0 0 3px"}}>Order Summary</h2>
           <p style={{fontSize:11,color:"#a8a29e",margin:"0 0 16px",letterSpacing:0.3}}>Review before paying with USDC on Arc</p>
+
+          {/* Email Input */}
           <div style={{marginBottom:14}}>
-  <label style={{fontSize:11,color:"#78716c",display:"block",marginBottom:6,letterSpacing:0.5}}>
-    Email for order confirmation
-  </label>
-  <input
-    type="email"
-    value={customerEmail}
-    onChange={e=>setCustomerEmail(e.target.value)}
-    placeholder="you@email.com"
-    style={{width:"100%",background:"#faf9f7",border:"1px solid #e7e4e0",borderRadius:8,padding:"9px 12px",fontSize:12,color:"#1c1917",outline:"none",fontFamily:"'Jost',sans-serif"}}
-    onFocus={e=>e.target.style.borderColor="#c47d2a"}
-    onBlur={e=>e.target.style.borderColor="#e7e4e0"}
-  />
-</div>
+            <label style={{fontSize:11,color:"#78716c",display:"block",marginBottom:6,letterSpacing:0.5,fontFamily:"'Jost',sans-serif",textTransform:"uppercase",fontWeight:700}}>
+              📧 Email for order confirmation
+            </label>
+            <input
+              type="email"
+              value={customerEmail}
+              onChange={e=>setCustomerEmail(e.target.value)}
+              placeholder="you@email.com"
+              style={{width:"100%",background:"#faf9f7",border:"1px solid #e7e4e0",borderRadius:8,padding:"10px 12px",fontSize:12,color:"#1c1917",outline:"none",fontFamily:"'Jost',sans-serif"}}
+              onFocus={e=>e.target.style.borderColor="#c47d2a"}
+              onBlur={e=>e.target.style.borderColor="#e7e4e0"}
+            />
+          </div>
+
+          {/* Order Items */}
           <div style={{background:"#faf9f7",borderRadius:10,border:"1px solid #f0ede8",marginBottom:16,maxHeight:140,overflowY:"auto"}}>
             {cart.map(i=>(
               <div key={i.id} style={{display:"flex",justifyContent:"space-between",padding:"6px 14px",borderBottom:"1px solid #f0ede8",fontSize:13,color:"#1c1917"}}>
@@ -381,6 +389,8 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
               </div>
             ))}
           </div>
+
+          {/* Arc Payment Box */}
           <div style={{background:"#1c1917",borderRadius:12,padding:"14px 16px",marginBottom:18}}>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
               <div style={{width:30,height:30,background:"#c47d2a",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"#fff",fontWeight:800,flexShrink:0}}>◎</div>
@@ -391,18 +401,23 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
             </div>
             {[["Wallet",trunc(wallet)||"Not connected"],["Network","Arc Testnet (5042002)"],["Gas","~0.001 USDC"]].map(([k,v])=>(
               <div key={k} style={{display:"flex",justifyContent:"space-between",fontSize:11,marginBottom:3}}>
-                <span style={{color:"#57534e"}}>{k}</span><span style={{fontFamily:"'DM Mono',monospace",color:"#a8a29e"}}>{v}</span>
+                <span style={{color:"#57534e"}}>{k}</span>
+                <span style={{fontFamily:"'DM Mono',monospace",color:"#a8a29e"}}>{v}</span>
               </div>
             ))}
             <div style={{display:"flex",justifyContent:"space-between",fontFamily:"'Playfair Display',serif",fontWeight:700,fontSize:16,color:"#fff",borderTop:"1px solid #292524",paddingTop:8,marginTop:6}}>
-              <span>Total</span><span style={{fontFamily:"'DM Mono',monospace",fontSize:13,color:"#c47d2a"}}>{fmt(total)}</span>
+              <span>Total</span>
+              <span style={{fontFamily:"'DM Mono',monospace",fontSize:13,color:"#c47d2a"}}>{fmt(total)}</span>
             </div>
           </div>
+
+          {/* Buttons */}
           <div style={{display:"flex",gap:10}}>
             <button onClick={onClose} style={{flex:1,background:"#f5f3f0",border:"1px solid #e7e4e0",borderRadius:10,padding:"11px",fontSize:11,cursor:"pointer",color:"#78716c",letterSpacing:1.5,textTransform:"uppercase"}}>Cancel</button>
             <button onClick={pay} style={{flex:2,background:"#f97316",color:"#fff",border:"none",borderRadius:10,padding:"11px",fontSize:11,fontWeight:700,cursor:"pointer",letterSpacing:1.5,textTransform:"uppercase",boxShadow:"0 4px 14px rgba(249,115,22,0.35)"}}>Pay {fmt(total)}</button>
           </div>
         </>}
+
         {step==="signing"&&(
           <div style={{textAlign:"center",padding:"44px 0"}}>
             <div style={{fontSize:40,marginBottom:14,animation:"spin 1s linear infinite",display:"inline-block"}}>⚡</div>
@@ -411,6 +426,7 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
             <p style={{fontSize:10,color:"#c47d2a",letterSpacing:1.5,textTransform:"uppercase",marginTop:6}}>Arc finality &lt;1 second</p>
           </div>
         )}
+
         {step==="success"&&(
           <div style={{textAlign:"center",padding:"34px 0"}}>
             <div style={{width:56,height:56,background:"#1c1917",borderRadius:"50%",margin:"0 auto 16px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,color:"#c47d2a"}}>✓</div>
