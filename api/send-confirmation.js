@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     <body style="margin:0;padding:0;background:#f5f3f0;font-family:sans-serif;">
       <div style="background:#1c1917;padding:24px 32px;text-align:center;">
         <h1 style="color:#c47d2a;font-size:24px;margin:0;letter-spacing:2px;">ARCWEAR</h1>
-        <p style="color:#78716c;font-size:11px;margin:4px 0 0;letter-spacing:1.5px;text-transform:uppercase;">Agentic · Arc Blockchain</p>
+        <p style="color:#78716c;font-size:11px;margin:4px 0 0;letter-spacing:1.5px;text-transform:uppercase;">Arc Blockchain</p>
       </div>
       <div style="background:#f97316;padding:16px 32px;text-align:center;">
         <p style="color:#fff;font-size:16px;font-weight:700;margin:0;">✓ Order Confirmed</p>
