@@ -447,10 +447,12 @@ function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClo
   };
 
   const runAgent=async(apiMsgs)=>{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,
-        system:"You are ArcWear's AI shopping agent. Help users find and purchase clothing via USDC on Arc blockchain. Always use tools to act. When recommending outfits, search and add multiple items. Summarise additions with USDC totals. Sections: men, women, children. Categories: shirts, trousers, belts, caps, shoes.",
-        tools:AGENT_TOOLS,messages:apiMsgs})});
+    const res=await fetch("/api/agent",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+     body:JSON.stringify({
+        tools:AGENT_TOOLS,
+        messages:apiMsgs,
+      }),});
     const data=await res.json();
     let text="";const toolBlocks=[];
     for(const b of data.content||[]){if(b.type==="text")text+=b.text;if(b.type==="tool_use")toolBlocks.push(b);}
