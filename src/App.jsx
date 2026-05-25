@@ -1,5 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 
+function useWindowSize(){
+  const [size,setSize]=useState({w:typeof window!=="undefined"?window.innerWidth:1280,h:typeof window!=="undefined"?window.innerHeight:800});
+  useEffect(()=>{
+    const h=()=>setSize({w:window.innerWidth,h:window.innerHeight});
+    window.addEventListener("resize",h);
+    return()=>window.removeEventListener("resize",h);
+  },[]);
+  return size;
+}
+
 const ARC_CHAIN_ID = "0x4cef52";
 const ARC_CHAIN_CONFIG = {
   chainId: ARC_CHAIN_ID, chainName: "Arc Testnet",
@@ -8,7 +18,7 @@ const ARC_CHAIN_CONFIG = {
   blockExplorerUrls: ["https://testnet.arcscan.app"],
 };
 const USDC_ADDRESS  = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
-const MERCHANT_ADDR = "0x4932B6c1970131321B79d8Be02A1791A09554bf5"; 
+const MERCHANT_ADDR = "0xDemoMerchantAddress000000000000000000001";
 
 const CATALOGUE = {
   men: { label:"Men", icon:"👔", categories:{
@@ -205,7 +215,7 @@ function ProductCard({item,onAdd,onEdit,agentPick}){
       {/* AI Pick badge */}
       {agentPick&&<div style={{position:"absolute",top:40,left:8,background:"#c47d2a",color:"#fff",fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,zIndex:2,letterSpacing:0.8,textTransform:"uppercase"}}>AI Pick</div>}
       {/* Image */}
-      <div style={{height:180,background:"#f9f7f5",display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}}>
+      <div style={{height:isMobile?140:180,background:"#f9f7f5",display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}}>
         {!imgErr?(
           <img src={item.img} alt={item.name} onError={()=>setImgErr(true)} style={{width:"100%",height:"100%",objectFit:"cover",transition:"transform .4s"}}
             onMouseEnter={e=>e.target.style.transform="scale(1.06)"}
@@ -244,12 +254,12 @@ function ProductCard({item,onAdd,onEdit,agentPick}){
 }
 
 /* ── Cart Drawer ─────────────────────────────────────────────────────────── */
-function CartDrawer({cart,onRemove,onCheckout,onClose,wallet}){
+function CartDrawer({cart,onRemove,onCheckout,onClose,wallet,w=1280}){
   const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
   return(
     <>
       <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.4)",zIndex:1100,backdropFilter:"blur(2px)"}}/>
-      <aside style={{position:"fixed",top:0,right:0,width:380,height:"100%",background:"#fff",zIndex:1200,display:"flex",flexDirection:"column",boxShadow:"-8px 0 40px rgba(0,0,0,0.12)",animation:"drawerIn .28s ease",fontFamily:"'Jost',sans-serif"}}>
+      <aside style={{position:"fixed",top:0,right:0,width:w<640?"100%":380,height:"100%",background:"#fff",zIndex:1200,display:"flex",flexDirection:"column",boxShadow:"-8px 0 40px rgba(0,0,0,0.12)",animation:"drawerIn .28s ease",fontFamily:"'Jost',sans-serif"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 20px",borderBottom:"1px solid #f0ede8"}}>
           <div>
             <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:"#1c1917",margin:0}}>Your Cart</h2>
@@ -348,7 +358,7 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
   };
   return(
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.65)",zIndex:2000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,backdropFilter:"blur(4px)"}}>
-      <div style={{background:"#fff",borderRadius:16,width:460,maxWidth:"100%",padding:30,position:"relative",boxShadow:"0 32px 80px rgba(0,0,0,0.3)",animation:"modalIn .3s ease",fontFamily:"'Jost',sans-serif"}}>
+      <div style={{background:"#fff",borderRadius:16,width:460,maxWidth:"100%",padding:w<640?20:30,position:"relative",boxShadow:"0 32px 80px rgba(0,0,0,0.3)",animation:"modalIn .3s ease",fontFamily:"'Jost',sans-serif"}}>
         <button onClick={onClose} style={{position:"absolute",top:12,right:12,background:"#f5f3f0",border:"none",borderRadius:8,width:30,height:30,cursor:"pointer",fontSize:13,color:"#78716c",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
         {step==="review"&&<>
           <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#1c1917",margin:"0 0 3px"}}>Order Summary</h2>
@@ -412,7 +422,7 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
 }
 
 /* ── AI Agent Chat ────────────────────────────────────────────────────────── */
-function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClose}){
+function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClose,w=1280}){
   const [msgs,setMsgs]=useState([{role:"assistant",text:"Hi! I'm your ArcWear AI agent 👋\n\nTell me what you're looking for — an outfit, a budget, an occasion — and I'll search, add items to your cart, and handle USDC checkout on Arc."}]);
   const [input,setInput]=useState("");
   const [loading,setLoading]=useState(false);
@@ -447,50 +457,19 @@ function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClo
   };
 
   const runAgent=async(apiMsgs)=>{
-    const res=await fetch("/api/agent",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        tools:AGENT_TOOLS,
-        messages:apiMsgs,
-      }),
-    });
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,
+        system:"You are ArcWear's AI shopping agent. Help users find and purchase clothing via USDC on Arc blockchain. Always use tools to act. When recommending outfits, search and add multiple items. Summarise additions with USDC totals. Sections: men, women, children. Categories: shirts, trousers, belts, caps, shoes.",
+        tools:AGENT_TOOLS,messages:apiMsgs})});
     const data=await res.json();
-
-    // Check for errors
-    if(data.error){
-      console.log("Agent API error:", data.error);
-      setTools([]);
-      return "Sorry, I ran into an issue. Please try again.";
-    }
-
-    let text="";
-    const toolBlocks=[];
-
-    for(const b of data.content||[]){
-      if(b.type==="text") text+=b.text;
-      if(b.type==="tool_use") toolBlocks.push(b);
-    }
-
-    if(toolBlocks.length>0){
+    let text="";const toolBlocks=[];
+    for(const b of data.content||[]){if(b.type==="text")text+=b.text;if(b.type==="tool_use")toolBlocks.push(b);}
+    if(toolBlocks.length){
       setTools(toolBlocks.map(b=>b.name));
-      const results=toolBlocks.map(b=>{
-        const result=exec(b.name,b.input);
-        return {
-          type:"tool_result",
-          tool_use_id:b.id,
-          content:JSON.stringify(result),
-        };
-      });
-      return runAgent([
-        ...apiMsgs,
-        {role:"assistant",content:data.content},
-        {role:"user",content:results},
-      ]);
+      const results=toolBlocks.map(b=>({type:"tool_result",tool_use_id:b.id,content:JSON.stringify(exec(b.name,b.input))}));
+      return runAgent([...apiMsgs,{role:"assistant",content:data.content},{role:"user",content:results}]);
     }
-
-    setTools([]);
-    return text||"Done! What else can I help with?";
+    setTools([]);return text;
   };
 
   const send=async()=>{
@@ -509,7 +488,7 @@ function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClo
   return(
     <>
       <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:1300,background:"rgba(0,0,0,0.2)"}}/>
-      <div style={{position:"fixed",bottom:24,right:24,width:385,height:565,background:"#fff",borderRadius:20,boxShadow:"0 24px 72px rgba(0,0,0,0.2)",zIndex:1400,display:"flex",flexDirection:"column",overflow:"hidden",animation:"agentIn .35s cubic-bezier(.16,1,.3,1)",fontFamily:"'Jost',sans-serif"}}>
+      <div style={{position:"fixed",bottom:w<640?0:24,right:w<640?0:24,width:w<640?"100%":385,height:w<640?"85vh":565,borderRadius:w<640?"20px 20px 0 0":20,background:"#fff",boxShadow:"0 24px 72px rgba(0,0,0,0.2)",zIndex:1400,display:"flex",flexDirection:"column",overflow:"hidden",animation:"agentIn .35s cubic-bezier(.16,1,.3,1)",fontFamily:"'Jost',sans-serif"}}>
         {/* Header */}
         <div style={{background:"#1c1917",padding:"12px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
@@ -584,6 +563,10 @@ export default function ArcWear(){
   const [toasts,setToasts]      =useState([]);
   const [scrolled,setScrolled]  =useState(false);
   const [editItem,setEditItem]  =useState(null);
+  const [mobileMenuOpen,setMobileMenu]=useState(false);
+  const {w}=useWindowSize();
+  const isMobile=w<640;
+  const isTablet=w>=640&&w<1024;
 
   useEffect(()=>{
     const h=()=>setScrolled(window.scrollY>50);
@@ -632,6 +615,11 @@ export default function ArcWear(){
         @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
         @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,.45)}60%{box-shadow:0 0 0 12px rgba(249,115,22,0)}}
+        @media(max-width:640px){
+          .nav-actions{gap:6px!important;}
+          .hero-stats{display:none!important;}
+          .filter-bar{padding:0 12px!important;}
+        }
         ::-webkit-scrollbar{width:4px}
         ::-webkit-scrollbar-track{background:#faf9f7}
         ::-webkit-scrollbar-thumb{background:#d4cfc8;border-radius:4px}
@@ -640,7 +628,7 @@ export default function ArcWear(){
       {/* ── TOP BAR ── */}
       <div style={{background:"#1c1917",padding:"6px 0",textAlign:"center"}}>
         <p style={{fontSize:11,color:"#fde68a",letterSpacing:0.5,fontFamily:"'Jost',sans-serif"}}>
-          🎉 Free shipping on orders over 150 USDC · Pay with USDC on Arc Blockchain
+          {isMobile?"🎉 Free shipping over 150 USDC":"🎉 Free shipping on orders over 150 USDC · Pay with USDC on Arc Blockchain"}
         </p>
       </div>
 
@@ -656,33 +644,35 @@ export default function ArcWear(){
         <div style={{maxWidth:1280,margin:"0 auto",padding:"0 24px",height:64,display:"flex",alignItems:"center",justifyContent:"space-between",gap:16}}>
           {/* Logo */}
           <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
-           <div style={{height:44,display:"flex",alignItems:"center"}}>
-  <img src="/arcc.png" alt="ArcWear" style={{height:"44px",width:"auto",objectFit:"contain"}}/>
-</div>
+            <div style={{width:36,height:36,background:"#1c1917",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <span style={{fontFamily:"'Playfair Display',serif",fontSize:12,fontWeight:700,color:"#c47d2a",letterSpacing:0.5}}>AW</span>
+            </div>
             <div>
               <p style={{fontFamily:"'Playfair Display',serif",fontSize:16,fontWeight:700,color:"#1c1917",lineHeight:1,letterSpacing:0.5}}>ArcWear</p>
               <p style={{fontSize:7,color:"#c47d2a",fontWeight:600,letterSpacing:2,textTransform:"uppercase",marginTop:1}}>Agentic · Arc Blockchain</p>
             </div>
           </div>
 
-          {/* Section Tabs */}
-          <div style={{display:"flex",gap:1,background:"#f5f3f0",borderRadius:10,padding:3}}>
-            {["men","women","children"].map(k=>{
-              const s=CATALOGUE[k];
-              return(
-                <button key={k} onClick={()=>{setSection(k);setActiveCat(null);}} style={{
-                  background:section===k?"#fff":"transparent",
-                  color:section===k?"#1c1917":"#78716c",
-                  border:"none",cursor:"pointer",padding:"7px 16px",borderRadius:8,
-                  fontFamily:"'Jost',sans-serif",fontSize:12,fontWeight:600,
-                  boxShadow:section===k?"0 1px 8px rgba(0,0,0,0.08)":"none",
-                  transition:"all .2s",display:"flex",alignItems:"center",gap:5,
-                }}>
-                  <span style={{fontSize:14}}>{s.icon}</span>{s.label}
-                </button>
-              );
-            })}
-          </div>
+          {/* Section Tabs - hidden on mobile */}
+          {!isMobile&&(
+            <div style={{display:"flex",gap:1,background:"#f5f3f0",borderRadius:10,padding:3}}>
+              {["men","women","children"].map(k=>{
+                const s=CATALOGUE[k];
+                return(
+                  <button key={k} onClick={()=>{setSection(k);setActiveCat(null);}} style={{
+                    background:section===k?"#fff":"transparent",
+                    color:section===k?"#1c1917":"#78716c",
+                    border:"none",cursor:"pointer",padding:"7px 16px",borderRadius:8,
+                    fontFamily:"'Jost',sans-serif",fontSize:12,fontWeight:600,
+                    boxShadow:section===k?"0 1px 8px rgba(0,0,0,0.08)":"none",
+                    transition:"all .2s",display:"flex",alignItems:"center",gap:5,
+                  }}>
+                    <span style={{fontSize:14}}>{s.icon}</span>{s.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
 
           {/* Actions */}
           <div style={{display:"flex",gap:8,alignItems:"center"}}>
@@ -695,7 +685,7 @@ export default function ArcWear(){
               <button onClick={connectWallet} style={{background:"#fff",color:"#1c1917",border:"1px solid #e7e4e0",borderRadius:20,padding:"7px 14px",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Jost',sans-serif",display:"flex",alignItems:"center",gap:5,transition:"border-color .15s"}}
                 onMouseEnter={e=>e.currentTarget.style.borderColor="#c47d2a"}
                 onMouseLeave={e=>e.currentTarget.style.borderColor="#e7e4e0"}>
-                <span>◎</span> Connect Wallet
+                <span>◎</span>{isMobile?"":"Connect Wallet"}
               </button>
             )}
             {/* CART with icon */}
@@ -710,7 +700,7 @@ export default function ArcWear(){
       </nav>
 
       {/* ── HERO ── */}
-      <section style={{background:"#1c1917",padding:"44px 24px 38px",position:"relative",overflow:"hidden"}}>
+      <section style={{background:"#1c1917",padding:isMobile?"28px 16px 24px":"44px 24px 38px",position:"relative",overflow:"hidden"}}>
         <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(circle at 15% 50%, rgba(196,125,42,0.15) 0%, transparent 55%), radial-gradient(circle at 85% 20%, rgba(249,115,22,0.08) 0%, transparent 50%)",pointerEvents:"none"}}/>
         <div style={{maxWidth:1280,margin:"0 auto",position:"relative"}}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:24}}>
@@ -751,6 +741,26 @@ export default function ArcWear(){
         </div>
       </section>
 
+      {/* ── MOBILE SECTION TABS ── */}
+      {isMobile&&(
+        <div style={{background:"#fff",borderBottom:"1px solid #e7e4e0",padding:"8px 16px",display:"flex",gap:6,overflowX:"auto"}}>
+          {["men","women","children"].map(k=>{
+            const s=CATALOGUE[k];
+            return(
+              <button key={k} onClick={()=>{setSection(k);setActiveCat(null);}} style={{
+                background:section===k?"#1c1917":"#f5f3f0",
+                color:section===k?"#fff":"#78716c",
+                border:"none",cursor:"pointer",padding:"8px 18px",borderRadius:20,
+                fontFamily:"'Jost',sans-serif",fontSize:12,fontWeight:600,
+                display:"flex",alignItems:"center",gap:5,whiteSpace:"nowrap",flexShrink:0,
+              }}>
+                <span style={{fontSize:14}}>{s.icon}</span>{s.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {/* ── FILTER BAR ── */}
       <div style={{background:"#fff",borderBottom:"1px solid #e7e4e0",position:"sticky",top:64,zIndex:800}}>
         <div style={{maxWidth:1280,margin:"0 auto",padding:"0 24px",height:48,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -769,7 +779,7 @@ export default function ArcWear(){
       </div>
 
       {/* ── PRODUCTS ── */}
-      <main id="products" style={{maxWidth:1280,margin:"0 auto",padding:"24px 24px 80px"}}>
+      <main id="products" style={{maxWidth:1280,margin:"0 auto",padding:isMobile?"16px 12px 80px":"24px 24px 80px"}}>
         {displayCats.map(([catKey,cat])=>(
           <section key={catKey} style={{marginBottom:40}}>
             {/* Section header */}
@@ -780,7 +790,7 @@ export default function ArcWear(){
               <span style={{fontSize:11,color:"#a8a29e"}}>{cat.items.length} products</span>
             </div>
             {/* Jumia-style grid */}
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(185px,1fr))",gap:1,border:"1px solid #e7e4e0",borderRadius:4,overflow:"hidden"}}>
+            <div style={{display:"grid",gridTemplateColumns:isMobile?"repeat(2,1fr)":isTablet?"repeat(3,1fr)":"repeat(auto-fill,minmax(185px,1fr))",gap:1,border:"1px solid #e7e4e0",borderRadius:4,overflow:"hidden"}}>
               {cat.items.map(item=>(
                 <ProductCard key={item.id} item={{...item,categoryLabel:cat.label}} onAdd={addToCart} onEdit={setEditItem} agentPick={false}/>
               ))}
@@ -808,7 +818,7 @@ export default function ArcWear(){
 
       {/* ── FLOATING BUTTONS ── */}
       {!agentOpen&&(
-        <button onClick={()=>setAgent(true)} style={{position:"fixed",bottom:28,right:28,background:"#1c1917",color:"#fff",border:"2px solid #f97316",borderRadius:28,padding:"13px 20px",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:8,boxShadow:"0 8px 28px rgba(0,0,0,0.25)",zIndex:700,fontFamily:"'Jost',sans-serif",animation:"glow 3s ease-in-out infinite",transition:"transform .2s"}}
+        <button onClick={()=>setAgent(true)} style={{position:"fixed",bottom:isMobile?80:28,right:isMobile?16:28,background:"#1c1917",color:"#fff",border:"2px solid #f97316",borderRadius:28,padding:"13px 20px",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:8,boxShadow:"0 8px 28px rgba(0,0,0,0.25)",zIndex:700,fontFamily:"'Jost',sans-serif",animation:"glow 3s ease-in-out infinite",transition:"transform .2s"}}
           onMouseEnter={e=>e.currentTarget.style.transform="scale(1.04)"}
           onMouseLeave={e=>e.currentTarget.style.transform="none"}>
           <div style={{position:"relative",width:8,height:8}}>
@@ -826,9 +836,27 @@ export default function ArcWear(){
 
       {/* Modals & Panels */}
       {editItem&&<EditModal item={editItem} onClose={()=>setEditItem(null)} onSave={addToCartWithOptions}/>}
-      {cartOpen&&<CartDrawer cart={cart} onRemove={id=>setCart(p=>p.filter(x=>x.id!==id))} onCheckout={()=>{if(!wallet){connectWallet();return;}setCartOpen(false);setCheckout(true);}} onClose={()=>setCartOpen(false)} wallet={wallet}/>}
+      {cartOpen&&<CartDrawer cart={cart} onRemove={id=>setCart(p=>p.filter(x=>x.id!==id))} onCheckout={()=>{if(!wallet){connectWallet();return;}setCartOpen(false);setCheckout(true);}} onClose={()=>setCartOpen(false)} wallet={wallet} w={w}/>}
       {checkout&&<CheckoutModal cart={cart} wallet={wallet} onClose={()=>setCheckout(false)} onSuccess={()=>{setCart([]);setCheckout(false);}} addToast={addToast}/>}
-      {agentOpen&&<AgentChat cart={cart} setCart={setCart} setActiveSection={setSection} setCheckoutOpen={setCheckout} addToast={addToast} onClose={()=>setAgent(false)}/>}
+      {agentOpen&&<AgentChat cart={cart} setCart={setCart} setActiveSection={setSection} setCheckoutOpen={setCheckout} addToast={addToast} onClose={()=>setAgent(false)} w={w}/>}
+
+      {/* Mobile Bottom Nav */}
+      {isMobile&&(
+        <div style={{position:"fixed",bottom:0,left:0,right:0,background:"#fff",borderTop:"1px solid #e7e4e0",display:"flex",zIndex:600,boxShadow:"0 -4px 16px rgba(0,0,0,0.08)"}}>
+          {[
+            {icon:"🏠",label:"Home",action:()=>window.scrollTo({top:0,behavior:"smooth"})},
+            {icon:sec.icon,label:"Men",action:()=>{setSection("men");setActiveCat(null);}},
+            {icon:"👗",label:"Women",action:()=>{setSection("women");setActiveCat(null);}},
+            {icon:"🧒",label:"Kids",action:()=>{setSection("children");setActiveCat(null);}},
+            {icon:"🛒",label:`Cart${cartCount>0?" ("+cartCount+")":""}`,action:()=>setCartOpen(true)},
+          ].map(({icon,label,action})=>(
+            <button key={label} onClick={action} style={{flex:1,background:"none",border:"none",padding:"10px 4px",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:2,fontFamily:"'Jost',sans-serif"}}>
+              <span style={{fontSize:18}}>{icon}</span>
+              <span style={{fontSize:9,color:"#78716c",fontWeight:600,letterSpacing:0.3}}>{label}</span>
+            </button>
+          ))}
+        </div>
+      )}
 
       <Toasts list={toasts}/>
     </div>
