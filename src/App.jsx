@@ -657,7 +657,7 @@ export default function ArcWear(){
           {/* Logo */}
           <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
             <div style={{width:36,height:36,borderRadius:8,overflow:"hidden"}}>
-  <img src="/ARCWEAR.png" alt="ArcWear" style={{width:"100%",height:"100%",objectFit:"contain"}}/>
+  <img src="/arcc.png" alt="ArcWear" style={{width:"100%",height:"100%",objectFit:"contain"}}/>
 </div>
             <div>
               <p style={{fontFamily:"'Playfair Display',serif",fontSize:16,fontWeight:700,color:"#1c1917",lineHeight:1,letterSpacing:0.5}}>ArcWear</p>
