@@ -692,7 +692,7 @@ export default function ArcWear(){
           {/* Logo */}
           <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
             <div style={{height:40,display:"flex",alignItems:"center"}}>
-              <img src="/ARCWEAR.png" alt="ArcWear" style={{height:"40px",width:"auto",objectFit:"contain"}}
+              <img src="/arcc.png" alt="ArcWear" style={{height:"40px",width:"auto",objectFit:"contain"}}
                 onError={e=>{e.target.style.display="none";e.target.nextSibling.style.display="flex";}}/>
               <div style={{display:"none",width:36,height:36,background:"#1c1917",borderRadius:8,alignItems:"center",justifyContent:"center"}}>
                 <span style={{fontSize:12,fontWeight:700,color:"#c47d2a"}}>AW</span>
