@@ -8,7 +8,7 @@ const ARC_CHAIN_CONFIG = {
   blockExplorerUrls: ["https://testnet.arcscan.app"],
 };
 const USDC_ADDRESS  = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
-const MERCHANT_ADDR = "0x4932B6c1970131321B79d8Be02A1791A09554bf5"; 
+const MERCHANT_ADDR = "0xDemoMerchantAddress000000000000000000001";
 
 const CATALOGUE = {
   men: { label:"Men", icon:"👔", categories:{
@@ -109,12 +109,11 @@ const fmt   = n=>`${Number(n).toFixed(2)} USDC`;
 const trunc = a=>a?`${a.slice(0,6)}…${a.slice(-4)}`:"";
 const disc  = (p,op)=>Math.round(((op-p)/op)*100);
 
-/* ── Toasts ─────────────────────────────────────────────────────────────── */
 function Toasts({list}){
   return(
-    <div style={{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",zIndex:9999,display:"flex",flexDirection:"column",gap:8,alignItems:"center",pointerEvents:"none"}}>
+    <div style={{position:"fixed",bottom:80,left:"50%",transform:"translateX(-50%)",zIndex:9999,display:"flex",flexDirection:"column",gap:8,alignItems:"center",pointerEvents:"none"}}>
       {list.map(t=>(
-        <div key={t.id} style={{background:t.type==="agent"?"#c47d2a":t.type==="error"?"#b91c1c":"#1c1917",color:"#fff",padding:"9px 22px",borderRadius:40,fontSize:13,fontFamily:"'Jost',sans-serif",boxShadow:"0 4px 20px rgba(0,0,0,0.2)",whiteSpace:"nowrap",animation:"toastIn .3s ease"}}>
+        <div key={t.id} style={{background:t.type==="agent"?"#c47d2a":t.type==="error"?"#b91c1c":"#1c1917",color:"#fff",padding:"9px 22px",borderRadius:40,fontSize:13,fontFamily:"sans-serif",boxShadow:"0 4px 20px rgba(0,0,0,0.2)",whiteSpace:"nowrap",animation:"toastIn .3s ease"}}>
           {t.msg}
         </div>
       ))}
@@ -122,61 +121,53 @@ function Toasts({list}){
   );
 }
 
-/* ── Edit Modal ─────────────────────────────────────────────────────────── */
 function EditModal({item,onClose,onSave}){
   const [qty,setQty]=useState(1);
   const [size,setSize]=useState("M");
   const [color,setColor]=useState("Default");
-  const sizes=["XS","S","M","L","XL","XXL"];
-  const colors=["Default","Black","White","Navy","Grey","Beige"];
   return(
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",zIndex:3000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
-      <div style={{background:"#fff",borderRadius:16,width:440,maxWidth:"100%",overflow:"hidden",boxShadow:"0 20px 60px rgba(0,0,0,0.25)",animation:"modalIn .25s ease"}}>
-        {/* Header */}
+      <div style={{background:"#fff",borderRadius:16,width:440,maxWidth:"100%",overflow:"hidden",boxShadow:"0 20px 60px rgba(0,0,0,0.25)"}}>
         <div style={{display:"flex",alignItems:"center",gap:12,padding:"16px 20px",borderBottom:"1px solid #f0ede8"}}>
           <div style={{width:56,height:56,borderRadius:10,overflow:"hidden",background:"#f5f3f0",flexShrink:0}}>
             <img src={item.img} alt={item.name} style={{width:"100%",height:"100%",objectFit:"cover"}} onError={e=>e.target.style.display="none"}/>
           </div>
           <div style={{flex:1}}>
-            <p style={{fontFamily:"'Playfair Display',serif",fontSize:15,fontWeight:600,color:"#1c1917",margin:0,lineHeight:1.3}}>{item.name}</p>
-            <p style={{fontFamily:"'DM Mono',monospace",fontSize:13,color:"#c47d2a",margin:"4px 0 0"}}>{fmt(item.price)}</p>
+            <p style={{fontSize:15,fontWeight:600,color:"#1c1917",margin:0,lineHeight:1.3}}>{item.name}</p>
+            <p style={{fontFamily:"monospace",fontSize:13,color:"#c47d2a",margin:"4px 0 0"}}>{fmt(item.price)}</p>
           </div>
-          <button onClick={onClose} style={{background:"#f5f3f0",border:"none",borderRadius:"50%",width:32,height:32,cursor:"pointer",fontSize:14,color:"#78716c",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+          <button onClick={onClose} style={{background:"#f5f3f0",border:"none",borderRadius:"50%",width:32,height:32,cursor:"pointer",fontSize:14,color:"#78716c"}}>✕</button>
         </div>
-        {/* Body */}
         <div style={{padding:"18px 20px"}}>
-          {/* Size */}
           <div style={{marginBottom:16}}>
-            <p style={{fontFamily:"'Jost',sans-serif",fontSize:12,fontWeight:700,color:"#78716c",letterSpacing:1.2,textTransform:"uppercase",marginBottom:8}}>Size</p>
+            <p style={{fontSize:11,fontWeight:700,color:"#78716c",letterSpacing:1.2,textTransform:"uppercase",marginBottom:8}}>Size</p>
             <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-              {sizes.map(s=>(
-                <button key={s} onClick={()=>setSize(s)} style={{padding:"6px 14px",borderRadius:8,border:`1.5px solid ${size===s?"#1c1917":"#e7e4e0"}`,background:size===s?"#1c1917":"#fff",color:size===s?"#fff":"#44403c",fontFamily:"'Jost',sans-serif",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all .15s"}}>
+              {["XS","S","M","L","XL","XXL"].map(s=>(
+                <button key={s} onClick={()=>setSize(s)} style={{padding:"6px 14px",borderRadius:8,border:`1.5px solid ${size===s?"#1c1917":"#e7e4e0"}`,background:size===s?"#1c1917":"#fff",color:size===s?"#fff":"#44403c",fontSize:12,fontWeight:600,cursor:"pointer"}}>
                   {s}
                 </button>
               ))}
             </div>
           </div>
-          {/* Color */}
           <div style={{marginBottom:16}}>
-            <p style={{fontFamily:"'Jost',sans-serif",fontSize:12,fontWeight:700,color:"#78716c",letterSpacing:1.2,textTransform:"uppercase",marginBottom:8}}>Color</p>
+            <p style={{fontSize:11,fontWeight:700,color:"#78716c",letterSpacing:1.2,textTransform:"uppercase",marginBottom:8}}>Color</p>
             <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-              {colors.map(c=>(
-                <button key={c} onClick={()=>setColor(c)} style={{padding:"6px 14px",borderRadius:8,border:`1.5px solid ${color===c?"#1c1917":"#e7e4e0"}`,background:color===c?"#1c1917":"#fff",color:color===c?"#fff":"#44403c",fontFamily:"'Jost',sans-serif",fontSize:12,fontWeight:600,cursor:"pointer",transition:"all .15s"}}>
+              {["Default","Black","White","Navy","Grey","Beige"].map(c=>(
+                <button key={c} onClick={()=>setColor(c)} style={{padding:"6px 14px",borderRadius:8,border:`1.5px solid ${color===c?"#1c1917":"#e7e4e0"}`,background:color===c?"#1c1917":"#fff",color:color===c?"#fff":"#44403c",fontSize:12,fontWeight:600,cursor:"pointer"}}>
                   {c}
                 </button>
               ))}
             </div>
           </div>
-          {/* Qty */}
           <div style={{marginBottom:20}}>
-            <p style={{fontFamily:"'Jost',sans-serif",fontSize:12,fontWeight:700,color:"#78716c",letterSpacing:1.2,textTransform:"uppercase",marginBottom:8}}>Quantity</p>
-            <div style={{display:"flex",alignItems:"center",gap:0,border:"1px solid #e7e4e0",borderRadius:10,overflow:"hidden",width:"fit-content"}}>
-              <button onClick={()=>setQty(q=>Math.max(1,q-1))} style={{width:40,height:40,border:"none",background:"#f5f3f0",cursor:"pointer",fontSize:16,color:"#44403c",display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
-              <span style={{width:44,textAlign:"center",fontFamily:"'DM Mono',monospace",fontSize:14,fontWeight:600,color:"#1c1917"}}>{qty}</span>
-              <button onClick={()=>setQty(q=>q+1)} style={{width:40,height:40,border:"none",background:"#f5f3f0",cursor:"pointer",fontSize:16,color:"#44403c",display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
+            <p style={{fontSize:11,fontWeight:700,color:"#78716c",letterSpacing:1.2,textTransform:"uppercase",marginBottom:8}}>Quantity</p>
+            <div style={{display:"flex",alignItems:"center",border:"1px solid #e7e4e0",borderRadius:10,overflow:"hidden",width:"fit-content"}}>
+              <button onClick={()=>setQty(q=>Math.max(1,q-1))} style={{width:40,height:40,border:"none",background:"#f5f3f0",cursor:"pointer",fontSize:16,color:"#44403c"}}>−</button>
+              <span style={{width:44,textAlign:"center",fontFamily:"monospace",fontSize:14,fontWeight:600,color:"#1c1917"}}>{qty}</span>
+              <button onClick={()=>setQty(q=>q+1)} style={{width:40,height:40,border:"none",background:"#f5f3f0",cursor:"pointer",fontSize:16,color:"#44403c"}}>+</button>
             </div>
           </div>
-          <button onClick={()=>onSave({...item,qty,size,color})} style={{width:"100%",background:"#1c1917",color:"#fff",border:"none",borderRadius:10,padding:"13px",fontSize:12,fontWeight:700,cursor:"pointer",letterSpacing:1.5,textTransform:"uppercase",fontFamily:"'Jost',sans-serif",boxShadow:"0 4px 16px rgba(0,0,0,0.2)"}}>
+          <button onClick={()=>onSave({...item,qty,size,color})} style={{width:"100%",background:"#1c1917",color:"#fff",border:"none",borderRadius:10,padding:"13px",fontSize:12,fontWeight:700,cursor:"pointer",letterSpacing:1.5,textTransform:"uppercase"}}>
             Add to Cart — {fmt(item.price*qty)}
           </button>
         </div>
@@ -185,27 +176,22 @@ function EditModal({item,onClose,onSave}){
   );
 }
 
-/* ── Product Card (Jumia style) ─────────────────────────────────────────── */
 function ProductCard({item,onAdd,onEdit,agentPick}){
   const [imgErr,setImgErr]=useState(false);
   const [wishlist,setWishlist]=useState(false);
   const pct=disc(item.price,item.oldPrice);
   return(
-    <div style={{background:"#fff",border:"1px solid #e7e4e0",borderRadius:4,overflow:"hidden",cursor:"pointer",position:"relative",transition:"box-shadow .2s",fontFamily:"'Jost',sans-serif"}}
+    <div className="product-card" style={{background:"#fff",border:"1px solid #e7e4e0",position:"relative",cursor:"pointer",transition:"box-shadow .2s"}}
       onMouseEnter={e=>e.currentTarget.style.boxShadow="0 4px 20px rgba(0,0,0,0.1)"}
       onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
-      {/* Discount badge */}
-      <div style={{position:"absolute",top:8,left:8,background:"#c41e3a",color:"#fff",fontSize:10,fontWeight:700,padding:"3px 8px",borderRadius:3,zIndex:2,letterSpacing:0.5}}>
+      <div style={{position:"absolute",top:8,left:8,background:"#c41e3a",color:"#fff",fontSize:10,fontWeight:700,padding:"3px 8px",borderRadius:3,zIndex:2}}>
         -{pct}%
       </div>
-      {/* Wishlist */}
       <button onClick={()=>setWishlist(w=>!w)} style={{position:"absolute",top:8,right:8,background:"rgba(255,255,255,0.9)",border:"none",borderRadius:"50%",width:30,height:30,cursor:"pointer",zIndex:2,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,boxShadow:"0 1px 4px rgba(0,0,0,0.1)"}}>
         {wishlist?"❤️":"🤍"}
       </button>
-      {/* AI Pick badge */}
-      {agentPick&&<div style={{position:"absolute",top:40,left:8,background:"#c47d2a",color:"#fff",fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,zIndex:2,letterSpacing:0.8,textTransform:"uppercase"}}>AI Pick</div>}
-      {/* Image */}
-      <div style={{height:180,background:"#f9f7f5",display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}}>
+      {agentPick&&<div style={{position:"absolute",top:40,left:8,background:"#c47d2a",color:"#fff",fontSize:9,fontWeight:700,padding:"2px 8px",borderRadius:3,zIndex:2,textTransform:"uppercase"}}>AI Pick</div>}
+      <div className="product-img" style={{background:"#f9f7f5",display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}}>
         {!imgErr?(
           <img src={item.img} alt={item.name} onError={()=>setImgErr(true)} style={{width:"100%",height:"100%",objectFit:"cover",transition:"transform .4s"}}
             onMouseEnter={e=>e.target.style.transform="scale(1.06)"}
@@ -214,27 +200,20 @@ function ProductCard({item,onAdd,onEdit,agentPick}){
           <span style={{fontSize:52}}>{item.emoji||"👕"}</span>
         )}
       </div>
-      {/* Info */}
       <div style={{padding:"10px 12px 12px"}}>
-        <p style={{fontFamily:"'Jost',sans-serif",fontSize:13,fontWeight:500,color:"#1c1917",margin:"0 0 4px",lineHeight:1.3,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.name}</p>
+        <p style={{fontSize:13,fontWeight:500,color:"#1c1917",margin:"0 0 4px",lineHeight:1.3,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{item.name}</p>
         <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:2}}>
-          <span style={{fontFamily:"'DM Mono',monospace",fontSize:14,fontWeight:700,color:"#c41e3a"}}>{fmt(item.price)}</span>
+          <span style={{fontFamily:"monospace",fontSize:14,fontWeight:700,color:"#c41e3a"}}>{fmt(item.price)}</span>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}>
-          <span style={{fontFamily:"'DM Mono',monospace",fontSize:11,color:"#a8a29e",textDecoration:"line-through"}}>{fmt(item.oldPrice)}</span>
-          <span style={{fontSize:10,color:"#78716c"}}>{item.desc}</span>
+          <span style={{fontFamily:"monospace",fontSize:11,color:"#a8a29e",textDecoration:"line-through"}}>{fmt(item.oldPrice)}</span>
         </div>
-        {/* Buttons */}
         <div style={{display:"flex",gap:6}}>
-          <button onClick={()=>onAdd(item)} style={{flex:1,background:"#f97316",color:"#fff",border:"none",borderRadius:4,padding:"8px 0",fontSize:11,fontWeight:700,cursor:"pointer",letterSpacing:0.8,textTransform:"uppercase",transition:"background .15s"}}
-            onMouseEnter={e=>e.currentTarget.style.background="#ea6c0a"}
-            onMouseLeave={e=>e.currentTarget.style.background="#f97316"}>
+          <button onClick={()=>onAdd(item)} className="add-btn" style={{flex:1,background:"#f97316",color:"#fff",border:"none",borderRadius:4,padding:"8px 0",fontSize:11,fontWeight:700,cursor:"pointer",textTransform:"uppercase",transition:"background .15s"}}>
             Add to Cart
           </button>
-          <button onClick={()=>onEdit(item)} style={{width:36,background:"#f5f3f0",border:"1px solid #e7e4e0",borderRadius:4,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",transition:"background .15s",flexShrink:0}}
-            title="Edit options"
-            onMouseEnter={e=>e.currentTarget.style.background="#e7e4e0"}
-            onMouseLeave={e=>e.currentTarget.style.background="#f5f3f0"}>
+          <button onClick={()=>onEdit(item)} style={{width:36,background:"#f5f3f0",border:"1px solid #e7e4e0",borderRadius:4,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,flexShrink:0}}
+            title="Edit options">
             ✏️
           </button>
         </div>
@@ -243,16 +222,15 @@ function ProductCard({item,onAdd,onEdit,agentPick}){
   );
 }
 
-/* ── Cart Drawer ─────────────────────────────────────────────────────────── */
 function CartDrawer({cart,onRemove,onCheckout,onClose,wallet}){
   const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
   return(
     <>
       <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.4)",zIndex:1100,backdropFilter:"blur(2px)"}}/>
-      <aside style={{position:"fixed",top:0,right:0,width:380,height:"100%",background:"#fff",zIndex:1200,display:"flex",flexDirection:"column",boxShadow:"-8px 0 40px rgba(0,0,0,0.12)",animation:"drawerIn .28s ease",fontFamily:"'Jost',sans-serif"}}>
+      <aside className="cart-drawer" style={{position:"fixed",top:0,right:0,height:"100%",background:"#fff",zIndex:1200,display:"flex",flexDirection:"column",boxShadow:"-8px 0 40px rgba(0,0,0,0.12)",animation:"drawerIn .28s ease"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 20px",borderBottom:"1px solid #f0ede8"}}>
           <div>
-            <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:700,color:"#1c1917",margin:0}}>Your Cart</h2>
+            <h2 style={{fontSize:20,fontWeight:700,color:"#1c1917",margin:0}}>Your Cart</h2>
             <p style={{fontSize:11,color:"#a8a29e",margin:"3px 0 0"}}>{cart.reduce((s,i)=>s+i.qty,0)} items</p>
           </div>
           <button onClick={onClose} style={{background:"#f5f3f0",border:"none",borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:14,color:"#78716c",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
@@ -269,11 +247,11 @@ function CartDrawer({cart,onRemove,onCheckout,onClose,wallet}){
                 <img src={item.img} alt={item.name} style={{width:"100%",height:"100%",objectFit:"cover"}} onError={e=>e.target.style.display="none"}/>
               </div>
               <div style={{flex:1,minWidth:0}}>
-                <p style={{fontFamily:"'Jost',sans-serif",fontSize:13,fontWeight:600,color:"#1c1917",margin:0,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.name}</p>
+                <p style={{fontSize:13,fontWeight:600,color:"#1c1917",margin:0,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{item.name}</p>
                 <p style={{fontSize:11,color:"#a8a29e",margin:"2px 0 0"}}>Qty {item.qty}{item.size?` · ${item.size}`:""}{item.color&&item.color!=="Default"?` · ${item.color}`:""}</p>
               </div>
               <div style={{textAlign:"right",flexShrink:0}}>
-                <p style={{fontFamily:"'DM Mono',monospace",fontSize:12,fontWeight:600,color:"#1c1917",margin:0}}>{fmt(item.price*item.qty)}</p>
+                <p style={{fontFamily:"monospace",fontSize:12,fontWeight:600,color:"#1c1917",margin:0}}>{fmt(item.price*item.qty)}</p>
                 <button onClick={()=>onRemove(item.id)} style={{background:"none",border:"none",color:"#a8a29e",cursor:"pointer",fontSize:10,marginTop:4,padding:0,textDecoration:"underline"}}>remove</button>
               </div>
             </div>
@@ -283,11 +261,11 @@ function CartDrawer({cart,onRemove,onCheckout,onClose,wallet}){
           <div style={{padding:"14px 20px 22px",borderTop:"1px solid #f0ede8"}}>
             {[["Subtotal",fmt(total)],["Gas (USDC)","~0.001"]].map(([k,v])=>(
               <div key={k} style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"#a8a29e",marginBottom:4}}>
-                <span>{k}</span><span style={{fontFamily:"'DM Mono',monospace"}}>{v}</span>
+                <span>{k}</span><span style={{fontFamily:"monospace"}}>{v}</span>
               </div>
             ))}
-            <div style={{display:"flex",justifyContent:"space-between",fontSize:16,fontWeight:700,color:"#1c1917",borderTop:"1px solid #f0ede8",paddingTop:10,marginTop:6,marginBottom:14,fontFamily:"'Playfair Display',serif"}}>
-              <span>Total</span><span style={{fontFamily:"'DM Mono',monospace",fontSize:14}}>{fmt(total)}</span>
+            <div style={{display:"flex",justifyContent:"space-between",fontSize:17,fontWeight:700,color:"#1c1917",borderTop:"1px solid #f0ede8",paddingTop:10,marginTop:6,marginBottom:14}}>
+              <span>Total</span><span style={{fontFamily:"monospace",fontSize:14}}>{fmt(total)}</span>
             </div>
             <div style={{background:"#1c1917",borderRadius:10,padding:"9px 13px",marginBottom:12,display:"flex",alignItems:"center",gap:10}}>
               <div style={{width:26,height:26,background:"#c47d2a",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:800,color:"#fff",flexShrink:0}}>◎</div>
@@ -296,7 +274,7 @@ function CartDrawer({cart,onRemove,onCheckout,onClose,wallet}){
                 <p style={{fontSize:9,color:"#57534e",margin:"2px 0 0"}}>Sub-second finality · Circle L1</p>
               </div>
             </div>
-            <button onClick={onCheckout} style={{width:"100%",background:"#f97316",color:"#fff",border:"none",borderRadius:10,padding:"13px",fontSize:12,fontWeight:700,cursor:"pointer",letterSpacing:1.5,textTransform:"uppercase",fontFamily:"'Jost',sans-serif",boxShadow:"0 4px 16px rgba(249,115,22,0.3)"}}>
+            <button onClick={onCheckout} style={{width:"100%",background:"#f97316",color:"#fff",border:"none",borderRadius:10,padding:"13px",fontSize:12,fontWeight:700,cursor:"pointer",letterSpacing:1.5,textTransform:"uppercase"}}>
               {wallet?"Pay with USDC on Arc →":"Connect Wallet to Pay →"}
             </button>
           </div>
@@ -306,12 +284,12 @@ function CartDrawer({cart,onRemove,onCheckout,onClose,wallet}){
   );
 }
 
-/* ── Checkout Modal ──────────────────────────────────────────────────────── */
 function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
   const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
   const [step,setStep]=useState("review");
   const [txHash,setTxHash]=useState("");
   const [customerEmail,setCustomerEmail]=useState("");
+
   const pay=async()=>{
     if(!window.ethereum){addToast("No wallet detected","error");return;}
     setStep("signing");
@@ -322,7 +300,7 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
         catch(e){
           try{await window.ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:ARC_CHAIN_ID}]});}
           catch(se){
-            addToast(se.code===4001?"Please approve the network switch":"Add Arc Testnet manually in your wallet","error");
+            addToast(se.code===4001?"Please approve the network switch":"Add Arc Testnet manually","error");
             setStep("review");return;
           }
         }
@@ -330,7 +308,10 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
       const amt=Math.round(total*1e6);
       const data="0xa9059cbb"+MERCHANT_ADDR.slice(2).padStart(64,"0")+amt.toString(16).padStart(64,"0");
       const hash=await window.ethereum.request({method:"eth_sendTransaction",params:[{from:wallet,to:USDC_ADDRESS,data,gas:"0x186A0"}]});
-      setTxHash(hash);setStep("success");onSuccess();addToast("Payment confirmed on Arc!","success");
+      setTxHash(hash);
+      setStep("success");
+      onSuccess();
+      addToast("Payment confirmed on Arc!","success");
       if(customerEmail){
         try{
           await fetch("/api/send-confirmation",{
@@ -338,7 +319,7 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
             headers:{"Content-Type":"application/json"},
             body:JSON.stringify({customerEmail,customerWallet:wallet,items:cart,total,txHash:hash}),
           });
-          addToast("Order confirmation email sent!","success");
+          addToast("Confirmation email sent!","success");
         }catch(e){console.log("Email error:",e);}
       }
     }catch(err){
@@ -346,24 +327,26 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
       setStep("review");
     }
   };
+
   return(
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.65)",zIndex:2000,display:"flex",alignItems:"center",justifyContent:"center",padding:16,backdropFilter:"blur(4px)"}}>
-      <div style={{background:"#fff",borderRadius:16,width:460,maxWidth:"100%",padding:30,position:"relative",boxShadow:"0 32px 80px rgba(0,0,0,0.3)",animation:"modalIn .3s ease",fontFamily:"'Jost',sans-serif"}}>
+      <div style={{background:"#fff",borderRadius:16,width:460,maxWidth:"100%",padding:28,position:"relative",boxShadow:"0 32px 80px rgba(0,0,0,0.3)",maxHeight:"90vh",overflowY:"auto"}}>
         <button onClick={onClose} style={{position:"absolute",top:12,right:12,background:"#f5f3f0",border:"none",borderRadius:8,width:30,height:30,cursor:"pointer",fontSize:13,color:"#78716c",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+
         {step==="review"&&<>
-          <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#1c1917",margin:"0 0 3px"}}>Order Summary</h2>
-          <p style={{fontSize:11,color:"#a8a29e",margin:"0 0 12px",letterSpacing:0.3}}>Review before paying with USDC on Arc</p>
+          <h2 style={{fontSize:22,fontWeight:700,color:"#1c1917",margin:"0 0 3px"}}>Order Summary</h2>
+          <p style={{fontSize:11,color:"#a8a29e",margin:"0 0 14px"}}>Review before paying with USDC on Arc</p>
           <div style={{marginBottom:14}}>
-            <label style={{fontSize:11,color:"#78716c",display:"block",marginBottom:6,letterSpacing:0.5,fontFamily:"'Jost',sans-serif",textTransform:"uppercase",fontWeight:700}}>📧 Email for order confirmation</label>
+            <label style={{fontSize:11,color:"#78716c",display:"block",marginBottom:6,letterSpacing:0.5,textTransform:"uppercase",fontWeight:700}}>📧 Email for confirmation</label>
             <input type="email" value={customerEmail} onChange={e=>setCustomerEmail(e.target.value)} placeholder="you@email.com"
-              style={{width:"100%",background:"#faf9f7",border:"1px solid #e7e4e0",borderRadius:8,padding:"10px 12px",fontSize:12,color:"#1c1917",outline:"none",fontFamily:"'Jost',sans-serif"}}
+              style={{width:"100%",background:"#faf9f7",border:"1px solid #e7e4e0",borderRadius:8,padding:"10px 12px",fontSize:12,color:"#1c1917",outline:"none"}}
               onFocus={e=>e.target.style.borderColor="#c47d2a"} onBlur={e=>e.target.style.borderColor="#e7e4e0"}/>
           </div>
           <div style={{background:"#faf9f7",borderRadius:10,border:"1px solid #f0ede8",marginBottom:16,maxHeight:140,overflowY:"auto"}}>
             {cart.map(i=>(
               <div key={i.id} style={{display:"flex",justifyContent:"space-between",padding:"6px 14px",borderBottom:"1px solid #f0ede8",fontSize:13,color:"#1c1917"}}>
                 <span>{i.name} <span style={{color:"#a8a29e"}}>×{i.qty}</span></span>
-                <span style={{fontFamily:"'DM Mono',monospace",fontSize:11}}>{fmt(i.price*i.qty)}</span>
+                <span style={{fontFamily:"monospace",fontSize:11}}>{fmt(i.price*i.qty)}</span>
               </div>
             ))}
           </div>
@@ -371,38 +354,42 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
               <div style={{width:30,height:30,background:"#c47d2a",borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"#fff",fontWeight:800,flexShrink:0}}>◎</div>
               <div>
-                <p style={{fontFamily:"'Playfair Display',serif",fontSize:14,fontWeight:700,color:"#fff",margin:0}}>Arc Blockchain · USDC</p>
-                <p style={{fontSize:9,color:"#57534e",letterSpacing:1.2,textTransform:"uppercase",margin:"2px 0 0"}}>Circle L1 · Rabby & MetaMask supported</p>
+                <p style={{fontSize:14,fontWeight:700,color:"#fff",margin:0}}>Arc Blockchain · USDC</p>
+                <p style={{fontSize:9,color:"#57534e",letterSpacing:1.2,textTransform:"uppercase",margin:"2px 0 0"}}>Circle L1 · Rabby & MetaMask</p>
               </div>
             </div>
             {[["Wallet",trunc(wallet)||"Not connected"],["Network","Arc Testnet (5042002)"],["Gas","~0.001 USDC"]].map(([k,v])=>(
               <div key={k} style={{display:"flex",justifyContent:"space-between",fontSize:11,marginBottom:3}}>
-                <span style={{color:"#57534e"}}>{k}</span><span style={{fontFamily:"'DM Mono',monospace",color:"#a8a29e"}}>{v}</span>
+                <span style={{color:"#57534e"}}>{k}</span>
+                <span style={{fontFamily:"monospace",color:"#a8a29e"}}>{v}</span>
               </div>
             ))}
-            <div style={{display:"flex",justifyContent:"space-between",fontFamily:"'Playfair Display',serif",fontWeight:700,fontSize:16,color:"#fff",borderTop:"1px solid #292524",paddingTop:8,marginTop:6}}>
-              <span>Total</span><span style={{fontFamily:"'DM Mono',monospace",fontSize:13,color:"#c47d2a"}}>{fmt(total)}</span>
+            <div style={{display:"flex",justifyContent:"space-between",fontWeight:700,fontSize:16,color:"#fff",borderTop:"1px solid #292524",paddingTop:8,marginTop:6}}>
+              <span>Total</span>
+              <span style={{fontFamily:"monospace",fontSize:13,color:"#c47d2a"}}>{fmt(total)}</span>
             </div>
           </div>
           <div style={{display:"flex",gap:10}}>
             <button onClick={onClose} style={{flex:1,background:"#f5f3f0",border:"1px solid #e7e4e0",borderRadius:10,padding:"11px",fontSize:11,cursor:"pointer",color:"#78716c",letterSpacing:1.5,textTransform:"uppercase"}}>Cancel</button>
-            <button onClick={pay} style={{flex:2,background:"#f97316",color:"#fff",border:"none",borderRadius:10,padding:"11px",fontSize:11,fontWeight:700,cursor:"pointer",letterSpacing:1.5,textTransform:"uppercase",boxShadow:"0 4px 14px rgba(249,115,22,0.35)"}}>Pay {fmt(total)}</button>
+            <button onClick={pay} style={{flex:2,background:"#f97316",color:"#fff",border:"none",borderRadius:10,padding:"11px",fontSize:11,fontWeight:700,cursor:"pointer",letterSpacing:1.5,textTransform:"uppercase"}}>Pay {fmt(total)}</button>
           </div>
         </>}
+
         {step==="signing"&&(
           <div style={{textAlign:"center",padding:"44px 0"}}>
             <div style={{fontSize:40,marginBottom:14,animation:"spin 1s linear infinite",display:"inline-block"}}>⚡</div>
-            <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#1c1917",marginBottom:6}}>Signing Transaction</h3>
+            <h3 style={{fontSize:22,fontWeight:700,color:"#1c1917",marginBottom:6}}>Signing Transaction</h3>
             <p style={{fontSize:12,color:"#a8a29e"}}>Approve in your wallet</p>
             <p style={{fontSize:10,color:"#c47d2a",letterSpacing:1.5,textTransform:"uppercase",marginTop:6}}>Arc finality &lt;1 second</p>
           </div>
         )}
+
         {step==="success"&&(
           <div style={{textAlign:"center",padding:"34px 0"}}>
             <div style={{width:56,height:56,background:"#1c1917",borderRadius:"50%",margin:"0 auto 16px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,color:"#c47d2a"}}>✓</div>
-            <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:24,fontWeight:700,color:"#1c1917",marginBottom:5}}>Payment Confirmed</h3>
+            <h3 style={{fontSize:24,fontWeight:700,color:"#1c1917",marginBottom:5}}>Payment Confirmed</h3>
             <p style={{fontSize:12,color:"#a8a29e",marginBottom:16}}>Settled on Arc Blockchain</p>
-            {txHash&&<p style={{fontSize:9,fontFamily:"'DM Mono',monospace",color:"#a8a29e",background:"#faf9f7",borderRadius:8,padding:"8px 12px",wordBreak:"break-all",marginBottom:16,border:"1px solid #f0ede8"}}>{txHash}</p>}
+            {txHash&&<p style={{fontSize:9,fontFamily:"monospace",color:"#a8a29e",background:"#faf9f7",borderRadius:8,padding:"8px 12px",wordBreak:"break-all",marginBottom:16,border:"1px solid #f0ede8"}}>{txHash}</p>}
             <button onClick={onClose} style={{background:"#1c1917",color:"#fff",border:"none",borderRadius:10,padding:"11px 28px",fontSize:11,fontWeight:700,cursor:"pointer",letterSpacing:1.5,textTransform:"uppercase"}}>Continue Shopping</button>
           </div>
         )}
@@ -411,7 +398,6 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
   );
 }
 
-/* ── AI Agent Chat ────────────────────────────────────────────────────────── */
 function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClose}){
   const [msgs,setMsgs]=useState([{role:"assistant",text:"Hi! I'm your ArcWear AI agent 👋\n\nTell me what you're looking for — an outfit, a budget, an occasion — and I'll search, add items to your cart, and handle USDC checkout on Arc."}]);
   const [input,setInput]=useState("");
@@ -450,45 +436,17 @@ function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClo
     const res=await fetch("/api/agent",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        tools:AGENT_TOOLS,
-        messages:apiMsgs,
-      }),
+      body:JSON.stringify({tools:AGENT_TOOLS,messages:apiMsgs}),
     });
     const data=await res.json();
-
-    // Check for errors
-    if(data.error){
-      console.log("Agent API error:", data.error);
-      setTools([]);
-      return "Sorry, I ran into an issue. Please try again.";
-    }
-
-    let text="";
-    const toolBlocks=[];
-
-    for(const b of data.content||[]){
-      if(b.type==="text") text+=b.text;
-      if(b.type==="tool_use") toolBlocks.push(b);
-    }
-
+    if(data.error){setTools([]);return "Sorry, I ran into an issue. Please try again.";}
+    let text="";const toolBlocks=[];
+    for(const b of data.content||[]){if(b.type==="text")text+=b.text;if(b.type==="tool_use")toolBlocks.push(b);}
     if(toolBlocks.length>0){
       setTools(toolBlocks.map(b=>b.name));
-      const results=toolBlocks.map(b=>{
-        const result=exec(b.name,b.input);
-        return {
-          type:"tool_result",
-          tool_use_id:b.id,
-          content:JSON.stringify(result),
-        };
-      });
-      return runAgent([
-        ...apiMsgs,
-        {role:"assistant",content:data.content},
-        {role:"user",content:results},
-      ]);
+      const results=toolBlocks.map(b=>({type:"tool_result",tool_use_id:b.id,content:JSON.stringify(exec(b.name,b.input))}));
+      return runAgent([...apiMsgs,{role:"assistant",content:data.content},{role:"user",content:results}]);
     }
-
     setTools([]);
     return text||"Done! What else can I help with?";
   };
@@ -509,8 +467,7 @@ function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClo
   return(
     <>
       <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:1300,background:"rgba(0,0,0,0.2)"}}/>
-      <div style={{position:"fixed",bottom:24,right:24,width:385,height:565,background:"#fff",borderRadius:20,boxShadow:"0 24px 72px rgba(0,0,0,0.2)",zIndex:1400,display:"flex",flexDirection:"column",overflow:"hidden",animation:"agentIn .35s cubic-bezier(.16,1,.3,1)",fontFamily:"'Jost',sans-serif"}}>
-        {/* Header */}
+      <div className="agent-panel" style={{position:"fixed",background:"#fff",boxShadow:"0 24px 72px rgba(0,0,0,0.2)",zIndex:1400,display:"flex",flexDirection:"column",overflow:"hidden"}}>
         <div style={{background:"#1c1917",padding:"12px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
             <div style={{position:"relative"}}>
@@ -522,17 +479,15 @@ function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClo
               <p style={{fontSize:8,color:"#c47d2a",letterSpacing:1.5,textTransform:"uppercase",margin:"2px 0 0"}}>AI · USDC · Arc Blockchain</p>
             </div>
           </div>
-          <button onClick={onClose} style={{background:"rgba(255,255,255,0.08)",border:"none",borderRadius:8,color:"#78716c",width:26,height:26,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
+          <button onClick={onClose} style={{background:"rgba(255,255,255,0.08)",border:"none",borderRadius:8,color:"#888",width:26,height:26,cursor:"pointer",fontSize:12,display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
         </div>
-        {/* Tool ticker */}
         {tools.length>0&&(
           <div style={{background:"#faf9f7",borderBottom:"1px solid #f0ede8",padding:"5px 14px",display:"flex",gap:6,alignItems:"center",flexShrink:0}}>
             <span style={{fontSize:8,color:"#c47d2a",fontWeight:700,animation:"pulse .8s infinite"}}>●</span>
             {tools.map((t,i)=><span key={i} style={{background:"#fef3c7",border:"1px solid #fde68a",borderRadius:20,padding:"2px 9px",fontSize:8,color:"#92400e",letterSpacing:1,textTransform:"uppercase",fontWeight:700}}>⚡ {t.replace(/_/g," ")}</span>)}
           </div>
         )}
-        {/* Messages */}
-        <div style={{flex:1,overflowY:"scroll",padding:"13px 14px",display:"flex",flexDirection:"column",gap:10,scrollbarWidth:"thin",scrollbarColor:"#c8c0b5 #f5f3f0"}}>
+        <div style={{flex:1,overflowY:"auto",padding:"13px 14px",display:"flex",flexDirection:"column",gap:10}}>
           {msgs.map((m,i)=>(
             <div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start",gap:8,alignItems:"flex-end"}}>
               {m.role==="assistant"&&<div style={{width:26,height:26,background:"linear-gradient(135deg,#c47d2a,#e8a849)",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:"#fff",fontWeight:800,flexShrink:0}}>◎</div>}
@@ -552,16 +507,14 @@ function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClo
           )}
           <div ref={bottomRef}/>
         </div>
-        {/* Chips */}
         {msgs.length<=1&&(
           <div style={{padding:"0 13px 10px",display:"flex",flexWrap:"wrap",gap:5,flexShrink:0}}>
-            {CHIPS.map((c,i)=><button key={i} onClick={()=>setInput(c)} style={{background:"#faf9f7",border:"1px solid #e7e4e0",borderRadius:20,padding:"4px 11px",fontSize:10,color:"#78716c",cursor:"pointer",fontFamily:"'Jost',sans-serif"}}>{c}</button>)}
+            {CHIPS.map((c,i)=><button key={i} onClick={()=>setInput(c)} style={{background:"#faf9f7",border:"1px solid #e7e4e0",borderRadius:20,padding:"4px 11px",fontSize:10,color:"#78716c",cursor:"pointer"}}>{c}</button>)}
           </div>
         )}
-        {/* Input */}
         <div style={{padding:"9px 13px 14px",borderTop:"1px solid #f0ede8",display:"flex",gap:8,flexShrink:0}}>
           <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="Ask about outfits, budgets, styles…"
-            style={{flex:1,background:"#faf9f7",border:"1px solid #e7e4e0",borderRadius:10,padding:"9px 13px",fontSize:12,color:"#1c1917",outline:"none",fontFamily:"'Jost',sans-serif"}}
+            style={{flex:1,background:"#faf9f7",border:"1px solid #e7e4e0",borderRadius:10,padding:"9px 13px",fontSize:12,color:"#1c1917",outline:"none"}}
             onFocus={e=>e.target.style.borderColor="#c47d2a"} onBlur={e=>e.target.style.borderColor="#e7e4e0"}/>
           <button onClick={send} disabled={loading||!input.trim()} style={{background:loading||!input.trim()?"#e7e4e0":"#1c1917",color:"#fff",border:"none",borderRadius:10,padding:"0 16px",fontSize:10,fontWeight:700,cursor:loading||!input.trim()?"not-allowed":"pointer",letterSpacing:1.2,textTransform:"uppercase"}}>
             {loading?"…":"Send"}
@@ -572,18 +525,18 @@ function AgentChat({cart,setCart,setActiveSection,setCheckoutOpen,addToast,onClo
   );
 }
 
-/* ── Main App ─────────────────────────────────────────────────────────────── */
 export default function ArcWear(){
-  const [section,setSection]    =useState("men");
-  const [activeCat,setActiveCat]=useState(null);
-  const [cart,setCart]          =useState([]);
-  const [cartOpen,setCartOpen]  =useState(false);
-  const [checkout,setCheckout]  =useState(false);
-  const [agentOpen,setAgent]    =useState(false);
-  const [wallet,setWallet]      =useState(null);
-  const [toasts,setToasts]      =useState([]);
-  const [scrolled,setScrolled]  =useState(false);
-  const [editItem,setEditItem]  =useState(null);
+  const [section,setSection]     =useState("men");
+  const [activeCat,setActiveCat] =useState(null);
+  const [cart,setCart]           =useState([]);
+  const [cartOpen,setCartOpen]   =useState(false);
+  const [checkout,setCheckout]   =useState(false);
+  const [agentOpen,setAgent]     =useState(false);
+  const [wallet,setWallet]       =useState(null);
+  const [toasts,setToasts]       =useState([]);
+  const [scrolled,setScrolled]   =useState(false);
+  const [editItem,setEditItem]   =useState(null);
+  const [mobileMenu,setMobileMenu]=useState(false);
 
   useEffect(()=>{
     const h=()=>setScrolled(window.scrollY>50);
@@ -610,7 +563,7 @@ export default function ArcWear(){
 
   const addToCartWithOptions=item=>{
     setCart(prev=>{const ex=prev.find(x=>x.id===item.id&&x.size===item.size&&x.color===item.color);if(ex)return prev.map(x=>x.id===item.id&&x.size===item.size&&x.color===item.color?{...x,qty:x.qty+item.qty}:x);return[...prev,item];});
-    addToast(`${item.name} (${item.size}, ${item.color}) added`,"success");
+    addToast(`${item.name} added`,"success");
     setEditItem(null);
   };
 
@@ -620,10 +573,12 @@ export default function ArcWear(){
   const displayCats=activeCat?cats.filter(([k])=>k===activeCat):cats;
 
   return(
-    <div style={{minHeight:"100vh",background:"#fff",fontFamily:"'Jost',sans-serif"}}>
+    <div style={{minHeight:"100vh",background:"#fff",fontFamily:"sans-serif"}}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Jost:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
         *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'Jost',sans-serif;}
+
         @keyframes toastIn{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
         @keyframes drawerIn{from{transform:translateX(100%)}to{transform:none}}
         @keyframes modalIn{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
@@ -632,52 +587,128 @@ export default function ArcWear(){
         @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
         @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,.45)}60%{box-shadow:0 0 0 12px rgba(249,115,22,0)}}
+        @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+
         ::-webkit-scrollbar{width:4px}
         ::-webkit-scrollbar-track{background:#faf9f7}
         ::-webkit-scrollbar-thumb{background:#d4cfc8;border-radius:4px}
+
+        /* ── Product Card ── */
+        .product-card{border-radius:0}
+        .product-img{height:200px}
+        .add-btn:hover{background:#ea6c0a!important}
+
+        /* ── Cart Drawer ── */
+        .cart-drawer{width:380px}
+
+        /* ── Agent Panel ── */
+        .agent-panel{
+          bottom:24px;right:24px;
+          width:385px;height:565px;
+          border-radius:20px;
+          animation:agentIn .35s cubic-bezier(.16,1,.3,1);
+        }
+
+        /* ── Nav ── */
+        .nav-desktop{display:flex}
+        .nav-mobile-tabs{display:none}
+        .mobile-menu{display:none}
+        .desktop-only{display:flex}
+        .mobile-bottom-nav{display:none}
+        .hero-stats{display:flex}
+
+        /* ── Product Grid ── */
+        .product-grid{
+          display:grid;
+          grid-template-columns:repeat(auto-fill,minmax(185px,1fr));
+          gap:1px;
+          border:1px solid #e7e4e0;
+          border-radius:4px;
+          overflow:hidden;
+          background:#e7e4e0;
+        }
+        .product-grid > *{background:#fff}
+
+        /* ── TABLET 768px–1024px ── */
+        @media(max-width:1024px) and (min-width:641px){
+          .product-grid{grid-template-columns:repeat(3,1fr)}
+          .product-img{height:180px}
+          .cart-drawer{width:360px}
+        }
+
+        /* ── MOBILE 640px and below ── */
+        @media(max-width:640px){
+          .nav-desktop{display:none!important}
+          .nav-mobile-tabs{display:flex!important}
+          .desktop-only{display:none!important}
+          .mobile-bottom-nav{display:flex!important}
+          .hero-stats{display:none!important}
+
+          .product-grid{
+            grid-template-columns:repeat(2,1fr);
+          }
+          .product-img{height:150px!important}
+          .product-card{border-radius:0}
+
+          .cart-drawer{width:100%!important}
+
+          .agent-panel{
+            bottom:0!important;
+            right:0!important;
+            width:100%!important;
+            height:80vh!important;
+            border-radius:20px 20px 0 0!important;
+          }
+
+          .nav-wrap{padding:0 12px!important}
+          .hero-section{padding:24px 16px!important}
+          .filter-wrap{padding:0 12px!important}
+          .main-wrap{padding:12px 8px 100px!important}
+          .section-header{padding:0 4px!important}
+          .fab-agent{bottom:76px!important;right:16px!important}
+          .scroll-top{display:none!important}
+          .topbar-text::after{content:"🎉 Free shipping over 150 USDC"}
+          .topbar-text{font-size:0}
+        }
+
+        /* ── SMALL MOBILE 380px and below ── */
+        @media(max-width:380px){
+          .product-img{height:130px!important}
+          .agent-panel{height:85vh!important}
+        }
       `}</style>
 
       {/* ── TOP BAR ── */}
       <div style={{background:"#1c1917",padding:"6px 0",textAlign:"center"}}>
-        <p style={{fontSize:11,color:"#fde68a",letterSpacing:0.5,fontFamily:"'Jost',sans-serif"}}>
+        <p className="topbar-text" style={{fontSize:11,color:"#fde68a",letterSpacing:0.5}}>
           🎉 Free shipping on orders over 150 USDC · Pay with USDC on Arc Blockchain
         </p>
       </div>
 
       {/* ── NAVBAR ── */}
-      <nav style={{
-        position:"sticky",top:0,zIndex:900,
-        background: scrolled?"rgba(255,255,255,0.97)":"#fff",
-        backdropFilter: scrolled?"blur(12px)":"none",
-        borderBottom:"1px solid #e7e4e0",
-        boxShadow: scrolled?"0 2px 16px rgba(0,0,0,0.06)":"none",
-        transition:"all .3s",
-      }}>
-        <div style={{maxWidth:1280,margin:"0 auto",padding:"0 24px",height:64,display:"flex",alignItems:"center",justifyContent:"space-between",gap:16}}>
+      <nav style={{position:"sticky",top:0,zIndex:900,background:scrolled?"rgba(255,255,255,0.97)":"#fff",backdropFilter:scrolled?"blur(12px)":"none",borderBottom:"1px solid #e7e4e0",boxShadow:scrolled?"0 2px 16px rgba(0,0,0,0.06)":"none",transition:"all .3s"}}>
+        <div className="nav-wrap" style={{maxWidth:1280,margin:"0 auto",padding:"0 24px",height:60,display:"flex",alignItems:"center",justifyContent:"space-between",gap:16}}>
+
           {/* Logo */}
           <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
-           <div style={{height:44,display:"flex",alignItems:"center"}}>
-  <img src="/arcc.png" alt="ArcWear" style={{height:"44px",width:"auto",objectFit:"contain"}}/>
-</div>
-            <div>
-              <p style={{fontFamily:"'Playfair Display',serif",fontSize:16,fontWeight:700,color:"#1c1917",lineHeight:1,letterSpacing:0.5}}>ArcWear</p>
-              <p style={{fontSize:7,color:"#c47d2a",fontWeight:600,letterSpacing:2,textTransform:"uppercase",marginTop:1}}>Agentic · Arc Blockchain</p>
+            <div style={{height:40,display:"flex",alignItems:"center"}}>
+              <img src="/ARCWEAR.png" alt="ArcWear" style={{height:"40px",width:"auto",objectFit:"contain"}}
+                onError={e=>{e.target.style.display="none";e.target.nextSibling.style.display="flex";}}/>
+              <div style={{display:"none",width:36,height:36,background:"#1c1917",borderRadius:8,alignItems:"center",justifyContent:"center"}}>
+                <span style={{fontSize:12,fontWeight:700,color:"#c47d2a"}}>AW</span>
+              </div>
+            </div>
+            <div className="desktop-only" style={{flexDirection:"column"}}>
+              <p style={{fontSize:7,color:"#c47d2a",fontWeight:600,letterSpacing:2,textTransform:"uppercase"}}>Agentic · Arc Blockchain</p>
             </div>
           </div>
 
-          {/* Section Tabs */}
-          <div style={{display:"flex",gap:1,background:"#f5f3f0",borderRadius:10,padding:3}}>
+          {/* Desktop Section Tabs */}
+          <div className="nav-desktop" style={{gap:1,background:"#f5f3f0",borderRadius:10,padding:3}}>
             {["men","women","children"].map(k=>{
               const s=CATALOGUE[k];
               return(
-                <button key={k} onClick={()=>{setSection(k);setActiveCat(null);}} style={{
-                  background:section===k?"#fff":"transparent",
-                  color:section===k?"#1c1917":"#78716c",
-                  border:"none",cursor:"pointer",padding:"7px 16px",borderRadius:8,
-                  fontFamily:"'Jost',sans-serif",fontSize:12,fontWeight:600,
-                  boxShadow:section===k?"0 1px 8px rgba(0,0,0,0.08)":"none",
-                  transition:"all .2s",display:"flex",alignItems:"center",gap:5,
-                }}>
+                <button key={k} onClick={()=>{setSection(k);setActiveCat(null);}} style={{background:section===k?"#fff":"transparent",color:section===k?"#1c1917":"#78716c",border:"none",cursor:"pointer",padding:"7px 16px",borderRadius:8,fontSize:12,fontWeight:600,boxShadow:section===k?"0 1px 8px rgba(0,0,0,0.08)":"none",transition:"all .2s",display:"flex",alignItems:"center",gap:5}}>
                   <span style={{fontSize:14}}>{s.icon}</span>{s.label}
                 </button>
               );
@@ -689,28 +720,37 @@ export default function ArcWear(){
             {wallet?(
               <div style={{display:"flex",alignItems:"center",gap:5,background:"#faf9f7",border:"1px solid #e7e4e0",borderRadius:20,padding:"5px 10px"}}>
                 <div style={{width:6,height:6,background:"#22c55e",borderRadius:"50%"}}/>
-                <span style={{fontFamily:"'DM Mono',monospace",fontSize:9,color:"#c47d2a"}}>{trunc(wallet)}</span>
+                <span style={{fontFamily:"monospace",fontSize:9,color:"#c47d2a"}}>{trunc(wallet)}</span>
               </div>
             ):(
-              <button onClick={connectWallet} style={{background:"#fff",color:"#1c1917",border:"1px solid #e7e4e0",borderRadius:20,padding:"7px 14px",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Jost',sans-serif",display:"flex",alignItems:"center",gap:5,transition:"border-color .15s"}}
+              <button onClick={connectWallet} className="desktop-only" style={{background:"#fff",color:"#1c1917",border:"1px solid #e7e4e0",borderRadius:20,padding:"7px 14px",fontSize:11,fontWeight:600,cursor:"pointer",alignItems:"center",gap:5,transition:"border-color .15s"}}
                 onMouseEnter={e=>e.currentTarget.style.borderColor="#c47d2a"}
                 onMouseLeave={e=>e.currentTarget.style.borderColor="#e7e4e0"}>
                 <span>◎</span> Connect Wallet
               </button>
             )}
-            {/* CART with icon */}
-            <button onClick={()=>setCartOpen(true)} style={{background:"#f97316",color:"#fff",border:"none",borderRadius:20,padding:"8px 16px",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"'Jost',sans-serif",display:"flex",alignItems:"center",gap:6,boxShadow:"0 2px 12px rgba(249,115,22,0.3)",transition:"all .15s"}}
-              onMouseEnter={e=>{e.currentTarget.style.background="#ea6c0a";e.currentTarget.style.transform="translateY(-1px)";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="#f97316";e.currentTarget.style.transform="none";}}>
+            <button onClick={()=>setCartOpen(true)} style={{background:"#f97316",color:"#fff",border:"none",borderRadius:20,padding:"8px 16px",fontSize:11,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:6,boxShadow:"0 2px 12px rgba(249,115,22,0.3)"}}>
               🛒 Cart
               {cartCount>0&&<span style={{background:"#fff",color:"#f97316",borderRadius:"50%",width:18,height:18,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:800}}>{cartCount}</span>}
             </button>
           </div>
         </div>
+
+        {/* Mobile Section Tabs */}
+        <div className="nav-mobile-tabs" style={{display:"none",gap:6,overflowX:"auto",padding:"8px 12px 10px",borderTop:"1px solid #f0ede8"}}>
+          {["men","women","children"].map(k=>{
+            const s=CATALOGUE[k];
+            return(
+              <button key={k} onClick={()=>{setSection(k);setActiveCat(null);}} style={{background:section===k?"#1c1917":"#f5f3f0",color:section===k?"#fff":"#78716c",border:"none",cursor:"pointer",padding:"8px 18px",borderRadius:20,fontSize:12,fontWeight:600,display:"flex",alignItems:"center",gap:5,whiteSpace:"nowrap",flexShrink:0}}>
+                <span style={{fontSize:14}}>{s.icon}</span>{s.label}
+              </button>
+            );
+          })}
+        </div>
       </nav>
 
       {/* ── HERO ── */}
-      <section style={{background:"#1c1917",padding:"44px 24px 38px",position:"relative",overflow:"hidden"}}>
+      <section className="hero-section" style={{background:"#1c1917",padding:"44px 24px 38px",position:"relative",overflow:"hidden"}}>
         <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(circle at 15% 50%, rgba(196,125,42,0.15) 0%, transparent 55%), radial-gradient(circle at 85% 20%, rgba(249,115,22,0.08) 0%, transparent 50%)",pointerEvents:"none"}}/>
         <div style={{maxWidth:1280,margin:"0 auto",position:"relative"}}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:24}}>
@@ -719,27 +759,22 @@ export default function ArcWear(){
                 <div style={{width:5,height:5,background:"#22c55e",borderRadius:"50%",animation:"pulse 2s infinite"}}/>
                 <span style={{fontSize:9,color:"#fb923c",fontWeight:700,letterSpacing:2,textTransform:"uppercase"}}>AI Agent · Live on Arc</span>
               </div>
-              <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(28px,4vw,48px)",fontWeight:700,color:"#fff",lineHeight:1.15,marginBottom:10}}>
+              <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(26px,4vw,48px)",fontWeight:700,color:"#fff",lineHeight:1.15,marginBottom:10}}>
                 Shop with ArcWear
               </h1>
               <p style={{fontSize:13,color:"#78716c",lineHeight:1.65,marginBottom:22}}>
-                {sec.label}'s collection — shirts, trousers, belts, headwear & footwear · Pay with USDC on Arc Blockchain
+                {sec.label}'s collection — shirts, trousers, belts, headwear & footwear · Pay with USDC on Arc
               </p>
               <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-                <button onClick={()=>setAgent(true)} style={{background:"#f97316",color:"#fff",border:"none",borderRadius:10,padding:"11px 22px",fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"'Jost',sans-serif",boxShadow:"0 6px 20px rgba(249,115,22,0.3)",display:"flex",alignItems:"center",gap:7,transition:"all .15s"}}
-                  onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"}
-                  onMouseLeave={e=>e.currentTarget.style.transform="none"}>
+                <button onClick={()=>setAgent(true)} style={{background:"#f97316",color:"#fff",border:"none",borderRadius:10,padding:"11px 22px",fontSize:12,fontWeight:700,cursor:"pointer",boxShadow:"0 6px 20px rgba(249,115,22,0.3)",display:"flex",alignItems:"center",gap:7}}>
                   ◎ Shop with AI Agent
                 </button>
-                <button onClick={()=>document.getElementById("products")?.scrollIntoView({behavior:"smooth"})} style={{color:"#d4cfc8",border:"1px solid #44403c",background:"transparent",borderRadius:10,padding:"11px 22px",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Jost',sans-serif",transition:"all .15s"}}
-                  onMouseEnter={e=>e.currentTarget.style.borderColor="#78716c"}
-                  onMouseLeave={e=>e.currentTarget.style.borderColor="#44403c"}>
-                  Browse Collection ↓
+                <button onClick={()=>document.getElementById("products")?.scrollIntoView({behavior:"smooth"})} style={{color:"#d4cfc8",border:"1px solid #44403c",background:"transparent",borderRadius:10,padding:"11px 22px",fontSize:12,fontWeight:600,cursor:"pointer"}}>
+                  Browse ↓
                 </button>
               </div>
             </div>
-            {/* Stats */}
-            <div style={{display:"flex",gap:20,flexWrap:"wrap"}}>
+            <div className="hero-stats" style={{gap:20,flexWrap:"wrap"}}>
               {[["5","Categories"],["25+","Products"],["USDC","Payment"],["Arc","Blockchain"]].map(([v,l])=>(
                 <div key={l} style={{textAlign:"center"}}>
                   <p style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#fff",lineHeight:1}}>{v}</p>
@@ -752,12 +787,11 @@ export default function ArcWear(){
       </section>
 
       {/* ── FILTER BAR ── */}
-      <div style={{background:"#fff",borderBottom:"1px solid #e7e4e0",position:"sticky",top:64,zIndex:800}}>
-        <div style={{maxWidth:1280,margin:"0 auto",padding:"0 24px",height:48,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+      <div style={{background:"#fff",borderBottom:"1px solid #e7e4e0",position:"sticky",top:60,zIndex:800}}>
+        <div className="filter-wrap" style={{maxWidth:1280,margin:"0 auto",padding:"0 24px",height:48,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <div style={{display:"flex",gap:6,overflowX:"auto",padding:"4px 0"}}>
             {[["all","All"],["shirts","Shirts"],["trousers","Trousers"],["belts","Belts"],["caps","Headwear"],["shoes","Footwear"]].map(([k,label])=>(
-              <button key={k} onClick={()=>setActiveCat(k==="all"?null:k)}
-                style={{background:(k==="all"&&!activeCat)||(activeCat===k)?"#1c1917":"#f5f3f0",color:(k==="all"&&!activeCat)||(activeCat===k)?"#fff":"#78716c",border:`1px solid ${(k==="all"&&!activeCat)||(activeCat===k)?"#1c1917":"#e7e4e0"}`,borderRadius:20,padding:"4px 14px",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"'Jost',sans-serif",whiteSpace:"nowrap",transition:"all .15s"}}>
+              <button key={k} onClick={()=>setActiveCat(k==="all"?null:k)} style={{background:(k==="all"&&!activeCat)||(activeCat===k)?"#1c1917":"#f5f3f0",color:(k==="all"&&!activeCat)||(activeCat===k)?"#fff":"#78716c",border:`1px solid ${(k==="all"&&!activeCat)||(activeCat===k)?"#1c1917":"#e7e4e0"}`,borderRadius:20,padding:"4px 14px",fontSize:10,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap",transition:"all .15s"}}>
                 {label}
               </button>
             ))}
@@ -769,18 +803,16 @@ export default function ArcWear(){
       </div>
 
       {/* ── PRODUCTS ── */}
-      <main id="products" style={{maxWidth:1280,margin:"0 auto",padding:"24px 24px 80px"}}>
+      <main id="products" className="main-wrap" style={{maxWidth:1280,margin:"0 auto",padding:"24px 24px 80px"}}>
         {displayCats.map(([catKey,cat])=>(
-          <section key={catKey} style={{marginBottom:40}}>
-            {/* Section header */}
-            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14,paddingBottom:10,borderBottom:"2px solid #f5f3f0"}}>
+          <section key={catKey} style={{marginBottom:36}}>
+            <div className="section-header" style={{display:"flex",alignItems:"center",gap:10,marginBottom:14,paddingBottom:10,borderBottom:"2px solid #f5f3f0"}}>
               <span style={{fontSize:20}}>{cat.emoji}</span>
               <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:"#1c1917"}}>{cat.label}</h2>
               <div style={{flex:1,height:1,background:"#f0ede8"}}/>
               <span style={{fontSize:11,color:"#a8a29e"}}>{cat.items.length} products</span>
             </div>
-            {/* Jumia-style grid */}
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(185px,1fr))",gap:1,border:"1px solid #e7e4e0",borderRadius:4,overflow:"hidden"}}>
+            <div className="product-grid">
               {cat.items.map(item=>(
                 <ProductCard key={item.id} item={{...item,categoryLabel:cat.label}} onAdd={addToCart} onEdit={setEditItem} agentPick={false}/>
               ))}
@@ -808,7 +840,7 @@ export default function ArcWear(){
 
       {/* ── FLOATING BUTTONS ── */}
       {!agentOpen&&(
-        <button onClick={()=>setAgent(true)} style={{position:"fixed",bottom:28,right:28,background:"#1c1917",color:"#fff",border:"2px solid #f97316",borderRadius:28,padding:"13px 20px",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:8,boxShadow:"0 8px 28px rgba(0,0,0,0.25)",zIndex:700,fontFamily:"'Jost',sans-serif",animation:"glow 3s ease-in-out infinite",transition:"transform .2s"}}
+        <button className="fab-agent" onClick={()=>setAgent(true)} style={{position:"fixed",bottom:28,right:28,background:"#1c1917",color:"#fff",border:"2px solid #f97316",borderRadius:28,padding:"13px 20px",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:8,boxShadow:"0 8px 28px rgba(0,0,0,0.25)",zIndex:700,animation:"glow 3s ease-in-out infinite",transition:"transform .2s"}}
           onMouseEnter={e=>e.currentTarget.style.transform="scale(1.04)"}
           onMouseLeave={e=>e.currentTarget.style.transform="none"}>
           <div style={{position:"relative",width:8,height:8}}>
@@ -818,13 +850,27 @@ export default function ArcWear(){
           ◎ AI Agent
         </button>
       )}
+
       {scrolled&&(
-        <button onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} style={{position:"fixed",bottom:28,left:28,background:"#fff",color:"#1c1917",border:"1px solid #e7e4e0",borderRadius:"50%",width:42,height:42,fontSize:16,cursor:"pointer",boxShadow:"0 4px 16px rgba(0,0,0,0.1)",zIndex:700,display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}}
-          onMouseEnter={e=>e.currentTarget.style.boxShadow="0 6px 20px rgba(0,0,0,0.15)"}
-          onMouseLeave={e=>e.currentTarget.style.boxShadow="0 4px 16px rgba(0,0,0,0.1)"}>↑</button>
+        <button className="scroll-top" onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} style={{position:"fixed",bottom:28,left:28,background:"#fff",color:"#1c1917",border:"1px solid #e7e4e0",borderRadius:"50%",width:42,height:42,fontSize:16,cursor:"pointer",boxShadow:"0 4px 16px rgba(0,0,0,0.1)",zIndex:700,display:"flex",alignItems:"center",justifyContent:"center"}}>↑</button>
       )}
 
-      {/* Modals & Panels */}
+      {/* ── MOBILE BOTTOM NAV ── */}
+      <div className="mobile-bottom-nav" style={{display:"none",position:"fixed",bottom:0,left:0,right:0,background:"#fff",borderTop:"1px solid #e7e4e0",zIndex:600,boxShadow:"0 -4px 16px rgba(0,0,0,0.08)"}}>
+        {[
+          {icon:"🏠",label:"Home",action:()=>window.scrollTo({top:0,behavior:"smooth"})},
+          {icon:"◎",label:"Agent",action:()=>setAgent(true)},
+          {icon:"👤",label:"Wallet",action:connectWallet},
+          {icon:"🛒",label:cartCount>0?`Cart (${cartCount})`:"Cart",action:()=>setCartOpen(true)},
+        ].map(({icon,label,action})=>(
+          <button key={label} onClick={action} style={{flex:1,background:"none",border:"none",padding:"10px 4px",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+            <span style={{fontSize:20}}>{icon}</span>
+            <span style={{fontSize:9,color:"#78716c",fontWeight:600,letterSpacing:0.3}}>{label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Panels */}
       {editItem&&<EditModal item={editItem} onClose={()=>setEditItem(null)} onSave={addToCartWithOptions}/>}
       {cartOpen&&<CartDrawer cart={cart} onRemove={id=>setCart(p=>p.filter(x=>x.id!==id))} onCheckout={()=>{if(!wallet){connectWallet();return;}setCartOpen(false);setCheckout(true);}} onClose={()=>setCartOpen(false)} wallet={wallet}/>}
       {checkout&&<CheckoutModal cart={cart} wallet={wallet} onClose={()=>setCheckout(false)} onSuccess={()=>{setCart([]);setCheckout(false);}} addToast={addToast}/>}
