@@ -894,17 +894,6 @@ export default function ArcWear(){
       </main>
 
       {/* ── FLOATING BUTTONS ── */}
-      {!agentOpen&&(
-        <button onClick={()=>setAgent(true)} style={{position:"fixed",bottom:28,right:28,background:"#1c1917",color:"#fff",border:"2px solid #f97316",borderRadius:28,padding:"11px 18px",fontSize:11,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:7,boxShadow:"0 8px 28px rgba(0,0,0,0.25)",zIndex:700,animation:"glow 3s ease-in-out infinite",transition:"transform .2s"}}
-          onMouseEnter={e=>e.currentTarget.style.transform="scale(1.04)"}
-          onMouseLeave={e=>e.currentTarget.style.transform="none"}>
-          <div style={{position:"relative",width:7,height:7}}>
-            <div style={{width:7,height:7,background:"#22c55e",borderRadius:"50%"}}/>
-            <div style={{position:"absolute",inset:0,background:"#22c55e",borderRadius:"50%",animation:"pulse 1.5s ease-out infinite",opacity:0.5}}/>
-          </div>
-          ◎ AI Agent
-        </button>
-      )}
 
       {scrolled&&(
         <button className="scroll-top" onClick={()=>window.scrollTo({top:0,behavior:"smooth"})} style={{position:"fixed",bottom:28,left:28,background:"#fff",color:"#1c1917",border:"1px solid #e7e4e0",borderRadius:"50%",width:42,height:42,fontSize:16,cursor:"pointer",boxShadow:"0 4px 16px rgba(0,0,0,0.1)",zIndex:700,display:"flex",alignItems:"center",justifyContent:"center"}}>↑</button>
@@ -914,7 +903,7 @@ export default function ArcWear(){
       <div className="mobile-bottom-nav" style={{display:"none",position:"fixed",bottom:0,left:0,right:0,background:"#fff",borderTop:"1px solid #e7e4e0",zIndex:600,boxShadow:"0 -4px 16px rgba(0,0,0,0.08)"}}>
         {[
           {icon:"🏠",label:"Home",action:()=>window.scrollTo({top:0,behavior:"smooth"})},
-          {icon:"◎",label:"AI Agent",action:()=>setAgent(true)},
+
           {icon:"👤",label:"Wallet",action:connectWallet},
           {icon:"🛒",label:cartCount>0?`Cart (${cartCount})`:"Cart",action:()=>setCartOpen(true)},
         ].map(({icon,label,action})=>(
