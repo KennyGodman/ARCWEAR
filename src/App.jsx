@@ -8,7 +8,7 @@ const ARC_CHAIN_CONFIG = {
   blockExplorerUrls: ["https://testnet.arcscan.app"],
 };
 const USDC_ADDRESS  = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
-const MERCHANT_ADDR = "0xDemoMerchantAddress000000000000000000001";
+const MERCHANT_ADDR = "0x4932B6c1970131321B79d8Be02A1791A09554bf5";
 
 const CATALOGUE = {
   men: { label:"Men", icon:"👔", categories:{
@@ -704,11 +704,13 @@ export default function ArcWear(){
           </div>
 
           {/* Desktop Section Tabs */}
-          <div className="nav-desktop" style={{gap:1,background:"#f5f3f0",borderRadius:10,padding:3}}>
+          <div className="nav-desktop" style={{gap:0,background:"#f5f3f0",borderRadius:6,padding:3,border:"1px solid #e7e4e0"}}>
             {["men","women","children"].map(k=>{
               const s=CATALOGUE[k];
               return(
-                <button key={k} onClick={()=>{setSection(k);setActiveCat(null);}} style={{background:section===k?"#fff":"transparent",color:section===k?"#1c1917":"#78716c",border:"none",cursor:"pointer",padding:"7px 16px",borderRadius:8,fontSize:12,fontWeight:600,boxShadow:section===k?"0 1px 8px rgba(0,0,0,0.08)":"none",transition:"all .2s",display:"flex",alignItems:"center",gap:5}}>
+                <button key={k} onClick={()=>{setSection(k);setActiveCat(null);}} style={{background:section===k?"#1c1917":"transparent",color:section===k?"#fff":"#78716c",border:"none",cursor:"pointer",padding:"7px 18px",borderRadius:4,fontSize:12,fontWeight:600,boxShadow:"none",transition:"all .2s",display:"flex",alignItems:"center",gap:5}}
+                  onMouseEnter={e=>{if(section!==k){e.currentTarget.style.background="#e7e4e0";e.currentTarget.style.color="#1c1917";}}}
+                  onMouseLeave={e=>{if(section!==k){e.currentTarget.style.background="transparent";e.currentTarget.style.color="#78716c";}}}>
                   <span style={{fontSize:14}}>{s.icon}</span>{s.label}
                 </button>
               );
@@ -717,21 +719,60 @@ export default function ArcWear(){
 
           {/* Actions */}
           <div style={{display:"flex",gap:8,alignItems:"center"}}>
+
+            {/* Help Dropdown */}
+            <div style={{position:"relative"}} className="desktop-only"
+              onMouseEnter={e=>e.currentTarget.querySelector(".help-dropdown").style.display="block"}
+              onMouseLeave={e=>e.currentTarget.querySelector(".help-dropdown").style.display="none"}>
+              <button style={{background:"#fff",color:"#1c1917",border:"1px solid #e7e4e0",borderRadius:4,padding:"5px 11px",fontSize:10,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:4,transition:"all .15s"}}
+                onMouseEnter={e=>{e.currentTarget.style.background="#f5f3f0";}}
+                onMouseLeave={e=>{e.currentTarget.style.background="#fff";}}>
+                ❓ Help <span style={{fontSize:9}}>▼</span>
+              </button>
+              <div className="help-dropdown" style={{display:"none",position:"absolute",top:"100%",right:0,background:"#fff",border:"1px solid #e7e4e0",borderRadius:4,boxShadow:"0 8px 24px rgba(0,0,0,0.12)",minWidth:200,zIndex:999,overflow:"hidden",animation:"slideDown .2s ease"}}>
+                {[
+                  {icon:"🏠",label:"Help Center",href:"#"},
+                  {icon:"📦",label:"Place an order",href:"#"},
+                  {icon:"💳",label:"Payment options",href:"#"},
+                  {icon:"🚚",label:"Track an order",href:"#"},
+                  {icon:"❌",label:"Cancel an order",href:"#"},
+                  {icon:"↩️",label:"Returns & Refunds",href:"#"},
+                  {icon:"🍪",label:"Cookie Preferences",href:"#"},
+                ].map(({icon,label,href})=>(
+                  <a key={label} href={href} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 16px",fontSize:12,color:"#1c1917",textDecoration:"none",borderBottom:"1px solid #f5f3f0",transition:"background .15s"}}
+                    onMouseEnter={e=>e.currentTarget.style.background="#faf9f7"}
+                    onMouseLeave={e=>e.currentTarget.style.background="#fff"}>
+                    <span style={{fontSize:14}}>{icon}</span>{label}
+                  </a>
+                ))}
+                <div style={{padding:"10px 16px",borderTop:"1px solid #e7e4e0",background:"#f5f3f0"}}>
+                  <button style={{width:"100%",background:"#f97316",color:"#fff",border:"none",borderRadius:4,padding:"8px",fontSize:11,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
+                    💬 Live Chat
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Connect Wallet / Wallet Address */}
             {wallet?(
-              <div style={{display:"flex",alignItems:"center",gap:5,background:"#faf9f7",border:"1px solid #e7e4e0",borderRadius:20,padding:"5px 10px"}}>
+              <div style={{display:"flex",alignItems:"center",gap:5,background:"#faf9f7",border:"1px solid #e7e4e0",borderRadius:4,padding:"5px 10px"}}>
                 <div style={{width:6,height:6,background:"#22c55e",borderRadius:"50%"}}/>
                 <span style={{fontFamily:"monospace",fontSize:9,color:"#c47d2a"}}>{trunc(wallet)}</span>
               </div>
             ):(
-              <button onClick={connectWallet} className="desktop-only" style={{background:"#fff",color:"#1c1917",border:"1px solid #e7e4e0",borderRadius:20,padding:"7px 14px",fontSize:11,fontWeight:600,cursor:"pointer",alignItems:"center",gap:5,transition:"border-color .15s"}}
-                onMouseEnter={e=>e.currentTarget.style.borderColor="#c47d2a"}
-                onMouseLeave={e=>e.currentTarget.style.borderColor="#e7e4e0"}>
+              <button onClick={connectWallet} className="desktop-only" style={{background:"#fff",color:"#1c1917",border:"1px solid #e7e4e0",borderRadius:4,padding:"5px 11px",fontSize:10,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:4,transition:"all .2s"}}
+                onMouseEnter={e=>{e.currentTarget.style.background="#7c4a1a";e.currentTarget.style.color="#fff";e.currentTarget.style.borderColor="#7c4a1a";}}
+                onMouseLeave={e=>{e.currentTarget.style.background="#fff";e.currentTarget.style.color="#1c1917";e.currentTarget.style.borderColor="#e7e4e0";}}>
                 <span>◎</span> Connect Wallet
               </button>
             )}
-            <button onClick={()=>setCartOpen(true)} style={{background:"#f97316",color:"#fff",border:"none",borderRadius:20,padding:"8px 16px",fontSize:11,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:6,boxShadow:"0 2px 12px rgba(249,115,22,0.3)"}}>
+
+            {/* Cart Button */}
+            <button onClick={()=>setCartOpen(true)} style={{background:"#f97316",color:"#fff",border:"1px solid #f97316",borderRadius:4,padding:"5px 12px",fontSize:10,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:5,transition:"all .2s"}}
+              onMouseEnter={e=>{e.currentTarget.style.background="#7c4a1a";e.currentTarget.style.borderColor="#7c4a1a";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="#f97316";e.currentTarget.style.borderColor="#f97316";}}>
               🛒 Cart
-              {cartCount>0&&<span style={{background:"#fff",color:"#f97316",borderRadius:"50%",width:18,height:18,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:800}}>{cartCount}</span>}
+              {cartCount>0&&<span style={{background:"#fff",color:"#f97316",borderRadius:"50%",width:16,height:16,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:8,fontWeight:800}}>{cartCount}</span>}
             </button>
           </div>
         </div>
@@ -840,11 +881,11 @@ export default function ArcWear(){
 
       {/* ── FLOATING BUTTONS ── */}
       {!agentOpen&&(
-        <button className="fab-agent" onClick={()=>setAgent(true)} style={{position:"fixed",bottom:28,right:28,background:"#1c1917",color:"#fff",border:"2px solid #f97316",borderRadius:28,padding:"13px 20px",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:8,boxShadow:"0 8px 28px rgba(0,0,0,0.25)",zIndex:700,animation:"glow 3s ease-in-out infinite",transition:"transform .2s"}}
+        <button onClick={()=>setAgent(true)} style={{position:"fixed",bottom:28,right:28,background:"#1c1917",color:"#fff",border:"2px solid #f97316",borderRadius:28,padding:"11px 18px",fontSize:11,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:7,boxShadow:"0 8px 28px rgba(0,0,0,0.25)",zIndex:700,animation:"glow 3s ease-in-out infinite",transition:"transform .2s"}}
           onMouseEnter={e=>e.currentTarget.style.transform="scale(1.04)"}
           onMouseLeave={e=>e.currentTarget.style.transform="none"}>
-          <div style={{position:"relative",width:8,height:8}}>
-            <div style={{width:8,height:8,background:"#22c55e",borderRadius:"50%"}}/>
+          <div style={{position:"relative",width:7,height:7}}>
+            <div style={{width:7,height:7,background:"#22c55e",borderRadius:"50%"}}/>
             <div style={{position:"absolute",inset:0,background:"#22c55e",borderRadius:"50%",animation:"pulse 1.5s ease-out infinite",opacity:0.5}}/>
           </div>
           ◎ AI Agent
@@ -859,7 +900,7 @@ export default function ArcWear(){
       <div className="mobile-bottom-nav" style={{display:"none",position:"fixed",bottom:0,left:0,right:0,background:"#fff",borderTop:"1px solid #e7e4e0",zIndex:600,boxShadow:"0 -4px 16px rgba(0,0,0,0.08)"}}>
         {[
           {icon:"🏠",label:"Home",action:()=>window.scrollTo({top:0,behavior:"smooth"})},
-          {icon:"◎",label:"Agent",action:()=>setAgent(true)},
+          {icon:"◎",label:"AI Agent",action:()=>setAgent(true)},
           {icon:"👤",label:"Wallet",action:connectWallet},
           {icon:"🛒",label:cartCount>0?`Cart (${cartCount})`:"Cart",action:()=>setCartOpen(true)},
         ].map(({icon,label,action})=>(
