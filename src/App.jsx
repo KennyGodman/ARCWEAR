@@ -8,7 +8,27 @@ const ARC_CHAIN_CONFIG = {
   blockExplorerUrls: ["https://testnet.arcscan.app"],
 };
 const USDC_ADDRESS  = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
-const MERCHANT_ADDR = "0x4932B6c1970131321B79d8Be02A1791A09554bf5";
+const MERCHANT_ADDR = "0xDemoMerchantAddress000000000000000000001";
+
+
+function LogoImage(){
+  const [err,setErr]=useState(false);
+  if(err){
+    return(
+      <div style={{display:"flex",alignItems:"center",gap:6}}>
+        <div style={{width:36,height:36,background:"#1c1917",borderRadius:8,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+          <span style={{fontSize:12,fontWeight:800,color:"#c47d2a",letterSpacing:1}}>AW</span>
+        </div>
+        <span style={{fontFamily:"'Playfair Display',serif",fontSize:16,fontWeight:700,color:"#1c1917",letterSpacing:0.5}}>ArcWear</span>
+      </div>
+    );
+  }
+  return(
+    <img src="/arcc.png" alt="ArcWear"
+      style={{height:"44px",width:"auto",objectFit:"contain",maxWidth:160}}
+      onError={()=>setErr(true)}/>
+  );
+}
 
 const CATALOGUE = {
   men: { label:"Men", icon:"👔", categories:{
@@ -620,7 +640,7 @@ export default function ArcWear(){
         /* ── Product Grid ── */
         .product-grid{
           display:grid;
-          grid-template-columns:repeat(auto-fill,minmax(185px,1fr));
+          grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
           gap:1px;
           border:1px solid #e7e4e0;
           border-radius:4px;
@@ -687,19 +707,13 @@ export default function ArcWear(){
 
       {/* ── NAVBAR ── */}
       <nav style={{position:"sticky",top:0,zIndex:900,background:scrolled?"rgba(255,255,255,0.97)":"#fff",backdropFilter:scrolled?"blur(12px)":"none",borderBottom:"1px solid #e7e4e0",boxShadow:scrolled?"0 2px 16px rgba(0,0,0,0.06)":"none",transition:"all .3s"}}>
-        <div className="nav-wrap" style={{maxWidth:1280,margin:"0 auto",padding:"0 24px",height:60,display:"flex",alignItems:"center",justifyContent:"space-between",gap:16}}>
+        <div className="nav-wrap" style={{maxWidth:"100%",padding:"0 3%",height:60,display:"flex",alignItems:"center",justifyContent:"space-between",gap:16}}>
 
           {/* Logo */}
-          <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
-            <div style={{height:40,display:"flex",alignItems:"center"}}>
-              <img src="/arcc.png" alt="ArcWear" style={{height:"40px",width:"auto",objectFit:"contain"}}
-                onError={e=>{e.target.style.display="none";e.target.nextSibling.style.display="flex";}}/>
-              <div style={{display:"none",width:36,height:36,background:"#1c1917",borderRadius:8,alignItems:"center",justifyContent:"center"}}>
-                <span style={{fontSize:12,fontWeight:700,color:"#c47d2a"}}>AW</span>
-              </div>
-            </div>
+          <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
+            <LogoImage/>
             <div className="desktop-only" style={{flexDirection:"column"}}>
-              <p style={{fontSize:7,color:"#c47d2a",fontWeight:600,letterSpacing:2,textTransform:"uppercase"}}>Agentic · Arc Blockchain</p>
+              <p style={{fontSize:7,color:"#c47d2a",fontWeight:600,letterSpacing:2,textTransform:"uppercase",margin:0}}>Agentic · Arc Blockchain</p>
             </div>
           </div>
 
@@ -791,11 +805,11 @@ export default function ArcWear(){
       </nav>
 
       {/* ── HERO ── */}
-      <section className="hero-section" style={{background:"#1c1917",padding:"44px 24px 38px",position:"relative",overflow:"hidden"}}>
+      <section className="hero-section" style={{background:"#1c1917",padding:"44px 5% 38px",position:"relative",overflow:"hidden"}}>
         <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(circle at 15% 50%, rgba(196,125,42,0.15) 0%, transparent 55%), radial-gradient(circle at 85% 20%, rgba(249,115,22,0.08) 0%, transparent 50%)",pointerEvents:"none"}}/>
-        <div style={{maxWidth:1280,margin:"0 auto",position:"relative"}}>
+        <div style={{maxWidth:"100%",position:"relative"}}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:24}}>
-            <div style={{maxWidth:520}}>
+            <div style={{maxWidth:640}}>
               <div style={{display:"inline-flex",alignItems:"center",gap:7,background:"rgba(249,115,22,0.15)",border:"1px solid rgba(249,115,22,0.25)",borderRadius:20,padding:"4px 12px",marginBottom:14}}>
                 <div style={{width:5,height:5,background:"#22c55e",borderRadius:"50%",animation:"pulse 2s infinite"}}/>
                 <span style={{fontSize:9,color:"#fb923c",fontWeight:700,letterSpacing:2,textTransform:"uppercase"}}>AI Agent · Live on Arc</span>
@@ -829,7 +843,7 @@ export default function ArcWear(){
 
       {/* ── FILTER BAR ── */}
       <div style={{background:"#fff",borderBottom:"1px solid #e7e4e0",position:"sticky",top:60,zIndex:800}}>
-        <div className="filter-wrap" style={{maxWidth:1280,margin:"0 auto",padding:"0 24px",height:48,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div className="filter-wrap" style={{maxWidth:"100%",padding:"0 4%",height:48,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <div style={{display:"flex",gap:6,overflowX:"auto",padding:"4px 0"}}>
             {[["all","All"],["shirts","Shirts"],["trousers","Trousers"],["belts","Belts"],["caps","Headwear"],["shoes","Footwear"]].map(([k,label])=>(
               <button key={k} onClick={()=>setActiveCat(k==="all"?null:k)} style={{background:(k==="all"&&!activeCat)||(activeCat===k)?"#1c1917":"#f5f3f0",color:(k==="all"&&!activeCat)||(activeCat===k)?"#fff":"#78716c",border:`1px solid ${(k==="all"&&!activeCat)||(activeCat===k)?"#1c1917":"#e7e4e0"}`,borderRadius:20,padding:"4px 14px",fontSize:10,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap",transition:"all .15s"}}>
@@ -844,7 +858,7 @@ export default function ArcWear(){
       </div>
 
       {/* ── PRODUCTS ── */}
-      <main id="products" className="main-wrap" style={{maxWidth:1280,margin:"0 auto",padding:"24px 24px 80px"}}>
+      <main id="products" className="main-wrap" style={{maxWidth:"100%",padding:"24px 4% 80px"}}>
         {displayCats.map(([catKey,cat])=>(
           <section key={catKey} style={{marginBottom:36}}>
             <div className="section-header" style={{display:"flex",alignItems:"center",gap:10,marginBottom:14,paddingBottom:10,borderBottom:"2px solid #f5f3f0"}}>
