@@ -36,25 +36,36 @@ const CATALOGUE = {
       {id:"m-s1",name:"Oxford Button-Down",price:42,oldPrice:58,desc:"Egyptian cotton, spread collar",img:"https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=400&q=80"},
       {id:"m-s2",name:"Linen Crew Tee",price:28,oldPrice:38,desc:"Stonewashed linen, relaxed fit",img:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80"},
       {id:"m-s3",name:"Flannel Overshirt",price:65,oldPrice:80,desc:"Brushed flannel, double chest pocket",img:"https://images.unsplash.com/photo-1588359348347-9bc6cbbb689e?w=400&q=80"},
+      {id:"m-s4",name:"Knit Polo Shirt",price:48,oldPrice:65,desc:"Fine knit cotton, ribbed collar & cuffs",img:"https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=400&q=80"},
+      {id:"m-s5",name:"Denim Utility Shirt",price:55,oldPrice:75,desc:"Lightweight denim, double chest pockets",img:"https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&q=80"},
     ]},
     trousers:{ label:"Trousers", emoji:"👖", items:[
       {id:"m-t1",name:"Slim Chino",price:58,oldPrice:75,desc:"Stretch cotton, tapered leg",img:"https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&q=80"},
       {id:"m-t2",name:"Cargo Pants",price:72,oldPrice:90,desc:"Ripstop canvas, utility pockets",img:"https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&q=80"},
       {id:"m-t3",name:"Dress Trouser",price:85,oldPrice:105,desc:"Wool-blend, flat-front cut",img:"https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&q=80"},
+      {id:"m-t4",name:"Tailored Corduroy",price:78,oldPrice:98,desc:"Fine-wale corduroy, comfortable stretch",img:"https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&q=80"},
+      {id:"m-t5",name:"Relaxed Linen Pants",price:65,oldPrice:85,desc:"Drawstring waist, breathable fabric",img:"https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&q=80"},
     ]},
     belts:   { label:"Belts", emoji:"🪢", items:[
       {id:"m-b1",name:"Leather Classic",price:35,oldPrice:45,desc:"Full-grain Italian leather",img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80"},
       {id:"m-b2",name:"Woven Canvas Belt",price:22,oldPrice:30,desc:"Military-style, brass buckle",img:"https://images.unsplash.com/photo-1625496492751-47e1f4a25c15?w=400&q=80"},
+      {id:"m-b3",name:"Suede Dress Belt",price:38,oldPrice:52,desc:"Genuine brushed suede, brushed steel buckle",img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80"},
+      {id:"m-b4",name:"Braided Leather Belt",price:42,oldPrice:55,desc:"Intricately hand-woven leather cords",img:"https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&q=80"},
+      {id:"m-b5",name:"Reversible Smooth Belt",price:45,oldPrice:60,desc:"Dual-sided black/brown sleek leather",img:"https://images.unsplash.com/photo-1625496492751-47e1f4a25c15?w=400&q=80"},
     ]},
     caps:    { label:"Headwear", emoji:"🧢", items:[
       {id:"m-c1",name:"Snapback Cap",price:25,oldPrice:32,desc:"6-panel, structured brim",img:"https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400&q=80"},
       {id:"m-c2",name:"Bucket Hat",price:20,oldPrice:28,desc:"Waxed cotton, packable",img:"https://images.unsplash.com/photo-1556306535-0f09a537f0a3?w=400&q=80"},
       {id:"m-c3",name:"Beanie Knit",price:18,oldPrice:25,desc:"Merino wool, ribbed cuff",img:"https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=400&q=80"},
+      {id:"m-c4",name:"Merino Wool Beanie",price:24,oldPrice:32,desc:"Ultra-soft merino, dynamic thermal weave",img:"https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=400&q=80"},
+      {id:"m-c5",name:"Classic Fedora",price:45,oldPrice:60,desc:"Stiff wool felt, leather band accent",img:"https://images.unsplash.com/photo-1514327605112-b887c0e61c0a?w=400&q=80"},
     ]},
     shoes:   { label:"Footwear", emoji:"👟", items:[
       {id:"m-sh1",name:"White Leather Sneaker",price:110,oldPrice:140,desc:"Tumbled leather, cupsole",img:"https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&q=80"},
       {id:"m-sh2",name:"Chelsea Boot",price:145,oldPrice:180,desc:"Suede upper, elastic gusset",img:"https://images.unsplash.com/photo-1638247025967-b4e38f787b76?w=400&q=80"},
       {id:"m-sh3",name:"Loafer Slip-On",price:98,oldPrice:120,desc:"Horsebit detail, leather lining",img:"https://images.unsplash.com/photo-1631984564919-1f6e59f72f73?w=400&q=80"},
+      {id:"m-sh4",name:"Suede Desert Boot",price:125,oldPrice:160,desc:"Crepe sole, water-repellent suede upper",img:"https://images.unsplash.com/photo-1520639888713-7851133b1ed0?w=400&q=80"},
+      {id:"m-sh5",name:"Double Monk Strap",price:135,oldPrice:170,desc:"Burnished calfskin, silver buckle details",img:"https://images.unsplash.com/photo-1533867617858-e7b97e060509?w=400&q=80"},
     ]},
   }},
   women: { label:"Women", icon:"👗", categories:{
@@ -62,25 +73,36 @@ const CATALOGUE = {
       {id:"w-s1",name:"Silk Blouse",price:68,oldPrice:85,desc:"Mulberry silk, relaxed drape",img:"https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=400&q=80"},
       {id:"w-s2",name:"Crop Cami",price:32,oldPrice:42,desc:"Ribbed modal, adjustable straps",img:"https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=400&q=80"},
       {id:"w-s3",name:"Wrap Cardigan",price:55,oldPrice:70,desc:"Cashmere blend, tie-waist",img:"https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&q=80"},
+      {id:"w-s4",name:"Linen V-Neck Blouse",price:48,oldPrice:65,desc:"Relaxed linen, shell button front",img:"https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80"},
+      {id:"w-s5",name:"Off-Shoulder Ribbed Knit",price:45,oldPrice:60,desc:"Soft cotton-rib blend, long sleeves",img:"https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=400&q=80"},
     ]},
     trousers:{ label:"Bottoms", emoji:"👗", items:[
       {id:"w-t1",name:"High-Rise Flare",price:75,oldPrice:95,desc:"Stretch denim, wide flare hem",img:"https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&q=80"},
       {id:"w-t2",name:"Midi Skirt",price:60,oldPrice:78,desc:"Satin lining, A-line silhouette",img:"https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=400&q=80"},
       {id:"w-t3",name:"Tailored Wide-Leg",price:88,oldPrice:110,desc:"Crepe fabric, pleat front",img:"https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400&q=80"},
+      {id:"w-t4",name:"Paperbag Linen Shorts",price:42,oldPrice:58,desc:"Tie-waist belt, breezy linen fabric",img:"https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=400&q=80"},
+      {id:"w-t5",name:"Pleated Tapered Trouser",price:78,oldPrice:98,desc:"High-waist front pleats, ankle crop",img:"https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&q=80"},
     ]},
     belts:   { label:"Belts", emoji:"🪢", items:[
       {id:"w-b1",name:"Gold Chain Belt",price:38,oldPrice:50,desc:"Brass links, adjustable fit",img:"https://images.unsplash.com/photo-1624623278313-a930126a11c3?w=400&q=80"},
       {id:"w-b2",name:"Slim Patent",price:30,oldPrice:40,desc:"Patent leather, pin buckle",img:"https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&q=80"},
+      {id:"w-b3",name:"Studded Suede Belt",price:35,oldPrice:48,desc:"Gold-tone studs, rich suede strap",img:"https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&q=80"},
+      {id:"w-b4",name:"Wide Leather Waist Cinch",price:48,oldPrice:65,desc:"Premium smooth leather, statement buckle",img:"https://images.unsplash.com/photo-1624623278313-a930126a11c3?w=400&q=80"},
+      {id:"w-b5",name:"Woven Raffia Belt",price:26,oldPrice:38,desc:"Natural straw weave, round wooden buckle",img:"https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&q=80"},
     ]},
     caps:    { label:"Headwear", emoji:"🎩", items:[
       {id:"w-c1",name:"Wide Brim Sun Hat",price:40,oldPrice:52,desc:"Raffia weave, ribbon band",img:"https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400&q=80"},
       {id:"w-c2",name:"Classic Beret",price:28,oldPrice:36,desc:"Felted wool, French-style",img:"https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400&q=80"},
       {id:"w-c3",name:"Knit Pom Beanie",price:22,oldPrice:30,desc:"Chunky knit, removable pom",img:"https://images.unsplash.com/photo-1510598155236-d3e2e31d3e0c?w=400&q=80"},
+      {id:"w-c4",name:"Angora Cable Beanie",price:32,oldPrice:45,desc:"Warm angora blend, delicate cable knit",img:"https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=400&q=80"},
+      {id:"w-c5",name:"Felted Panama Hat",price:52,oldPrice:70,desc:"Sleek teardrop crown, raw-edge brim",img:"https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400&q=80"},
     ]},
     shoes:   { label:"Footwear", emoji:"👠", items:[
       {id:"w-sh1",name:"Block Heel Mule",price:120,oldPrice:150,desc:"Suede upper, 7cm block heel",img:"https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80"},
       {id:"w-sh2",name:"Platform Sneaker",price:95,oldPrice:120,desc:"Leather & canvas, 4cm platform",img:"https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&q=80"},
       {id:"w-sh3",name:"Kitten Heel Pump",price:138,oldPrice:170,desc:"Satin finish, pointed toe",img:"https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=400&q=80"},
+      {id:"w-sh4",name:"Pointed Toe Flat",price:88,oldPrice:110,desc:"Soft glove leather, cushioned insole",img:"https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80"},
+      {id:"w-sh5",name:"Ankle Strap Sandal",price:115,oldPrice:145,desc:"Block heel, gold buckle closure",img:"https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&q=80"},
     ]},
   }},
   children: { label:"Children", icon:"🧒", categories:{
@@ -88,23 +110,36 @@ const CATALOGUE = {
       {id:"k-s1",name:"Dino Print Tee",price:18,oldPrice:25,desc:"100% organic cotton, crew neck",img:"https://images.unsplash.com/photo-1519278409-1f56ab241a7d?w=400&q=80"},
       {id:"k-s2",name:"Rainbow Hoodie",price:32,oldPrice:42,desc:"Brushed fleece, kangaroo pocket",img:"https://images.unsplash.com/photo-1503944168849-8bf86875bbd8?w=400&q=80"},
       {id:"k-s3",name:"Striped Long Sleeve",price:22,oldPrice:30,desc:"Soft jersey, ribbed cuffs",img:"https://images.unsplash.com/photo-1471286174890-9c112ffca5b4?w=400&q=80"},
+      {id:"k-s4",name:"Flannel Plaid Shirt",price:25,oldPrice:35,desc:"Soft organic flannel, button-up front",img:"https://images.unsplash.com/photo-1519278409-1f56ab241a7d?w=400&q=80"},
+      {id:"k-s5",name:"Embroidered Knit Top",price:28,oldPrice:38,desc:"Cute floral accents, scalloped collar",img:"https://images.unsplash.com/photo-1503944168849-8bf86875bbd8?w=400&q=80"},
     ]},
     trousers:{ label:"Bottoms", emoji:"👖", items:[
       {id:"k-t1",name:"Elastic Joggers",price:25,oldPrice:32,desc:"French terry, elastic waist",img:"https://images.unsplash.com/photo-1519689373023-dd07c7988603?w=400&q=80"},
       {id:"k-t2",name:"Denim Shortalls",price:40,oldPrice:52,desc:"Stretch denim, adjustable straps",img:"https://images.unsplash.com/photo-1468820153901-27f1c5dcafd4?w=400&q=80"},
       {id:"k-t3",name:"Cargo Shorts",price:28,oldPrice:36,desc:"Ripstop, velcro side pockets",img:"https://images.unsplash.com/photo-1577253313708-cab167d2c474?w=400&q=80"},
+      {id:"k-t4",name:"Corduroy Overall Dress",price:35,oldPrice:48,desc:"Adjustable straps, front pouch pocket",img:"https://images.unsplash.com/photo-1519689373023-dd07c7988603?w=400&q=80"},
+      {id:"k-t5",name:"Chino Work Shorts",price:22,oldPrice:30,desc:"Durable twill, elastic button adjusters",img:"https://images.unsplash.com/photo-1468820153901-27f1c5dcafd4?w=400&q=80"},
     ]},
     belts:   { label:"Belts", emoji:"🪢", items:[
       {id:"k-b1",name:"Cartoon Buckle Belt",price:12,oldPrice:18,desc:"Woven, fun character buckle",img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80"},
+      {id:"k-b2",name:"Glitter Elastic Belt",price:14,oldPrice:20,desc:"Sparkly elastic webbing, heart-shape clasp",img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80"},
+      {id:"k-b3",name:"Braided Cotton Belt",price:15,oldPrice:22,desc:"Colorful cotton cord, brass hardware",img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80"},
+      {id:"k-b4",name:"Reversible Casual Belt",price:16,oldPrice:24,desc:"Two-tone webbed strap, steel buckle",img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80"},
+      {id:"k-b5",name:"Classic Toddler Suspenders",price:18,oldPrice:26,desc:"Y-back elastic strap, heavy-duty clips",img:"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80"},
     ]},
     caps:    { label:"Headwear", emoji:"🧢", items:[
       {id:"k-c1",name:"Dino Baseball Cap",price:15,oldPrice:22,desc:"Cotton twill, embroidered dino",img:"https://images.unsplash.com/photo-1534215754734-18e55d13e346?w=400&q=80"},
       {id:"k-c2",name:"Sun Protection Hat",price:20,oldPrice:28,desc:"UPF 50+, wide brim",img:"https://images.unsplash.com/photo-1556306535-0f09a537f0a3?w=400&q=80"},
+      {id:"k-c3",name:"Cozy Knit Ear Hat",price:18,oldPrice:25,desc:"Soft fleece lining, cute bear ear details",img:"https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=400&q=80"},
+      {id:"k-c4",name:"Straw Sun Visor",price:16,oldPrice:24,desc:"Open-top weave, velcro strap back",img:"https://images.unsplash.com/photo-1556306535-0f09a537f0a3?w=400&q=80"},
+      {id:"k-c5",name:"Waterproof Rain Hat",price:22,oldPrice:30,desc:"Wide brim, toggle drawstring chin strap",img:"https://images.unsplash.com/photo-1534215754734-18e55d13e346?w=400&q=80"},
     ]},
     shoes:   { label:"Footwear", emoji:"👟", items:[
       {id:"k-sh1",name:"Light-Up Sneakers",price:55,oldPrice:70,desc:"LED outsole, velcro close",img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80"},
       {id:"k-sh2",name:"Velcro Sandals",price:38,oldPrice:50,desc:"Quick-dry, adjustable strap",img:"https://images.unsplash.com/photo-1603487742131-4160ec999306?w=400&q=80"},
       {id:"k-sh3",name:"Rain Boots",price:42,oldPrice:55,desc:"Natural rubber, easy-pull tab",img:"https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=400&q=80"},
+      {id:"k-sh4",name:"Canvas Slip-On Loafer",price:35,oldPrice:46,desc:"Breathable canvas upper, flexible outsole",img:"https://images.unsplash.com/photo-1603487742131-4160ec999306?w=400&q=80"},
+      {id:"k-sh5",name:"Classic High-Top Sneaker",price:48,oldPrice:62,desc:"Lace closure with side zipper for easy on/off",img:"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80"},
     ]},
   }},
 };
@@ -145,6 +180,15 @@ function EditModal({item,onClose,onSave}){
   const [qty,setQty]=useState(1);
   const [size,setSize]=useState("M");
   const [color,setColor]=useState("Default");
+  const [added,setAdded]=useState(false);
+
+  const handleSave = (e) => {
+    setAdded(true);
+    setTimeout(() => {
+      onSave({...item,qty,size,color}, e);
+    }, 600);
+  };
+
   return(
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",zIndex:3000,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
       <div style={{background:"#fff",borderRadius:16,width:440,maxWidth:"100%",overflow:"hidden",boxShadow:"0 20px 60px rgba(0,0,0,0.25)"}}>
@@ -187,8 +231,8 @@ function EditModal({item,onClose,onSave}){
               <button onClick={()=>setQty(q=>q+1)} style={{width:40,height:40,border:"none",background:"#f5f3f0",cursor:"pointer",fontSize:16,color:"#44403c"}}>+</button>
             </div>
           </div>
-          <button onClick={()=>onSave({...item,qty,size,color})} style={{width:"100%",background:"#1c1917",color:"#fff",border:"none",borderRadius:10,padding:"13px",fontSize:12,fontWeight:700,cursor:"pointer",letterSpacing:1.5,textTransform:"uppercase"}}>
-            Add to Cart — {fmt(item.price*qty)}
+          <button onClick={handleSave} style={{width:"100%",background: added ? "hsl(158, 65%, 38%)" : "#1c1917",color:"#fff",border:"none",borderRadius:10,padding:"13px",fontSize:12,fontWeight:700,cursor:"pointer",letterSpacing:1.5,textTransform:"uppercase",transition:"all .25s cubic-bezier(0.175, 0.885, 0.32, 1.275)",transform:added?"scale(0.96)":"scale(1)"}}>
+            {added ? "✓ Added to Cart!" : `Add to Cart — ${fmt(item.price*qty)}`}
           </button>
         </div>
       </div>
@@ -199,9 +243,17 @@ function EditModal({item,onClose,onSave}){
 function ProductCard({item,onAdd,onEdit,agentPick}){
   const [imgErr,setImgErr]=useState(false);
   const [wishlist,setWishlist]=useState(false);
+  const [added,setAdded]=useState(false);
   const pct=disc(item.price,item.oldPrice);
+
+  const handleAdd = (e) => {
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+    onAdd(item, e);
+  };
+
   return(
-    <div className="product-card" style={{background:"#fff",border:"1px solid #e7e4e0",position:"relative",cursor:"pointer",transition:"box-shadow .2s"}}
+    <div className="product-card" data-product-id={item.id} style={{background:"#fff",border:"1px solid #e7e4e0",position:"relative",cursor:"pointer",transition:"box-shadow .2s"}}
       onMouseEnter={e=>e.currentTarget.style.boxShadow="0 4px 20px rgba(0,0,0,0.1)"}
       onMouseLeave={e=>e.currentTarget.style.boxShadow="none"}>
       <div style={{position:"absolute",top:8,left:8,background:"#c41e3a",color:"#fff",fontSize:10,fontWeight:700,padding:"3px 8px",borderRadius:3,zIndex:2}}>
@@ -229,8 +281,8 @@ function ProductCard({item,onAdd,onEdit,agentPick}){
           <span style={{fontFamily:"monospace",fontSize:11,color:"#a8a29e",textDecoration:"line-through"}}>{fmt(item.oldPrice)}</span>
         </div>
         <div style={{display:"flex",gap:6}}>
-          <button onClick={()=>onAdd(item)} className="add-btn" style={{flex:1,background:"#f97316",color:"#fff",border:"none",borderRadius:4,padding:"8px 0",fontSize:11,fontWeight:700,cursor:"pointer",textTransform:"uppercase",transition:"background .15s"}}>
-            Add to Cart
+          <button onClick={handleAdd} className="add-btn" style={{flex:1,background: added ? "hsl(158, 65%, 38%)" : "#f97316",color:"#fff",border:"none",borderRadius:4,padding:"8px 0",fontSize:11,fontWeight:700,cursor:"pointer",textTransform:"uppercase",transition:"all .25s cubic-bezier(0.175, 0.885, 0.32, 1.275)",transform:added?"scale(1.05)":"scale(1)"}}>
+            {added ? "✓ Added!" : "Add to Cart"}
           </button>
           <button onClick={()=>onEdit(item)} style={{width:36,background:"#f5f3f0",border:"1px solid #e7e4e0",borderRadius:4,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,flexShrink:0}}
             title="Edit options">
@@ -317,7 +369,7 @@ function CheckoutModal({cart,wallet,onClose,onSuccess,addToast}){
       const currentChain=await window.ethereum.request({method:"eth_chainId"});
       if(currentChain!==ARC_CHAIN_ID){
         try{await window.ethereum.request({method:"wallet_addEthereumChain",params:[ARC_CHAIN_CONFIG]});}
-        catch(e){
+        catch{
           try{await window.ethereum.request({method:"wallet_switchEthereumChain",params:[{chainId:ARC_CHAIN_ID}]});}
           catch(se){
             addToast(se.code===4001?"Please approve the network switch":"Add Arc Testnet manually","error");
@@ -556,7 +608,6 @@ export default function ArcWear(){
   const [toasts,setToasts]       =useState([]);
   const [scrolled,setScrolled]   =useState(false);
   const [editItem,setEditItem]   =useState(null);
-  const [mobileMenu,setMobileMenu]=useState(false);
 
   useEffect(()=>{
     const h=()=>setScrolled(window.scrollY>50);
@@ -576,15 +627,148 @@ export default function ArcWear(){
     catch{addToast("Connection cancelled","error");}
   };
 
-  const addToCart=item=>{
-    setCart(prev=>{const ex=prev.find(x=>x.id===item.id);if(ex)return prev.map(x=>x.id===item.id?{...x,qty:x.qty+1}:x);return[...prev,{...item,qty:1}];});
-    addToast(`${item.name} added`,"success");
+  const triggerCartBounce = (cartEl) => {
+    cartEl.classList.remove("cart-btn-bounce");
+    void cartEl.offsetWidth;
+    cartEl.classList.add("cart-btn-bounce");
+
+    const rect = cartEl.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    for (let i = 0; i < 8; i++) {
+      const sparkle = document.createElement("div");
+      sparkle.style.position = "fixed";
+      sparkle.style.left = `${centerX}px`;
+      sparkle.style.top = `${centerY}px`;
+      sparkle.style.width = `${Math.random() * 5 + 4}px`;
+      sparkle.style.height = sparkle.style.width;
+      sparkle.style.borderRadius = "50%";
+      const colors = ["#f97316", "#fb923c", "#fde047", "#ffffff", "#c47d2a"];
+      sparkle.style.background = colors[Math.floor(Math.random() * colors.length)];
+      sparkle.style.boxShadow = `0 0 6px ${sparkle.style.background}`;
+      sparkle.style.zIndex = "99999";
+      sparkle.style.pointerEvents = "none";
+      document.body.appendChild(sparkle);
+
+      const angle = (i * 45 + Math.random() * 20) * (Math.PI / 180);
+      const distance = Math.random() * 30 + 35;
+      const destX = Math.cos(angle) * distance;
+      const destY = Math.sin(angle) * distance;
+
+      const anim = sparkle.animate([
+        { transform: "translate(-50%, -50%) scale(1)", opacity: 1 },
+        { transform: `translate(calc(-50% + ${destX}px), calc(-50% + ${destY}px)) scale(0)`, opacity: 0 }
+      ], {
+        duration: Math.random() * 300 + 400,
+        easing: "cubic-bezier(0.1, 0.8, 0.3, 1)"
+      });
+      anim.onfinish = () => sparkle.remove();
+    }
   };
 
-  const addToCartWithOptions=item=>{
+  const animateFlyToCart = (item, event) => {
+    let startX;
+    let startY;
+
+    if (event && (event.clientX || event.touches)) {
+      startX = event.clientX || event.touches[0].clientX;
+      startY = event.clientY || event.touches[0].clientY;
+    } else {
+      const cardEl = document.querySelector(`[data-product-id="${item.id}"]`);
+      if (cardEl) {
+        const rect = cardEl.getBoundingClientRect();
+        startX = rect.left + rect.width / 2;
+        startY = rect.top + rect.height / 2;
+      } else {
+        startX = window.innerWidth / 2;
+        startY = window.innerHeight / 2;
+      }
+    }
+
+    const desktopCart = document.getElementById("desktop-cart-btn");
+    const mobileCart = document.getElementById("mobile-cart-btn");
+    let targetEl = null;
+
+    if (desktopCart && desktopCart.getBoundingClientRect().width > 0) {
+      targetEl = desktopCart;
+    } else if (mobileCart && mobileCart.getBoundingClientRect().width > 0) {
+      targetEl = mobileCart;
+    }
+
+    if (!targetEl) return;
+
+    const targetRect = targetEl.getBoundingClientRect();
+    const destX = targetRect.left + targetRect.width / 2;
+    const destY = targetRect.top + targetRect.height / 2;
+
+    const flyer = document.createElement("div");
+    flyer.className = "flying-cart-item";
+    flyer.style.position = "fixed";
+    flyer.style.left = `${startX - 20}px`;
+    flyer.style.top = `${startY - 20}px`;
+    flyer.style.width = "40px";
+    flyer.style.height = "40px";
+    flyer.style.borderRadius = "50%";
+    flyer.style.background = "rgba(255, 255, 255, 0.98)";
+    flyer.style.border = "2px solid #f97316";
+    flyer.style.boxShadow = "0 8px 24px rgba(249, 115, 22, 0.35)";
+    flyer.style.display = "flex";
+    flyer.style.alignItems = "center";
+    flyer.style.justifyContent = "center";
+    flyer.style.fontSize = "20px";
+    flyer.style.zIndex = "99999";
+    flyer.style.pointerEvents = "none";
+    flyer.style.overflow = "hidden";
+
+    if (item.img) {
+      const img = document.createElement("img");
+      img.src = item.img;
+      img.style.width = "100%";
+      img.style.height = "100%";
+      img.style.objectFit = "cover";
+      img.onerror = () => {
+        img.style.display = "none";
+        flyer.innerText = item.emoji || "👕";
+      };
+      flyer.appendChild(img);
+    } else {
+      flyer.innerText = item.emoji || "👕";
+    }
+
+    document.body.appendChild(flyer);
+
+    const deltaX = destX - startX;
+    const deltaY = destY - startY;
+    const midX = deltaX * 0.45;
+    const midY = Math.min(deltaY, -120) - 80;
+
+    const anim = flyer.animate([
+      { transform: "translate(0, 0) scale(1) rotate(0deg)", opacity: 1 },
+      { transform: `translate(${midX}px, ${midY}px) scale(1.25) rotate(180deg)`, opacity: 0.9, offset: 0.45 },
+      { transform: `translate(${deltaX}px, ${deltaY}px) scale(0.15) rotate(360deg)`, opacity: 0 }
+    ], {
+      duration: 800,
+      easing: "cubic-bezier(0.12, 0.85, 0.3, 1)"
+    });
+
+    anim.onfinish = () => {
+      flyer.remove();
+      triggerCartBounce(targetEl);
+    };
+  };
+
+  const addToCart=(item, event)=>{
+    setCart(prev=>{const ex=prev.find(x=>x.id===item.id);if(ex)return prev.map(x=>x.id===item.id?{...x,qty:x.qty+1}:x);return[...prev,{...item,qty:1}];});
+    addToast(`${item.name} added`,"success");
+    animateFlyToCart(item, event);
+  };
+
+  const addToCartWithOptions=(item, event)=>{
     setCart(prev=>{const ex=prev.find(x=>x.id===item.id&&x.size===item.size&&x.color===item.color);if(ex)return prev.map(x=>x.id===item.id&&x.size===item.size&&x.color===item.color?{...x,qty:x.qty+item.qty}:x);return[...prev,item];});
     addToast(`${item.name} added`,"success");
     setEditItem(null);
+    animateFlyToCart(item, event);
   };
 
   const cartCount=cart.reduce((s,i)=>s+i.qty,0);
@@ -608,6 +792,16 @@ export default function ArcWear(){
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
         @keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,.45)}60%{box-shadow:0 0 0 12px rgba(249,115,22,0)}}
         @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+        @keyframes cartBounce{
+          0%{transform:scale(1)}
+          30%{transform:scale(1.28) rotate(-7deg)}
+          50%{transform:scale(0.9) rotate(4deg)}
+          70%{transform:scale(1.08) rotate(-2deg)}
+          100%{transform:scale(1) rotate(0deg)}
+        }
+        .cart-btn-bounce{
+          animation:cartBounce 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        }
 
         ::-webkit-scrollbar{width:4px}
         ::-webkit-scrollbar-track{background:#faf9f7}
@@ -617,6 +811,30 @@ export default function ArcWear(){
         .product-card{border-radius:0}
         .product-img{height:200px}
         .add-btn:hover{background:#ea6c0a!important}
+
+        @keyframes cardEntrance {
+          from {
+            opacity: 0;
+            transform: translateY(12px) scale(0.97);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+        .product-card {
+          animation: cardEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        .product-card:nth-child(1) { animation-delay: 0ms; }
+        .product-card:nth-child(2) { animation-delay: 35ms; }
+        .product-card:nth-child(3) { animation-delay: 70ms; }
+        .product-card:nth-child(4) { animation-delay: 105ms; }
+        .product-card:nth-child(5) { animation-delay: 140ms; }
+        .product-card:nth-child(6) { animation-delay: 175ms; }
+        .product-card:nth-child(7) { animation-delay: 210ms; }
+        .product-card:nth-child(8) { animation-delay: 245ms; }
+        .product-card:nth-child(9) { animation-delay: 280ms; }
+        .product-card:nth-child(10) { animation-delay: 315ms; }
 
         /* ── Cart Drawer ── */
         .cart-drawer{width:380px}
@@ -782,7 +1000,7 @@ export default function ArcWear(){
             )}
 
             {/* Cart Button */}
-            <button onClick={()=>setCartOpen(true)} style={{background:"#f97316",color:"#fff",border:"1px solid #f97316",borderRadius:4,padding:"5px 12px",fontSize:10,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:5,transition:"all .2s"}}
+            <button id="desktop-cart-btn" onClick={()=>setCartOpen(true)} style={{background:"#f97316",color:"#fff",border:"1px solid #f97316",borderRadius:4,padding:"5px 12px",fontSize:10,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:5,transition:"all .2s"}}
               onMouseEnter={e=>{e.currentTarget.style.background="#7c4a1a";e.currentTarget.style.borderColor="#7c4a1a";}}
               onMouseLeave={e=>{e.currentTarget.style.background="#f97316";e.currentTarget.style.borderColor="#f97316";}}>
               🛒 Cart
@@ -867,7 +1085,7 @@ export default function ArcWear(){
               <div style={{flex:1,height:1,background:"#f0ede8"}}/>
               <span style={{fontSize:11,color:"#a8a29e"}}>{cat.items.length} products</span>
             </div>
-            <div className="product-grid">
+            <div className="product-grid" key={`${section}-${activeCat}-${catKey}`}>
               {cat.items.map(item=>(
                 <ProductCard key={item.id} item={{...item,categoryLabel:cat.label}} onAdd={addToCart} onEdit={setEditItem} agentPick={false}/>
               ))}
@@ -907,7 +1125,7 @@ export default function ArcWear(){
           {icon:"👤",label:"Wallet",action:connectWallet},
           {icon:"🛒",label:cartCount>0?`Cart (${cartCount})`:"Cart",action:()=>setCartOpen(true)},
         ].map(({icon,label,action})=>(
-          <button key={label} onClick={action} style={{flex:1,background:"none",border:"none",padding:"10px 4px",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
+          <button key={label} id={icon === "🛒" ? "mobile-cart-btn" : undefined} onClick={action} style={{flex:1,background:"none",border:"none",padding:"10px 4px",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:2}}>
             <span style={{fontSize:20}}>{icon}</span>
             <span style={{fontSize:9,color:"#78716c",fontWeight:600,letterSpacing:0.3}}>{label}</span>
           </button>
