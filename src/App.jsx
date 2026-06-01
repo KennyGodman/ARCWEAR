@@ -1222,7 +1222,6 @@ export default function ArcWear() {
     });
     addToast(`${item.name} added`, "success");
     setEditItem(null);
-    animateFlyToCart(item, event);
   };
 
   // ── Derived values ────────────────────────────────────────
