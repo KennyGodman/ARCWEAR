@@ -15,7 +15,7 @@ const ARC_CHAIN_CONFIG = {
   blockExplorerUrls: ["https://testnet.arcscan.app"],
 };
 const USDC_ADDRESS = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238";
-const MERCHANT_ADDR = "0xDemoMerchantAddress000000000000000000001";
+const MERCHANT_ADDR = "0x4932B6c1970131321B79d8Be02A1791A09554bf5";
 
 // ── Helpers ───────────────────────────────────────────────
 const fmt = (n) => `${Number(n).toFixed(2)} USDC`;
@@ -138,8 +138,8 @@ const CATALOGUE = {
           { id: "w-sh3", name: "Kitten Heel Pump", price: 138, oldPrice: 170, desc: "Satin finish, pointed toe", img: "https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=400&q=80" },
           { id: "w-sh4", name: "Pointed Toe Flat", price: 88, oldPrice: 110, desc: "Soft glove leather, cushioned insole", img: "https://images.unsplash.com/photo-1535043934128-cf0b28d52f95?w=400&q=80" },
           { id: "w-sh5", name: "Ankle Strap Sandal", price: 115, oldPrice: 145, desc: "Block heel, gold buckle closure", img: "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&q=80" },
-          { id: "w-sh6", name: "Kitten Heel Pump", price: 138, oldPrice: 170, desc: "Satin finish, pointed toe", img: "https://images.unsplash.com/photo-1579338559194-a162d19bf7ee?w=400&q=80" },
-          { id: "w-sh7", name: "Pointed Toe Flat", price: 88, oldPrice: 110, desc: "Soft glove leather, cushioned insole", img: "https://images.unsplash.com/photo-1515490088941-98170e7e1c3a?w=400&q=80" },
+          { id: "w-sh6", name: "Kitten Heel Pump", price: 138, oldPrice: 170, desc: "Satin finish, pointed toe", img: "https://plus.unsplash.com/premium_photo-1676234844384-82e1830af724?w=400&q=80" },
+          { id: "w-sh7", name: "Pointed Toe Flat", price: 88, oldPrice: 110, desc: "Soft glove leather, cushioned insole", img: "https://images.unsplash.com/photo-1618274158638-41d9f8d9279d?w=400&q=80" },
         ],
       },
     },
@@ -170,35 +170,35 @@ const CATALOGUE = {
       },
       belts: {
         label: "Belts", emoji: "🪢", items: [
-          { id: "k-b1", name: "Cartoon Buckle Belt", price: 12, oldPrice: 18, desc: "Woven, fun character buckle", img: "https://images.unsplash.com/photo-1566454825481-4e48f76b5d7e?w=400&q=80" },
-          { id: "k-b2", name: "Glitter Elastic Belt", price: 14, oldPrice: 20, desc: "Sparkly elastic webbing, heart-shape clasp", img: "https://images.unsplash.com/photo-1503919005314-30d93d07d823?w=400&q=80" },
-          { id: "k-b3", name: "Braided Cotton Belt", price: 15, oldPrice: 22, desc: "Colorful cotton cord, brass hardware", img: "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=400&q=80" },
-          { id: "k-b4", name: "Reversible Casual Belt", price: 16, oldPrice: 24, desc: "Two-tone webbed strap, steel buckle", img: "https://images.unsplash.com/photo-1519689680058-324335c77ebe?w=400&q=80" },
-          { id: "k-b5", name: "Classic Toddler Suspenders", price: 18, oldPrice: 26, desc: "Y-back elastic strap, heavy-duty clips", img: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=400&q=80" },
-          { id: "k-b6", name: "Braided Cotton Belt", price: 15, oldPrice: 22, desc: "Colorful cotton cord, brass hardware", img: "https://images.unsplash.com/photo-1516624683217-fb350018f257?w=400&q=80" },
-          { id: "k-b7", name: "Reversible Casual Belt", price: 16, oldPrice: 24, desc: "Two-tone webbed strap, steel buckle", img: "https://images.unsplash.com/photo-1537678122166-41639d7ef2aa?w=400&q=80" },
+          { id: "k-b1", name: "Cartoon Buckle Belt", price: 12, oldPrice: 18, desc: "Woven, fun character buckle", img: "https://images.unsplash.com/photo-1752386341161-de2b02ea1f50?w=400&q=80" },
+          { id: "k-b2", name: "Glitter Elastic Belt", price: 14, oldPrice: 20, desc: "Sparkly elastic webbing, heart-shape clasp", img: "https://images.unsplash.com/photo-1711443982852-b3df5c563448?w=400&q=80" },
+          { id: "k-b3", name: "Braided Cotton Belt", price: 15, oldPrice: 22, desc: "Colorful cotton cord, brass hardware", img: "https://images.unsplash.com/photo-1664286074176-5206ee5dc878?w=400&q=80" },
+          { id: "k-b4", name: "Reversible Casual Belt", price: 16, oldPrice: 24, desc: "Two-tone webbed strap, steel buckle", img: "https://plus.unsplash.com/premium_photo-1723575737806-ecd7f74bf3a1?w=400&q=80" },
+          { id: "k-b5", name: "Classic Toddler Suspenders", price: 18, oldPrice: 26, desc: "Y-back elastic strap, heavy-duty clips", img: "https://images.unsplash.com/photo-1717241424404-5331845a1107?w=400&q=80" },
+          { id: "k-b6", name: "Black leather Suspenders", price: 15, oldPrice: 22, desc: "Colorful cotton cord, brass hardware", img: "https://images.unsplash.com/photo-1503327151497-be3b97ef0d42?w=400&q=80" },
+          { id: "k-b7", name: "KungFu Belt", price: 16, oldPrice: 24, desc: "Two-tone webbed strap, steel buckle", img: "https://plus.unsplash.com/premium_photo-1667941272664-9146446e1b7b?w=400&q=80" },
         ],
       },
       caps: {
         label: "Headwear", emoji: "🧢", items: [
-          { id: "k-c1", name: "Dino Baseball Cap", price: 15, oldPrice: 22, desc: "Cotton twill, embroidered dino", img: "https://images.unsplash.com/photo-1534215754734-18e55d13e346?w=400&q=80" },
-          { id: "k-c2", name: "Sun Protection Hat", price: 20, oldPrice: 28, desc: "UPF 50+, wide brim", img: "https://images.unsplash.com/photo-1544816155-12df9643f363?w=400&q=80" },
-          { id: "k-c3", name: "Cozy Knit Ear Hat", price: 18, oldPrice: 25, desc: "Soft fleece lining, cute bear ear details", img: "https://images.unsplash.com/photo-1545601445-4d6a5a04d9e6?w=400&q=80" },
-          { id: "k-c4", name: "Straw Sun Visor", price: 16, oldPrice: 24, desc: "Open-top weave, velcro strap back", img: "https://images.unsplash.com/photo-1528642474498-1af0c17fd8c3?w=400&q=80" },
-          { id: "k-c5", name: "Waterproof Rain Hat", price: 22, oldPrice: 30, desc: "Wide brim, toggle drawstring chin strap", img: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&q=80" },
-          { id: "k-c6", name: "Cozy Knit Ear Hat", price: 18, oldPrice: 25, desc: "Soft fleece lining, cute bear ear details", img: "https://images.unsplash.com/photo-1604949506655-64402b535805?w=400&q=80" },
-          { id: "k-c7", name: "Straw Sun Visor", price: 16, oldPrice: 24, desc: "Open-top weave, velcro strap back", img: "https://images.unsplash.com/photo-1565463934784-d90b8f1f0057?w=400&q=80" },
+          { id: "k-c1", name: "Dino Baseball Cap", price: 15, oldPrice: 22, desc: "Cotton twill, embroidered dino", img: "https://images.unsplash.com/flagged/photo-1552840207-7b12058bfee4?w=400&q=80" },
+          { id: "k-c2", name: "Sun Protection Hat", price: 20, oldPrice: 28, desc: "UPF 50+, wide brim", img: "https://images.unsplash.com/photo-1732041101188-eff6bfc65692?w=400&q=80" },
+          { id: "k-c3", name: "Cozy Knit Ear Hat", price: 18, oldPrice: 25, desc: "Soft fleece lining, cute bear ear details", img: "https://plus.unsplash.com/premium_photo-1697183202193-a5037862b539?w=400&q=80" },
+          { id: "k-c4", name: "Head Warmer", price: 16, oldPrice: 24, desc: "Open-top weave, velcro strap back", img: "https://images.unsplash.com/photo-1768399408789-3a5e1fac6166?q=80&w=400" },
+          { id: "k-c5", name: "Waterproof Rain Hat", price: 22, oldPrice: 30, desc: "Wide brim, toggle drawstring chin strap", img: "https://images.unsplash.com/photo-1773176862337-17602cd46015?q=80&w=400" },
+          { id: "k-c6", name: "Face cap", price: 18, oldPrice: 25, desc: "Soft fleece lining, cute bear ear details", img: "https://images.unsplash.com/photo-1616788474390-5c5d9db71a19?q=80&w=400" },
+          { id: "k-c7", name: "Bucket Hat", price: 16, oldPrice: 24, desc: "Open-top weave, velcro strap back", img: "https://images.unsplash.com/photo-1775324588624-6bbe1092734d?q=80&w=400" },
         ],
       },
       shoes: {
         label: "Footwear", emoji: "👟", items: [
-          { id: "k-sh1", name: "Light-Up Sneakers", price: 55, oldPrice: 70, desc: "LED outsole, velcro close", img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" },
-          { id: "k-sh2", name: "Velcro Sandals", price: 38, oldPrice: 50, desc: "Quick-dry, adjustable strap", img: "https://images.unsplash.com/photo-1603487742131-4160ec999306?w=400&q=80" },
-          { id: "k-sh3", name: "Rain Boots", price: 42, oldPrice: 55, desc: "Natural rubber, easy-pull tab", img: "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?w=400&q=80" },
-          { id: "k-sh4", name: "Canvas Slip-On Loafer", price: 35, oldPrice: 46, desc: "Breathable canvas upper, flexible outsole", img: "https://images.unsplash.com/photo-1514989940723-e8e5163ccbe8?w=400&q=80" },
+          { id: "k-sh1", name: "Light-Up Sneakers", price: 55, oldPrice: 70, desc: "LED outsole, velcro close", img: "https://images.unsplash.com/photo-1742390671647-bc9c5399fdf3?q=80&w=400" },
+          { id: "k-sh2", name: "Velcro Sandals", price: 38, oldPrice: 50, desc: "Quick-dry, adjustable strap", img: "https://images.unsplash.com/photo-1625563206627-7e713d1ac0a8?q=80&w=400" },
+          { id: "k-sh3", name: "Rain Boots", price: 42, oldPrice: 55, desc: "Natural rubber, easy-pull tab", img: "https://images.unsplash.com/photo-1571180202803-407624f64578?q=80&w=400" },
+          { id: "k-sh4", name: "Canvas Slip-On Loafer", price: 35, oldPrice: 46, desc: "Breathable canvas upper, flexible outsole", img: "https://images.unsplash.com/photo-1764155161021-bab07b550c01?q=80&w=400" },
           { id: "k-sh5", name: "Classic High-Top Sneaker", price: 48, oldPrice: 62, desc: "Lace closure with side zipper for easy on/off", img: "https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=400&q=80" },
-          { id: "k-sh6", name: "Rain Boots", price: 42, oldPrice: 55, desc: "Natural rubber, easy-pull tab", img: "https://images.unsplash.com/photo-1510832427230-67c254546089?w=400&q=80" },
-          { id: "k-sh7", name: "Canvas Slip-On Loafer", price: 35, oldPrice: 46, desc: "Breathable canvas upper, flexible outsole", img: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&q=80" },
+          { id: "k-sh6", name: "Soft Sneakers", price: 42, oldPrice: 55, desc: "Natural rubber, easy-pull tab", img: "https://images.unsplash.com/photo-1631542245680-3bc3aeb813be?w=400&q=80" },
+          { id: "k-sh7", name: "Rubber Sandals", price: 35, oldPrice: 46, desc: "Breathable canvas upper, flexible outsole", img: "https://plus.unsplash.com/premium_photo-1749544314937-e95c0200a250?q=80&w=400" },
         ],
       },
     },
@@ -689,15 +689,24 @@ function CheckoutModal({ cart, wallet, onClose, onSuccess, addToast }) {
 
       if (customerEmail) {
         try {
-          await fetch("/api/send-confirmation", {
+          const emailRes = await fetch("/api/send-confirmation", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ customerEmail, customerWallet: wallet, items: cart, total, txHash: hash }),
           });
-          addToast("Confirmation email sent!", "success");
+          const emailData = await emailRes.json();
+          if (emailRes.ok && emailData.success) {
+            addToast("📧 Confirmation email sent!", "success");
+          } else {
+            console.error("Email error:", emailData);
+            addToast("Email failed: " + (emailData?.error?.message || JSON.stringify(emailData?.error) || "Unknown error"), "error");
+          }
         } catch (e) {
           console.error("Email confirmation error:", e);
+          addToast("Email could not be sent: " + e.message, "error");
         }
+      } else {
+        addToast("No email entered — skipping confirmation", "success");
       }
     } catch (err) {
       const msg = err.code === 4001 || err.message?.includes("denied")
