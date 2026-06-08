@@ -1029,13 +1029,17 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
       if (inp.maxPrice) r = r.filter(p => p.price <= inp.maxPrice);
       if (inp.minPrice) r = r.filter(p => p.price >= inp.minPrice);
       if (inp.keywords) {
-        const query = (typeof inp.keywords === "string" ? inp.keywords : inp.keywords.join(" ")).toLowerCase().trim();
+        const query = (typeof inp.keywords === "string" ? inp.keywords : inp.keywords.join(" "))
+          .toLowerCase()
+          .replace(/\b(men|man|women|woman|children|child|kid|kids|wear|wears|clothes|clothing)\b/g, "")
+          .trim();
         if (query) {
-          const terms = query.split(/\s+/);
+          const terms = query.split(/\s+/).filter(Boolean);
           r = r.filter(p => {
             const nameLower = p.name.toLowerCase();
             const descLower = (p.desc || "").toLowerCase();
-            return terms.every(term => nameLower.includes(term) || descLower.includes(term));
+            const catLower = p.categoryLabel.toLowerCase();
+            return terms.every(term => nameLower.includes(term) || descLower.includes(term) || catLower.includes(term));
           });
         }
       }
@@ -1221,6 +1225,7 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
 
     const apiMsgs = msgs
       .filter(m => m.role === "assistant" || m.role === "user")
+      .slice(-4)
       .map(m => ({ role: m.role, content: m.text }));
     apiMsgs.push({ role: "user", content: txt });
 
