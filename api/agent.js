@@ -112,7 +112,7 @@ TONE: Helpful, concise, confident. Always show USDC prices. After adding items, 
         "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "llama-3.1-8b-instant",
         messages: groqMessages,
         tools: groqTools.length > 0 ? groqTools : undefined,
         tool_choice: groqTools.length > 0 ? "auto" : undefined,
