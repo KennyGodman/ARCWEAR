@@ -229,7 +229,7 @@ const AGENT_TOOLS = [
         category: { type: "string" },
         maxPrice: { type: "number" },
         minPrice: { type: "number" },
-        keywords: { type: "array", items: { type: "string" } },
+        keywords: { type: "string", description: "Keywords to search in name or description (e.g. 'oxford button-down')" },
       },
     },
   },
@@ -1020,8 +1020,17 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
       if (inp.category) r = r.filter(p => p.category === inp.category);
       if (inp.maxPrice) r = r.filter(p => p.price <= inp.maxPrice);
       if (inp.minPrice) r = r.filter(p => p.price >= inp.minPrice);
-      if (inp.keywords?.length)
-        r = r.filter(p => inp.keywords.some(k => p.name.toLowerCase().includes(k.toLowerCase())));
+      if (inp.keywords) {
+        const query = (typeof inp.keywords === "string" ? inp.keywords : inp.keywords.join(" ")).toLowerCase().trim();
+        if (query) {
+          const terms = query.split(/\s+/);
+          r = r.filter(p => {
+            const nameLower = p.name.toLowerCase();
+            const descLower = (p.desc || "").toLowerCase();
+            return terms.every(term => nameLower.includes(term) || descLower.includes(term));
+          });
+        }
+      }
       return { found: r.length, products: r.map(p => ({ id: p.id, name: p.name, price: p.price, section: p.sectionLabel, category: p.categoryLabel })) };
     }
     if (name === "add_to_cart") {
