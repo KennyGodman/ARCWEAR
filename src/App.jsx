@@ -1332,6 +1332,7 @@ export default function ArcWear() {
   const [checkout, setCheckout] = useState(false);
   const [agentOpen, setAgentOpen] = useState(false);
   const [wallet, setWallet] = useState(null);
+  const [walletDropdownOpen, setWalletDropdownOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
   const [scrolled, setScrolled] = useState(false);
   const [editItem, setEditItem] = useState(null);
@@ -1348,6 +1349,52 @@ export default function ArcWear() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Check for already connected wallet on mount & listen for account switches/disconnects
+  useEffect(() => {
+    const checkConnection = async () => {
+      if (window.ethereum) {
+        try {
+          const accounts = await window.ethereum.request({ method: "eth_accounts" });
+          if (accounts && accounts.length > 0) {
+            setWallet(accounts[0]);
+          }
+        } catch (err) {
+          console.error("Error checking wallet connection:", err);
+        }
+      }
+    };
+    checkConnection();
+
+    if (window.ethereum) {
+      const handleAccountsChanged = (accounts) => {
+        if (accounts && accounts.length > 0) {
+          setWallet(accounts[0]);
+          addToast(`Wallet changed: ${trunc(accounts[0])}`, "info");
+        } else {
+          setWallet(null);
+          addToast("Wallet disconnected", "info");
+        }
+      };
+
+      window.ethereum.on("accountsChanged", handleAccountsChanged);
+      return () => {
+        window.ethereum.removeListener("accountsChanged", handleAccountsChanged);
+      };
+    }
+  }, []);
+
+  // Close wallet dropdown when clicking outside
+  useEffect(() => {
+    if (!walletDropdownOpen) return;
+    const handleOutsideClick = (e) => {
+      if (!e.target.closest(".wallet-chip") && !e.target.closest(".wallet-dropdown")) {
+        setWalletDropdownOpen(false);
+      }
+    };
+    window.addEventListener("click", handleOutsideClick);
+    return () => window.removeEventListener("click", handleOutsideClick);
+  }, [walletDropdownOpen]);
 
   // Toast system
   const addToast = (msg, type = "info") => {
@@ -1611,9 +1658,112 @@ export default function ArcWear() {
 
             {/* Wallet chip / connect button */}
             {wallet ? (
-              <div className="wallet-chip" aria-label={`Wallet connected: ${trunc(wallet)}`}>
-                <div className="wallet-chip__dot" aria-hidden="true" />
-                <span className="wallet-chip__address">{trunc(wallet)}</span>
+              <div className="desktop-only" style={{ position: "relative" }}>
+                <button
+                  className="wallet-chip"
+                  onClick={() => setWalletDropdownOpen(!walletDropdownOpen)}
+                  aria-label={`Wallet connected: ${trunc(wallet)}. Click to toggle menu.`}
+                  aria-expanded={walletDropdownOpen}
+                  aria-haspopup="true"
+                  style={{
+                    cursor: "pointer",
+                    border: walletDropdownOpen ? "1px solid var(--color-brand)" : "1px solid var(--color-border)",
+                    background: "var(--color-surface)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                    borderRadius: "var(--radius-sm)",
+                    padding: "5px 10px",
+                    outline: "none"
+                  }}
+                >
+                  <div className="wallet-chip__dot" aria-hidden="true" />
+                  <span className="wallet-chip__address">{trunc(wallet)}</span>
+                  <span style={{ fontSize: 8, color: "#a8a29e", marginLeft: 2, display: "inline-block", transform: walletDropdownOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
+                </button>
+                {walletDropdownOpen && (
+                  <>
+                    <style>{`
+                      @keyframes walletDropdownIn {
+                        from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+                        to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+                      }
+                    `}</style>
+                    <div
+                      className="wallet-dropdown"
+                      style={{
+                        position: "absolute",
+                        top: "100%",
+                        left: "50%",
+                        transform: "translateX(-50%)",
+                        marginTop: 10,
+                        zIndex: 999,
+                        animation: "walletDropdownIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards",
+                        filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.08))"
+                      }}
+                    >
+                      {/* Triangle Arrow */}
+                      <div style={{
+                        position: "absolute",
+                        top: -5,
+                        left: "50%",
+                        transform: "translateX(-50%) rotate(45deg)",
+                        width: 10,
+                        height: 10,
+                        background: "#fff",
+                        borderLeft: "1px solid var(--color-border)",
+                        borderTop: "1px solid var(--color-border)",
+                        zIndex: 1
+                      }} />
+                      
+                      {/* Inner Container */}
+                      <div style={{
+                        background: "#fff",
+                        border: "1px solid var(--color-border)",
+                        borderRadius: "var(--radius-md)",
+                        minWidth: "155px",
+                        position: "relative",
+                        zIndex: 2,
+                        overflow: "hidden"
+                      }}>
+                        <button
+                          onClick={() => {
+                            setWallet(null);
+                            setWalletDropdownOpen(false);
+                            addToast("Wallet disconnected", "info");
+                          }}
+                          style={{
+                            width: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: "8px",
+                            padding: "10px 16px",
+                            fontSize: "11px",
+                            color: "#c41e3a",
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            fontWeight: 700,
+                            transition: "background 0.15s, color 0.15s",
+                            whiteSpace: "nowrap",
+                            fontFamily: "inherit"
+                          }}
+                          onMouseEnter={e => {
+                            e.currentTarget.style.background = "#fff5f5";
+                            e.currentTarget.style.color = "#b91c1c";
+                          }}
+                          onMouseLeave={e => {
+                            e.currentTarget.style.background = "none";
+                            e.currentTarget.style.color = "#c41e3a";
+                          }}
+                        >
+                          🔌 Disconnect Wallet
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             ) : (
               <button
@@ -1856,7 +2006,10 @@ export default function ArcWear() {
       >
         {[
           { icon: "🏠", label: "Home", action: () => window.scrollTo({ top: 0, behavior: "smooth" }) },
-          { icon: "👤", label: "Wallet", action: connectWallet },
+          { icon: "👤", label: wallet ? "Disconnect" : "Wallet", action: wallet ? () => {
+            setWallet(null);
+            addToast("Wallet disconnected", "info");
+          } : connectWallet },
           { icon: "🛒", label: cartCount > 0 ? `Cart (${cartCount})` : "Cart", action: () => setCartOpen(true) },
         ].map(({ icon, label, action }) => (
           <button
