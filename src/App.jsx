@@ -2048,21 +2048,53 @@ export default function ArcWear() {
         style={{ display: "none", position: "fixed", bottom: 0, left: 0, right: 0, background: "#fff", borderTop: "1px solid #e7e4e0", zIndex: 600, boxShadow: "0 -4px 16px rgba(0,0,0,0.08)" }}
       >
         {[
-          { icon: "🏠", label: "Home", action: () => window.scrollTo({ top: 0, behavior: "smooth" }) },
-          { icon: "👤", label: wallet ? "Disconnect" : "Wallet", action: wallet ? () => {
-            setWallet(null);
-            addToast("Wallet disconnected", "info");
-          } : connectWallet },
-          { icon: "🛒", label: cartCount > 0 ? `Cart (${cartCount})` : "Cart", action: () => setCartOpen(true) },
-        ].map(({ icon, label, action }) => (
+          {
+            icon: (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                <polyline points="9 22 9 12 15 12 15 22" />
+              </svg>
+            ),
+            label: "Home",
+            id: "mobile-home-btn",
+            action: () => window.scrollTo({ top: 0, behavior: "smooth" })
+          },
+          {
+            icon: (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <rect width="20" height="14" x="2" y="5" rx="2" />
+                <path d="M12 12h.01" />
+                <path d="M16 9.5a2.5 2.5 0 0 1 0 5H2" />
+              </svg>
+            ),
+            label: wallet ? "Disconnect" : "Wallet",
+            id: "mobile-wallet-btn",
+            action: wallet ? () => {
+              setWallet(null);
+              addToast("Wallet disconnected", "info");
+            } : connectWallet
+          },
+          {
+            icon: (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="8" cy="21" r="1" />
+                <circle cx="19" cy="21" r="1" />
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+              </svg>
+            ),
+            label: cartCount > 0 ? `Cart (${cartCount})` : "Cart",
+            id: "mobile-cart-btn",
+            action: () => setCartOpen(true)
+          },
+        ].map(({ icon, label, id, action }) => (
           <button
             key={label}
-            id={icon === "🛒" ? "mobile-cart-btn" : undefined}
+            id={id}
             onClick={action}
             aria-label={label}
             style={{ flex: 1, background: "none", border: "none", padding: "10px 4px", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}
           >
-            <span style={{ fontSize: 20 }} aria-hidden="true">{icon}</span>
+            <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#78716c", height: 24 }} aria-hidden="true">{icon}</span>
             <span style={{ fontSize: 9, color: "#78716c", fontWeight: 600, letterSpacing: 0.3 }}>{label}</span>
           </button>
         ))}
