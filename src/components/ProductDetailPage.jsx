@@ -114,6 +114,7 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
       aria-label={`Product details: ${item.name}`}
     >
       <div
+        className="pdp-dialog"
         style={{
           background: "#fff",
           borderRadius: 20,
@@ -160,6 +161,7 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
         >
           {/* ── LEFT: Image Panel ── */}
           <div
+            className="pdp-img-panel"
             style={{
               background: "#f9f7f5",
               borderRadius: "20px 0 0 20px",
@@ -205,6 +207,7 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
               <img
                 src={item.img}
                 alt={item.name}
+                className="pdp-img"
                 onLoad={() => setImgLoaded(true)}
                 onError={() => setImgError(true)}
                 style={{
@@ -218,7 +221,7 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
                 }}
               />
             ) : (
-              <div style={{ fontSize: 80, opacity: 0.3 }}>{item.emoji || "👕"}</div>
+              <div className="pdp-fallback-emoji" style={{ fontSize: 80, opacity: 0.3 }}>{item.emoji || "👕"}</div>
             )}
 
             {/* Shimmer loader */}
@@ -251,7 +254,7 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
           </div>
 
           {/* ── RIGHT: Info Panel ── */}
-          <div style={{ padding: "32px 32px 28px", display: "flex", flexDirection: "column", gap: 0 }}>
+          <div className="pdp-info-panel" style={{ padding: "32px 32px 28px", display: "flex", flexDirection: "column", gap: 0 }}>
 
             {/* Breadcrumb */}
             <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 14 }}>
@@ -531,7 +534,7 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
 
         {/* ── Related Products ── */}
         {related.length > 0 && (
-          <div style={{ borderTop: "1px solid #f0ede8", padding: "28px 32px 32px" }}>
+          <div className="pdp-related-section" style={{ borderTop: "1px solid #f0ede8", padding: "28px 32px 32px" }}>
             <h3 style={{
               fontFamily: "var(--font-serif)",
               fontSize: 18, fontWeight: 700,
@@ -539,7 +542,7 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
             }}>
               You may also like
             </h3>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+            <div className="pdp-related-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
               {related.map(rel => (
                 <RelatedCard
                   key={rel.id}
