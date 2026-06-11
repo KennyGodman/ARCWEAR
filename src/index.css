@@ -204,8 +204,8 @@ body {
   overflow: hidden;
   bottom: 24px;
   right: 24px;
-  width: 385px;
-  height: 565px;
+  width: 360px;
+  height: 530px;
   border-radius: var(--radius-2xl);
   animation: agentIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
