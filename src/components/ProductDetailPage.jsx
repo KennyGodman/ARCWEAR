@@ -46,11 +46,11 @@ function StarRating({ rating, count }) {
   );
 }
 
-export default function ProductDetailPage({ item, allProducts, onClose, onAdd, onEdit }) {
+export default function ProductDetailPage({ item, allProducts, onClose, onAdd, onEdit, wishlist = [], onToggleWishlist }) {
   const [selectedSize, setSelectedSize] = useState("M");
   const [selectedColor, setSelectedColor] = useState("Default");
   const [qty, setQty] = useState(1);
-  const [wishlist, setWishlist] = useState(false);
+  const isWishlisted = wishlist.includes(item.id);
   const [added, setAdded] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
@@ -184,8 +184,8 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
 
             {/* Wishlist */}
             <button
-              onClick={() => setWishlist(w => !w)}
-              aria-label={wishlist ? "Remove from wishlist" : "Add to wishlist"}
+              onClick={() => onToggleWishlist(item)}
+              aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
               style={{
                 position: "absolute", top: 16, right: 16, zIndex: 2,
                 background: "rgba(255,255,255,0.9)",
@@ -199,7 +199,7 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
               onMouseEnter={e => e.currentTarget.style.transform = "scale(1.15)"}
               onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
             >
-              {wishlist ? "❤️" : "🤍"}
+              {isWishlisted ? "❤️" : "🤍"}
             </button>
 
             {/* Image */}

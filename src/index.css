@@ -383,3 +383,174 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* =========================================================
+   Search Bar
+   ========================================================= */
+.search-bar-wrap {
+  display: flex;
+  align-items: center;
+  width: 340px;
+  border: 1.5px solid #b0a9a0;
+  border-radius: 50px;
+  overflow: hidden;
+  background: #fff;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.search-bar-wrap:focus-within {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px rgba(196, 125, 42, 0.1);
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  padding: 8px 10px 8px 16px;
+  font-size: 12px;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  outline: none;
+}
+.search-input::placeholder { color: var(--color-ink-faint); }
+
+.search-submit-btn {
+  background: #f97316;
+  color: #fff;
+  border: none;
+  padding: 9px 20px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  border-radius: 0 50px 50px 0;
+  transition: background 0.2s;
+  letter-spacing: 0.4px;
+}
+.search-submit-btn:hover  { background: #ea6c0a; }
+.search-submit-btn:active { background: #c95e08; }
+
+/* =========================================================
+   Order History Drawer
+   ========================================================= */
+.order-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 440px;
+  background: #fff;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.12);
+  animation: drawerIn 0.28s ease;
+}
+
+.order-row {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-lt);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.order-row:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.order-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   Wishlist Drawer
+   ========================================================= */
+.wishlist-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 380px;
+  background: #fff;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.12);
+  animation: drawerIn 0.28s ease;
+}
+
+.wishlist-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-lt);
+  border-radius: var(--radius-md);
+  margin-bottom: 10px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.wishlist-item:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.wishlist-item__thumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--color-border-lt);
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   Product Card — Premium Hover Lift
+   ========================================================= */
+.product-card {
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+.product-card:hover {
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+}
+
+/* =========================================================
+   Responsive — New Components
+   ========================================================= */
+@media (max-width: 640px) {
+  .order-drawer    { width: 100% !important; }
+  .wishlist-drawer { width: 100% !important; }
+  .search-bar-wrap { width: 240px !important; }
+  .search-submit-btn { padding: 9px 12px; }
+}
+
+
+/* =========================================================
+   Social Icons for Blockchain Banner
+   ========================================================= */
+.social-icon-banner {
+  color: #78716c;
+  transition: color 0.2s, transform 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.social-icon-banner:hover {
+  color: #fff;
+  transform: translateY(-2px);
+}
+

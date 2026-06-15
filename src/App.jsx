@@ -299,6 +299,33 @@ const AGENT_TOOLS = [
       },
     },
   },
+  {
+    name: "add_to_wishlist",
+    description: "Add a product to the user's wishlist by ID.",
+    input_schema: {
+      type: "object",
+      required: ["productId"],
+      properties: {
+        productId: { type: "string" },
+      },
+    },
+  },
+  {
+    name: "remove_from_wishlist",
+    description: "Remove a product from the user's wishlist by ID.",
+    input_schema: {
+      type: "object",
+      required: ["productId"],
+      properties: {
+        productId: { type: "string" },
+      },
+    },
+  },
+  {
+    name: "view_wishlist",
+    description: "View the user's wishlist contents.",
+    input_schema: { type: "object", properties: {} },
+  },
 ];
 
 /* =========================================================
@@ -468,9 +495,9 @@ function EditModal({ item, onClose, onSave }) {
 /* =========================================================
    ProductCard
    ========================================================= */
-function ProductCard({ item, onAdd, onEdit, onViewDetail, agentPick }) {
+function ProductCard({ item, onAdd, onEdit, onViewDetail, agentPick, wishlist = [], onToggleWishlist }) {
   const [imgErr, setImgErr] = useState(false);
-  const [wishlist, setWishlist] = useState(false);
+  const isWishlisted = wishlist.includes(item.id);
   const [added, setAdded] = useState(false);
   const pct = disc(item.price, item.oldPrice);
 
@@ -490,11 +517,11 @@ function ProductCard({ item, onAdd, onEdit, onViewDetail, agentPick }) {
       {/* Wishlist */}
       <button
         className="wishlist-btn"
-        onClick={() => setWishlist(w => !w)}
-        aria-label={wishlist ? "Remove from wishlist" : "Add to wishlist"}
-        aria-pressed={wishlist}
+        onClick={(e) => { e.stopPropagation(); onToggleWishlist(item); }}
+        aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+        aria-pressed={isWishlisted}
       >
-        {wishlist ? "❤️" : "🤍"}
+        {isWishlisted ? "❤️" : "🤍"}
       </button>
 
       {/* AI Pick badge */}
@@ -998,7 +1025,7 @@ function CheckoutModal({ cart, wallet, onClose, onSuccess, addToast }) {
 /* =========================================================
    AgentChat — AI shopping assistant panel
    ========================================================= */
-function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast, onClose, wallet, allowance, onRequestApproval, onRefreshAllowance }) {
+function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast, onClose, wallet, allowance, onRequestApproval, onRefreshAllowance, onSaveOrder, wishlist, onToggleWishlist }) {
   const [msgs, setMsgs] = useState([{
     role: "assistant",
     text: "Hi! I'm your ArcWear AI agent 👋\n\nTell me what you're looking for — an outfit, a budget, an occasion — and I'll search, add items to your cart, and handle USDC checkout on Arc." + (allowance > 0 ? `\n\n🔓 Agent mode active — ${allowance.toFixed(2)} USDC remaining allowance.` : ""),
@@ -1007,9 +1034,11 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
   const [loading, setLoading] = useState(false);
   const [tools, setTools] = useState([]);
   const cartRef = useRef(cart);
+  const wishlistRef = useRef(wishlist);
   const bottomRef = useRef(null);
 
   useEffect(() => { cartRef.current = cart; }, [cart]);
+  useEffect(() => { wishlistRef.current = wishlist; }, [wishlist]);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, loading]);
 
   // Execute a tool call locally
@@ -1019,8 +1048,8 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
       if (inp.section && inp.section !== "all") r = r.filter(p => p.section === inp.section);
       if (inp.category) {
         const catQuery = String(inp.category).toLowerCase().trim();
-        r = r.filter(p => 
-          p.category.toLowerCase().includes(catQuery) || 
+        r = r.filter(p =>
+          p.category.toLowerCase().includes(catQuery) ||
           catQuery.includes(p.category.toLowerCase()) ||
           p.categoryLabel.toLowerCase().includes(catQuery) ||
           catQuery.includes(p.categoryLabel.toLowerCase())
@@ -1046,19 +1075,34 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
       return { found: r.length, products: r.map(p => ({ id: p.id, name: p.name, price: p.price, section: p.sectionLabel, category: p.categoryLabel })) };
     }
     if (name === "add_to_cart") {
-      const p = ALL_PRODUCTS.find(x => x.id === inp.productId);
+      let p = ALL_PRODUCTS.find(x => x.id === inp.productId);
+      if (!p) {
+        p = ALL_PRODUCTS.find(x => x.name.toLowerCase() === inp.productId.toLowerCase());
+      }
       if (!p) return { error: "Product not found" };
-      setCart(prev => {
-        const ex = prev.find(x => x.id === p.id);
-        if (ex) return prev.map(x => x.id === p.id ? { ...x, qty: x.qty + (inp.quantity || 1) } : x);
-        return [...prev, { ...p, qty: inp.quantity || 1 }];
-      });
+      const qty = inp.quantity || 1;
+      let newCart;
+      const ex = cartRef.current.find(x => x.id === p.id);
+      if (ex) {
+        newCart = cartRef.current.map(x => x.id === p.id ? { ...x, qty: x.qty + qty } : x);
+      } else {
+        newCart = [...cartRef.current, { ...p, qty }];
+      }
+      cartRef.current = newCart;
+      setCart(newCart);
       setActiveSection(p.section);
       addToast(`✓ Agent added ${p.name}`, "agent");
       return { success: true, added: p.name };
     }
     if (name === "remove_from_cart") {
-      setCart(p => p.filter(x => x.id !== inp.productId));
+      let p = ALL_PRODUCTS.find(x => x.id === inp.productId);
+      if (!p) {
+        p = ALL_PRODUCTS.find(x => x.name.toLowerCase() === inp.productId.toLowerCase());
+      }
+      const pId = p ? p.id : inp.productId;
+      const newCart = cartRef.current.filter(x => x.id !== pId);
+      cartRef.current = newCart;
+      setCart(newCart);
       return { success: true };
     }
     if (name === "view_cart") {
@@ -1118,6 +1162,7 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
           return { error: data.error || data.message || "Agent payment failed" };
         }
         // Success — clear cart and refresh allowance
+        if (onSaveOrder) onSaveOrder(data.txHash, total, c);
         setCart([]);
         if (onRefreshAllowance) setTimeout(onRefreshAllowance, 2000);
         addToast(`✓ Agent purchased ${c.length} items for ${total.toFixed(2)} USDC!`, "success");
@@ -1156,6 +1201,37 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
         message: `Reorder created! ${p.name} will be reordered every ${inp.intervalDays} days. You'll receive a confirmation before each purchase. Next reorder: ${newReorder.nextOrder.split("T")[0]}`,
       };
     }
+    if (name === "add_to_wishlist") {
+      let p = ALL_PRODUCTS.find(x => x.id === inp.productId);
+      if (!p) {
+        p = ALL_PRODUCTS.find(x => x.name.toLowerCase() === inp.productId.toLowerCase());
+      }
+      if (!p) return { error: "Product not found" };
+      if (!wishlistRef.current.includes(p.id)) {
+        wishlistRef.current = [...wishlistRef.current, p.id];
+        onToggleWishlist(p);
+      }
+      return { success: true, added: p.name };
+    }
+    if (name === "remove_from_wishlist") {
+      let p = ALL_PRODUCTS.find(x => x.id === inp.productId);
+      if (!p) {
+        p = ALL_PRODUCTS.find(x => x.name.toLowerCase() === inp.productId.toLowerCase());
+      }
+      if (!p) return { error: "Product not found" };
+      if (wishlistRef.current.includes(p.id)) {
+        wishlistRef.current = wishlistRef.current.filter(id => id !== p.id);
+        onToggleWishlist(p);
+      }
+      return { success: true, removed: p.name };
+    }
+    if (name === "view_wishlist") {
+      const wishlistedProducts = ALL_PRODUCTS.filter(p => wishlistRef.current.includes(p.id));
+      return {
+        items: wishlistedProducts.map(p => ({ id: p.id, name: p.name, price: p.price })),
+        count: wishlistedProducts.length
+      };
+    }
     return { error: "Unknown tool" };
   };
 
@@ -1169,7 +1245,7 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
     const res = await fetch("/api/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tools: availableTools, messages: apiMsgs, allowance, wallet }),
+      body: JSON.stringify({ tools: availableTools, messages: apiMsgs, allowance, wallet, wishlist: ALL_PRODUCTS.filter(p => wishlistRef.current.includes(p.id)) }),
     });
     const data = await res.json();
     if (data.error) { setTools([]); return "Sorry, I ran into an issue. Please try again."; }
@@ -1365,6 +1441,391 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
 }
 
 /* =========================================================
+   WishlistDrawer — slide-out panel for wishlisted items
+   ========================================================= */
+function WishlistDrawer({ wishlist, onClose, onRemove, onAddToCart, allProducts }) {
+  const wishlistedItems = allProducts.filter(p => wishlist.includes(p.id));
+
+  return (
+    <>
+      <div className="backdrop" onClick={onClose} aria-label="Close wishlist" />
+      <aside
+        className="wishlist-drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Wishlist"
+        style={{
+          position: "fixed", top: 0, right: 0, height: "100%",
+          background: "#fff", zIndex: 1200,
+          display: "flex", flexDirection: "column",
+          boxShadow: "-8px 0 40px rgba(0,0,0,0.12)",
+          animation: "drawerIn .28s ease",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px", borderBottom: "1px solid #f0ede8" }}>
+          <div>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: "#1c1917", margin: 0 }}>Your Wishlist</h2>
+            <p style={{ fontSize: 13, color: "#a8a29e", margin: "3px 0 0" }}>
+              {wishlistedItems.length} items
+            </p>
+          </div>
+          <button className="btn-icon" onClick={onClose} aria-label="Close wishlist">✕</button>
+        </div>
+
+        <div style={{ flex: 1, overflowY: "auto", padding: "14px 20px" }}>
+          {wishlistedItems.length === 0 ? (
+            <div style={{ textAlign: "center", paddingTop: 80 }}>
+              <p style={{ fontSize: 48, marginBottom: 10, opacity: 0.2 }}>❤️</p>
+              <p style={{ fontSize: 15, color: "#a8a29e" }}>Your wishlist is empty</p>
+            </div>
+          ) : wishlistedItems.map(item => (
+            <div key={item.id} className="wishlist-item">
+              <div className="wishlist-item__thumb">
+                <img
+                  src={item.img} alt={item.name}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  onError={e => e.target.style.display = "none"}
+                />
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: 15, fontWeight: 600, color: "#1c1917", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  {item.name}
+                </p>
+                <p style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "#c47d2a", margin: "2px 0 0" }}>
+                  {fmt(item.price)}
+                </p>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6, flexShrink: 0 }}>
+                <button
+                  onClick={() => { onAddToCart(item); onRemove(item); }}
+                  style={{
+                    background: "#f97316", color: "#fff",
+                    border: "none", borderRadius: 4,
+                    padding: "6px 10px", fontSize: 11, fontWeight: 700,
+                    cursor: "pointer", textTransform: "uppercase"
+                  }}
+                >
+                  + Cart
+                </button>
+                <button
+                  onClick={() => onRemove(item)}
+                  style={{ background: "none", border: "none", color: "#a8a29e", cursor: "pointer", fontSize: 11, padding: 0, textDecoration: "underline" }}
+                >
+                  remove
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </aside>
+    </>
+  );
+}
+
+/* =========================================================
+   OrderDrawer — slide-out panel for order history
+   ========================================================= */
+function OrderDrawer({ orders, onClose }) {
+  return (
+    <>
+      <div className="backdrop" onClick={onClose} aria-label="Close orders" />
+      <aside
+        className="order-drawer"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Order history"
+        style={{
+          position: "fixed", top: 0, right: 0, height: "100%",
+          background: "#fff", zIndex: 1200,
+          display: "flex", flexDirection: "column",
+          boxShadow: "-8px 0 40px rgba(0,0,0,0.12)",
+          animation: "drawerIn .28s ease",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px", borderBottom: "1px solid #f0ede8" }}>
+          <div>
+            <h2 style={{ fontSize: 22, fontWeight: 700, color: "#1c1917", margin: 0 }}>Order History</h2>
+            <p style={{ fontSize: 13, color: "#a8a29e", margin: "3px 0 0" }}>
+              {orders.length} orders on Arc Blockchain
+            </p>
+          </div>
+          <button className="btn-icon" onClick={onClose} aria-label="Close orders">✕</button>
+        </div>
+
+        <div style={{ flex: 1, overflowY: "auto", padding: "14px 20px" }}>
+          {orders.length === 0 ? (
+            <div style={{ textAlign: "center", paddingTop: 80 }}>
+              <p style={{ fontSize: 48, marginBottom: 10, opacity: 0.2 }}>📦</p>
+              <p style={{ fontSize: 15, color: "#a8a29e" }}>No orders found</p>
+            </div>
+          ) : orders.map(order => {
+            let bg = "#fef3c7", color = "#d97706";
+            if (order.status === "success") { bg = "#dcfce7"; color = "#15803d"; }
+            if (order.status === "failed") { bg = "#fee2e2"; color = "#b91c1c"; }
+
+            return (
+              <div key={order.id || order.txHash} className="order-row">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <span style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "#a8a29e" }}>
+                    {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}
+                  </span>
+                  <span className="order-status-badge" style={{ background: bg, color: color }}>
+                    {order.status === "pending" ? "⏳ Confirming" : order.status === "success" ? "✓ Confirmed" : "✕ Failed"}
+                  </span>
+                </div>
+
+                <div style={{ marginBottom: 8 }}>
+                  {order.items && order.items.map((item, idx) => (
+                    <div key={idx} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#1c1917", margin: "2px 0" }}>
+                      <span>{item.name} <span style={{ color: "#a8a29e" }}>×{item.qty}</span></span>
+                      <span style={{ fontFamily: "var(--font-mono)", color: "#78716c" }}>{fmt(item.price * item.qty)}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #e7e4e0", paddingTop: 8, marginTop: 4 }}>
+                  <div>
+                    <span style={{ fontSize: 12, color: "#a8a29e" }}>Total: </span>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 14, fontWeight: 700, color: "#1c1917" }}>{fmt(order.total)}</span>
+                  </div>
+                  <a
+                    href={`https://testnet.arcscan.app/tx/${order.txHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontSize: 11, color: "#f97316", textDecoration: "underline", fontFamily: "var(--font-mono)" }}
+                  >
+                    ArcScan ↗
+                  </a>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </aside>
+    </>
+  );
+}
+
+/* =========================================================
+   CombinedFooter component — merges blockchain banner & footer
+   ========================================================= */
+function CombinedFooter({ addToast }) {
+  const [email, setEmail] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!email || !email.includes("@")) {
+      addToast("Please enter a valid email address.", "error");
+      return;
+    }
+    addToast("✓ Subscribed successfully! Thank you for joining ArcWear.", "success");
+    setEmail("");
+  };
+
+  return (
+    <footer aria-label="Powered by Arc Blockchain and Footer" style={{
+      background: "#1c1917",
+      borderRadius: 16,
+      padding: "32px 36px 24px",
+      marginTop: 36,
+      border: "1px solid #292524",
+      fontFamily: "var(--font-sans)",
+      color: "#e7e4e0",
+    }}>
+      {/* Top Section: Powered by Arc Blockchain Banner */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: 24,
+        paddingBottom: 28,
+        borderBottom: "1px solid #292524",
+      }}>
+        <div style={{ flex: 1, minWidth: 240 }}>
+          <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 21, fontWeight: 700, color: "#fff", marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ color: "#c47d2a" }}>◎</span> Powered by Arc Blockchain
+          </h3>
+          <p style={{ fontSize: 13, color: "#87827b", lineHeight: 1.6, margin: 0 }}>
+            AI shopping agent · USDC stablecoin · Circle&apos;s Arc L1 · Sub-second settlement · Non-custodial.
+          </p>
+        </div>
+        <div style={{ display: "flex", gap: 24, flexWrap: "wrap", alignItems: "center" }}>
+          {[
+            ["◎", "AI Agent", "Autonomous"],
+            ["⚡", "<1s", "Finality"],
+            ["$", "USDC", "Stablecoin"],
+            ["🔒", "Non", "Custodial"]
+          ].map(([ic, a, b]) => (
+            <div key={b} style={{ textAlign: "center", minWidth: 70 }}>
+              <p style={{ fontSize: 20, marginBottom: 4, color: "#c47d2a", margin: 0 }} aria-hidden="true">{ic}</p>
+              <p style={{ fontSize: 12, fontWeight: 700, color: "#fff", margin: 0 }}>{a}</p>
+              <p style={{ fontSize: 9, color: "#57534e", letterSpacing: 1, textTransform: "uppercase", marginTop: 2, margin: 0 }}>{b}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Middle Section: Connect & Newsletter */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+        gap: 40,
+        padding: "32px 0 24px",
+      }}>
+        {/* Connect & Social Links */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <h4 style={{ fontSize: 14, fontWeight: 700, color: "#fff", textTransform: "uppercase", letterSpacing: 1, margin: 0 }}>
+            Connect with ArcWear
+          </h4>
+          <p style={{ color: "#a8a29e", fontSize: 13, lineHeight: 1.5, margin: 0 }}>
+            Follow us to stay updated on web3 fashion, developer drops, and new AI capabilities.
+          </p>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            {[
+              {
+                name: "Twitter",
+                url: "https://x.com/arcwear_",
+                icon: (
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                )
+              },
+              {
+                name: "Instagram",
+                url: "https://www.instagram.com/arcwear__",
+                icon: (
+                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                  </svg>
+                )
+              },
+              {
+                name: "TikTok",
+                url: "https://tiktok.com/@arcwear_",
+                icon: (
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.86-.74-3.94-1.72-.01 2.93-.01 5.85-.02 8.78-.1 1.78-.71 3.56-1.95 4.86-1.24 1.35-3.03 2.21-4.87 2.37-2.01.19-4.14-.3-5.71-1.63-1.65-1.37-2.52-3.56-2.31-5.7.13-2.18 1.31-4.22 3.19-5.32 1.34-.82 2.94-1.21 4.5-.96.01 1.39.01 2.78.01 4.17-1-.21-2.11-.08-3 .46-.77.47-1.29 1.33-1.34 2.25-.09.99.31 2.02 1.07 2.68.79.72 1.93.99 2.97.77 1.05-.2 2.01-.99 2.37-1.99.28-.75.24-1.57.26-2.37.01-4.29.01-8.58.01-12.87z" />
+                  </svg>
+                )
+              }
+            ].map(social => (
+              <a
+                key={social.name}
+                href={social.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={social.name}
+                style={{
+                  color: "#a8a29e",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                  border: "1px solid #292524",
+                  background: "#171513",
+                  transition: "all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.color = "#fff";
+                  e.currentTarget.style.borderColor = "#c47d2a";
+                  e.currentTarget.style.background = "#c47d2a";
+                  e.currentTarget.style.transform = "scale(1.15)";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.color = "#a8a29e";
+                  e.currentTarget.style.borderColor = "#292524";
+                  e.currentTarget.style.background = "#171513";
+                  e.currentTarget.style.transform = "scale(1)";
+                }}
+              >
+                {social.icon}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* Newsletter Subscription */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <h4 style={{ fontSize: 14, fontWeight: 700, color: "#fff", textTransform: "uppercase", letterSpacing: 1, margin: 0 }}>
+            Subscribe to our Newsletter
+          </h4>
+          <p style={{ color: "#a8a29e", fontSize: 13, lineHeight: 1.5, margin: 0 }}>
+            Get notifications on new fashion drops, exclusive collections, and AI shopping integrations.
+          </p>
+          <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8, maxWidth: 360, margin: 0 }}>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              required
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              style={{
+                flex: 1,
+                background: "#171513",
+                color: "#fff",
+                border: "1px solid #292524",
+                borderRadius: 8,
+                padding: "8px 12px",
+                fontSize: 13,
+                outline: "none",
+                transition: "border-color 0.2s",
+              }}
+              onFocus={e => e.currentTarget.style.borderColor = "#f97316"}
+              onBlur={e => e.currentTarget.style.borderColor = "#292524"}
+            />
+            <button
+              type="submit"
+              style={{
+                background: "#f97316",
+                color: "#fff",
+                border: "none",
+                borderRadius: 8,
+                padding: "0 18px",
+                fontSize: 13,
+                fontWeight: 700,
+                cursor: "pointer",
+                transition: "background 0.2s, transform 0.15s",
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = "#ea6c0a"}
+              onMouseLeave={e => e.currentTarget.style.background = "#f97316"}
+              onMouseDown={e => e.currentTarget.style.transform = "scale(0.96)"}
+              onMouseUp={e => e.currentTarget.style.transform = "scale(1)"}
+            >
+              Subscribe
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* Bottom Copyright Bar */}
+      <div style={{
+        borderTop: "1px solid #292524",
+        paddingTop: 18,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: 12,
+        color: "#57534e",
+        fontSize: 11,
+      }}>
+        <p style={{ margin: 0 }}>
+          &copy; {new Date().getFullYear()} ArcWear. All rights reserved.
+        </p>
+        <p style={{ margin: 0, display: "flex", alignItems: "center", gap: 4 }}>
+          Powered by <span style={{ color: "#c47d2a", fontWeight: 600 }}>Arc Blockchain</span>
+        </p>
+      </div>
+    </footer>
+  );
+}
+
+/* =========================================================
    ArcWear — Root Page Component
    ========================================================= */
 export default function ArcWear() {
@@ -1382,6 +1843,169 @@ export default function ArcWear() {
   const [approvalOpen, setApprovalOpen] = useState(false);
   const [approvalAmount, setApprovalAmount] = useState(500);
   const [detailItem, setDetailItem] = useState(null);
+
+  // ── Wishlist State ──
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("arcwear_wishlist") || "[]");
+      const validIds = ALL_PRODUCTS.map(p => p.id);
+      return Array.isArray(stored) ? stored.filter(id => validIds.includes(id)) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [wishlistOpen, setWishlistOpen] = useState(false);
+
+  // Sync wishlist to localStorage
+  useEffect(() => {
+    localStorage.setItem("arcwear_wishlist", JSON.stringify(wishlist));
+  }, [wishlist]);
+
+  const toggleWishlist = (item) => {
+    if (!item || !item.id) return;
+    const validIds = ALL_PRODUCTS.map(p => p.id);
+    if (!validIds.includes(item.id)) return;
+    setWishlist(prev => {
+      const isWishlisted = prev.includes(item.id);
+      if (isWishlisted) {
+        addToast(`${item.name || "Item"} removed from wishlist`, "info");
+        return prev.filter(id => id !== item.id);
+      } else {
+        addToast(`${item.name || "Item"} added to wishlist`, "success");
+        return [...prev, item.id].filter(id => validIds.includes(id));
+      }
+    });
+  };
+
+  // ── Orders State & Syncing ──
+  const [orders, setOrders] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("arcwear_orders") || "[]");
+    } catch {
+      return [];
+    }
+  });
+  const [ordersOpen, setOrdersOpen] = useState(false);
+
+  // Sync orders to localStorage
+  useEffect(() => {
+    localStorage.setItem("arcwear_orders", JSON.stringify(orders));
+  }, [orders]);
+
+  // Load orders from API when wallet is connected
+  const loadOrders = async (userWallet) => {
+    if (!userWallet) return;
+    try {
+      const res = await fetch(`/api/orders?wallet=${userWallet}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.orders) {
+          setOrders(data.orders);
+        }
+      }
+    } catch (e) {
+      console.error("Error loading orders from API:", e);
+    }
+  };
+
+  useEffect(() => {
+    if (wallet) {
+      loadOrders(wallet);
+    } else {
+      setOrders([]);
+    }
+  }, [wallet]);
+
+  // Function to save new order to API & local state
+  const saveOrder = async (txHash, totalAmount, orderItems) => {
+    const newOrderData = {
+      userWallet: wallet || "0x0000000000000000000000000000000000000000",
+      items: orderItems.map(i => ({ id: i.id, name: i.name, price: i.price, qty: i.qty, img: i.img, size: i.size, color: i.color })),
+      total: totalAmount,
+      txHash: txHash,
+      status: "pending",
+      createdAt: new Date().toISOString()
+    };
+
+    // Add locally immediately
+    setOrders(prev => [newOrderData, ...prev]);
+
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newOrderData)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.order) {
+          // Replace local temp order with saved order containing its ID
+          setOrders(prev => prev.map(o => o.txHash === txHash ? data.order : o));
+        }
+      }
+    } catch (e) {
+      console.error("Error saving order:", e);
+    }
+  };
+
+  // Helper to query transaction receipt from Arc RPC
+  const checkOnChainStatus = async (txHash) => {
+    try {
+      const res = await fetch("https://rpc.testnet.arc.network", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 1,
+          method: "eth_getTransactionReceipt",
+          params: [txHash]
+        })
+      });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.result) {
+          return json.result.status === "0x1" ? "success" : "failed";
+        }
+      }
+    } catch (e) {
+      console.error("Error fetching transaction receipt:", e);
+    }
+    return "pending";
+  };
+
+  // Periodically check status of pending orders
+  useEffect(() => {
+    const pendingOrders = orders.filter(o => o.status === "pending" && o.id);
+    if (pendingOrders.length === 0) return;
+
+    const interval = setInterval(async () => {
+      for (const order of pendingOrders) {
+        const status = await checkOnChainStatus(order.txHash);
+        if (status !== "pending") {
+          // Update locally
+          setOrders(prev => prev.map(o => o.id === order.id ? { ...o, status } : o));
+          // Update DB
+          try {
+            await fetch("/api/orders", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id: order.id, status })
+            });
+          } catch (e) {
+            console.error("Error updating order status in API:", e);
+          }
+        }
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [orders]);
+
+  // ── Search & Filter State ──
+  const [searchQuery, setSearchQuery] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [sortBy, setSortBy] = useState("default");
 
   // ── Agent Allowance (ERC-20 approve/transferFrom) ─────────
   const { allowance, isApproved, approveAgent, refresh: refreshAllowance } = useAllowance(wallet);
@@ -1429,7 +2053,7 @@ export default function ArcWear() {
 
   // Disable body scroll when any modal or drawer is open
   useEffect(() => {
-    const isAnyModalOpen = agentOpen || cartOpen || checkout || !!editItem || approvalOpen || !!detailItem;
+    const isAnyModalOpen = agentOpen || cartOpen || checkout || !!editItem || approvalOpen || !!detailItem || wishlistOpen || ordersOpen;
     if (isAnyModalOpen) {
       document.body.style.overflow = "hidden";
     } else {
@@ -1438,7 +2062,7 @@ export default function ArcWear() {
     return () => {
       document.body.style.overflow = "";
     };
-  }, [agentOpen, cartOpen, checkout, editItem, approvalOpen, detailItem]);
+  }, [agentOpen, cartOpen, checkout, editItem, approvalOpen, detailItem, wishlistOpen, ordersOpen]);
 
   // Close wallet dropdown when clicking outside
   useEffect(() => {
@@ -1586,7 +2210,30 @@ export default function ArcWear() {
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
   const sec = CATALOGUE[section];
   const cats = Object.entries(sec.categories);
-  const displayCats = activeCat ? cats.filter(([k]) => k === activeCat) : cats;
+
+  // Filter and sort items per category based on search, price bounds, and sort dropdown
+  const filteredCats = cats.map(([catKey, cat]) => {
+    let filteredItems = cat.items.filter(item => {
+      const matchesSearch = searchQuery.trim() === "" ||
+        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.desc.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesMinPrice = minPrice.trim() === "" || item.price >= Number(minPrice);
+      const matchesMaxPrice = maxPrice.trim() === "" || item.price <= Number(maxPrice);
+
+      return matchesSearch && matchesMinPrice && matchesMaxPrice;
+    });
+
+    if (sortBy === "price-asc") {
+      filteredItems = [...filteredItems].sort((a, b) => a.price - b.price);
+    } else if (sortBy === "price-desc") {
+      filteredItems = [...filteredItems].sort((a, b) => b.price - a.price);
+    }
+
+    return [catKey, { ...cat, items: filteredItems }];
+  }).filter(([_, cat]) => cat.items.length > 0);
+
+  const displayCats = activeCat ? filteredCats.filter(([k]) => k === activeCat) : filteredCats;
 
   return (
     <div style={{ minHeight: "100vh", background: "#fff", fontFamily: "var(--font-sans)" }}>
@@ -1619,7 +2266,7 @@ export default function ArcWear() {
             <LogoImage />
             <div className="desktop-only" style={{ flexDirection: "column" }}>
               <p style={{ fontSize: 9, color: "#c47d2a", fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", margin: 0 }}>
-                Agentic · Arc Blockchain
+
               </p>
             </div>
           </div>
@@ -1658,59 +2305,30 @@ export default function ArcWear() {
             })}
           </div>
 
+          {/* Desktop search bar */}
+          <div className="desktop-only search-bar-wrap" style={{ flex: 1, maxWidth: 320, margin: "0 16px" }}>
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search fashion, styles..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                style={{ background: "none", border: "none", cursor: "pointer", padding: "0 10px 0 0", fontSize: 13, color: "#a8a29e" }}
+                aria-label="Clear search"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
           {/* Actions */}
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
 
-            {/* Help dropdown */}
-            <div
-              className="desktop-only"
-              style={{ position: "relative" }}
-              onMouseEnter={e => e.currentTarget.querySelector(".help-dropdown").style.display = "block"}
-              onMouseLeave={e => e.currentTarget.querySelector(".help-dropdown").style.display = "none"}
-            >
-              <button
-                style={{
-                  background: "#fff", color: "#1c1917",
-                  border: "1px solid #e7e4e0", borderRadius: 4,
-                  padding: "5px 11px", fontSize: 10, fontWeight: 600,
-                  cursor: "pointer", display: "flex", alignItems: "center", gap: 4,
-                  transition: "all .15s",
-                }}
-                aria-haspopup="true"
-                onMouseEnter={e => e.currentTarget.style.background = "#f5f3f0"}
-                onMouseLeave={e => e.currentTarget.style.background = "#fff"}
-              >
-                ❓ Help <span style={{ fontSize: 9 }}>▼</span>
-              </button>
 
-              <div className="help-dropdown" role="menu">
-                {[
-                  { icon: "🏠", label: "Help Center", href: "#" },
-                  { icon: "📦", label: "Place an order", href: "#" },
-                  { icon: "💳", label: "Payment options", href: "#" },
-                  { icon: "🚚", label: "Track an order", href: "#" },
-                  { icon: "❌", label: "Cancel an order", href: "#" },
-                  { icon: "↩️", label: "Returns & Refunds", href: "#" },
-                  { icon: "🍪", label: "Cookie Preferences", href: "#" },
-                ].map(({ icon, label, href }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    className="help-dropdown__item"
-                    role="menuitem"
-                  >
-                    <span style={{ fontSize: 14 }}>{icon}</span>{label}
-                  </a>
-                ))}
-                <div style={{ padding: "10px 16px", borderTop: "1px solid #e7e4e0", background: "#f5f3f0" }}>
-                  <button
-                    style={{ width: "100%", background: "#f97316", color: "#fff", border: "none", borderRadius: 4, padding: "8px", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
-                  >
-                    💬 Live Chat
-                  </button>
-                </div>
-              </div>
-            </div>
 
             {/* Wallet chip / connect button */}
             {wallet ? (
@@ -1771,7 +2389,7 @@ export default function ArcWear() {
                         borderTop: "1px solid var(--color-border)",
                         zIndex: 1
                       }} />
-                      
+
                       {/* Inner Container */}
                       <div style={{
                         background: "#fff",
@@ -1838,6 +2456,52 @@ export default function ArcWear() {
                 <span aria-hidden="true">◎</span> Connect Wallet
               </button>
             )}
+
+            {/* Wishlist button */}
+            <button
+              onClick={() => setWishlistOpen(true)}
+              className="desktop-only"
+              aria-label={`Open wishlist — ${wishlist.length} items`}
+              style={{
+                background: "#fff", color: "#1c1917",
+                border: "1px solid #e7e4e0", borderRadius: 4,
+                padding: "5px 12px", fontSize: 10, fontWeight: 700,
+                cursor: "pointer", display: "flex", alignItems: "center", gap: 5,
+                transition: "all .2s",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#f5f3f0"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#fff"; }}
+            >
+              ❤️ Wishlist
+              {wishlist.length > 0 && (
+                <span style={{ background: "#c41e3a", color: "#fff", borderRadius: "50%", width: 16, height: 16, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 800 }}>
+                  {wishlist.length}
+                </span>
+              )}
+            </button>
+
+            {/* Order History button */}
+            <button
+              onClick={() => setOrdersOpen(true)}
+              className="desktop-only"
+              aria-label={`Open order history — ${orders.length} orders`}
+              style={{
+                background: "#fff", color: "#1c1917",
+                border: "1px solid #e7e4e0", borderRadius: 4,
+                padding: "5px 12px", fontSize: 10, fontWeight: 700,
+                cursor: "pointer", display: "flex", alignItems: "center", gap: 5,
+                transition: "all .2s",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#f5f3f0"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#fff"; }}
+            >
+              📦 Orders
+              {orders.length > 0 && (
+                <span style={{ background: "#1c1917", color: "#fff", borderRadius: "50%", width: 16, height: 16, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 800 }}>
+                  {orders.length}
+                </span>
+              )}
+            </button>
 
             {/* Cart button */}
             <button
@@ -1975,15 +2639,80 @@ export default function ArcWear() {
               );
             })}
           </div>
-          <p style={{ fontSize: 13, color: "#a8a29e", flexShrink: 0, marginLeft: 12 }}>
-            {displayCats.reduce((s, [, c]) => s + c.items.length, 0)} items
-          </p>
+          <div style={{ display: "flex", gap: 12, alignItems: "center", flexShrink: 0 }}>
+            {/* Price filters */}
+            <div className="desktop-only" style={{ alignItems: "center", gap: 6, fontSize: 12, color: "#78716c" }}>
+              <span>Price (USDC):</span>
+              <input
+                type="number"
+                placeholder="Min"
+                value={minPrice}
+                onChange={e => setMinPrice(e.target.value)}
+                style={{
+                  width: 56, height: 28, background: "#faf9f7",
+                  border: "1px solid #e7e4e0", borderRadius: 4,
+                  padding: "0 6px", outline: "none", fontSize: 11,
+                  fontFamily: "var(--font-mono)",
+                }}
+              />
+              <span>–</span>
+              <input
+                type="number"
+                placeholder="Max"
+                value={maxPrice}
+                onChange={e => setMaxPrice(e.target.value)}
+                style={{
+                  width: 56, height: 28, background: "#faf9f7",
+                  border: "1px solid #e7e4e0", borderRadius: 4,
+                  padding: "0 6px", outline: "none", fontSize: 11,
+                  fontFamily: "var(--font-mono)",
+                }}
+              />
+            </div>
+
+            {/* Sort by dropdown */}
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value)}
+              style={{
+                height: 28, background: "#faf9f7",
+                border: "1px solid #e7e4e0", borderRadius: 4,
+                padding: "0 8px", outline: "none", fontSize: 11,
+                color: "#44403c", fontWeight: 600, cursor: "pointer"
+              }}
+            >
+              <option value="default">Default Sort</option>
+              <option value="price-asc">Price: Low to High</option>
+              <option value="price-desc">Price: High to Low</option>
+            </select>
+
+            <p style={{ fontSize: 12, color: "#a8a29e", flexShrink: 0, marginLeft: 6 }}>
+              {displayCats.reduce((s, [, c]) => s + c.items.length, 0)} items
+            </p>
+          </div>
         </div>
       </div>
 
       {/* ── PRODUCTS ── */}
       <main id="products" className="main-wrap" style={{ maxWidth: "100%", padding: "24px 4% 80px" }}>
-        {displayCats.map(([catKey, cat]) => (
+        {displayCats.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "80px 20px" }}>
+            <p style={{ fontSize: 48, marginBottom: 12 }}>🔍</p>
+            <h3 style={{ fontSize: 19, fontWeight: 700, color: "#1c1917", marginBottom: 6 }}>No products found</h3>
+            <p style={{ fontSize: 14, color: "#78716c" }}>Try checking your spelling or clearing filters.</p>
+            <button
+              onClick={() => { setSearchQuery(""); setMinPrice(""); setMaxPrice(""); setActiveCat(null); }}
+              style={{
+                marginTop: 16, background: "#1c1917", color: "#fff",
+                border: "none", borderRadius: 8, padding: "8px 20px",
+                fontSize: 12, fontWeight: 700, cursor: "pointer",
+                letterSpacing: 1, textTransform: "uppercase"
+              }}
+            >
+              Reset Filters
+            </button>
+          </div>
+        ) : displayCats.map(([catKey, cat]) => (
           <section key={catKey} style={{ marginBottom: 36 }}>
             <div className="section-header section-header">
               <span style={{ fontSize: 22 }} aria-hidden="true">{cat.emoji}</span>
@@ -2000,32 +2729,16 @@ export default function ArcWear() {
                   onEdit={setEditItem}
                   onViewDetail={(i) => setDetailItem({ ...i, categoryLabel: cat.label, sectionLabel: sec.label })}
                   agentPick={false}
+                  wishlist={wishlist}
+                  onToggleWishlist={toggleWishlist}
                 />
               ))}
             </div>
           </section>
         ))}
 
-        {/* Arc blockchain banner */}
-        <aside aria-label="Powered by Arc Blockchain" style={{ background: "#1c1917", borderRadius: 12, padding: "24px 28px", display: "flex", alignItems: "center", flexWrap: "wrap", gap: 20, marginTop: 8, border: "1px solid #292524" }}>
-          <div style={{ flex: 1, minWidth: 200 }}>
-            <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 19, fontWeight: 700, color: "#fff", marginBottom: 5 }}>
-              Powered by Arc Blockchain
-            </h3>
-            <p style={{ fontSize: 13, color: "#57534e", lineHeight: 1.7, margin: 0 }}>
-              AI shopping agent · USDC stablecoin · Circle&apos;s Arc L1 · Sub-second settlement · Non-custodial
-            </p>
-          </div>
-          <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-            {[["◎", "AI Agent", "Autonomous"], ["⚡", "<1s", "Finality"], ["$", "USDC", "Stablecoin"], ["🔒", "Non", "Custodial"]].map(([ic, a, b]) => (
-              <div key={b} style={{ textAlign: "center" }}>
-                <p style={{ fontSize: 20, marginBottom: 4 }} aria-hidden="true">{ic}</p>
-                <p style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>{a}</p>
-                <p style={{ fontSize: 10, color: "#44403c", letterSpacing: 1, textTransform: "uppercase", marginTop: 2 }}>{b}</p>
-              </div>
-            ))}
-          </div>
-        </aside>
+        {/* Combined Footer & Blockchain Banner */}
+        <CombinedFooter addToast={addToast} />
       </main>
 
       {/* ── FLOATING ELEMENTS ── */}
@@ -2090,6 +2803,27 @@ export default function ArcWear() {
           {
             icon: (
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+              </svg>
+            ),
+            label: wishlist.length > 0 ? `Wishlist (${wishlist.length})` : "Wishlist",
+            id: "mobile-wishlist-btn",
+            action: () => setWishlistOpen(true)
+          },
+          {
+            icon: (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+                <path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12" />
+              </svg>
+            ),
+            label: orders.length > 0 ? `Orders (${orders.length})` : "Orders",
+            id: "mobile-orders-btn",
+            action: () => setOrdersOpen(true)
+          },
+          {
+            icon: (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="8" cy="21" r="1" />
                 <circle cx="19" cy="21" r="1" />
                 <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
@@ -2121,13 +2855,17 @@ export default function ArcWear() {
           onClose={() => setDetailItem(null)}
           onAdd={(item, e) => { addToCart(item, e); addToast(`${item.name} added`, "success"); }}
           onEdit={setEditItem}
+          wishlist={wishlist}
+          onToggleWishlist={toggleWishlist}
         />
       )}
       {editItem && <EditModal item={editItem} onClose={() => setEditItem(null)} onSave={addToCartWithOptions} />}
       {cartOpen && <CartDrawer cart={cart} onRemove={id => setCart(p => p.filter(x => x.id !== id))} onCheckout={() => { if (!wallet) { connectWallet(); return; } setCartOpen(false); setCheckout(true); }} onClose={() => setCartOpen(false)} wallet={wallet} />}
-      {checkout && <CheckoutModal cart={cart} wallet={wallet} onClose={() => setCheckout(false)} onSuccess={() => { setCart([]); setCheckout(false); }} addToast={addToast} />}
-      {agentOpen && <AgentChat cart={cart} setCart={setCart} setActiveSection={setSection} setCheckoutOpen={setCheckout} addToast={addToast} onClose={() => setAgentOpen(false)} wallet={wallet} allowance={allowance} onRequestApproval={(amt) => { setApprovalAmount(amt); setApprovalOpen(true); }} onRefreshAllowance={refreshAllowance} />}
+      {checkout && <CheckoutModal cart={cart} wallet={wallet} onClose={() => setCheckout(false)} onSuccess={(hash) => { saveOrder(hash, cart.reduce((s, i) => s + i.price * i.qty, 0), cart); setCart([]); setCheckout(false); }} addToast={addToast} />}
+      {agentOpen && <AgentChat cart={cart} setCart={setCart} setActiveSection={setSection} setCheckoutOpen={setCheckout} addToast={addToast} onClose={() => setAgentOpen(false)} wallet={wallet} allowance={allowance} onRequestApproval={(amt) => { setApprovalAmount(amt); setApprovalOpen(true); }} onRefreshAllowance={refreshAllowance} onSaveOrder={saveOrder} wishlist={wishlist} onToggleWishlist={toggleWishlist} />}
       {approvalOpen && <ApprovalModal wallet={wallet} requestedAmount={approvalAmount} onApprove={async (amt) => { const hash = await approveAgent(amt); setApprovalOpen(false); addToast(`✓ Agent mode enabled — ${amt} USDC approved`, "success"); return hash; }} onClose={() => setApprovalOpen(false)} />}
+      {wishlistOpen && <WishlistDrawer wishlist={wishlist} allProducts={ALL_PRODUCTS} onClose={() => setWishlistOpen(false)} onRemove={toggleWishlist} onAddToCart={addToCart} />}
+      {ordersOpen && <OrderDrawer orders={orders} onClose={() => setOrdersOpen(false)} />}
 
       <Toasts list={toasts} />
     </div>

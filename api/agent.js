@@ -3,7 +3,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { messages, tools, allowance, wallet } = req.body;
+  const { messages, tools, allowance, wallet, wishlist } = req.body;
 
   if (!process.env.GROQ_API_KEY) {
     return res.status(500).json({ error: "GROQ_API_KEY not configured" });
@@ -15,6 +15,10 @@ export default async function handler(req, res) {
 
     const walletStr = wallet ? wallet : "Not Connected";
     const allowanceStr = allowance !== undefined && allowance !== null ? `${allowance} USDC` : "0 USDC";
+    const wishlistItems = Array.isArray(wishlist) ? wishlist : [];
+    const wishlistStr = wishlistItems.length > 0
+      ? wishlistItems.map(item => `${item.name} (${item.price} USDC, ID: ${item.id})`).join(", ")
+      : "No items in wishlist";
 
     // Add system message first
     groqMessages.push({
@@ -24,6 +28,7 @@ export default async function handler(req, res) {
 CURRENT USER STATUS:
 - Connected Wallet: ${walletStr}
 - Pre-approved USDC Allowance: ${allowanceStr}
+- User's Wishlist: ${wishlistStr}
 
 CORE TOOLS:
 - search_products: Search the catalogue by section (men/women/children), category, price, keywords
@@ -37,6 +42,9 @@ AUTONOMOUS TOOLS:
 - request_approval: Ask user to approve a USDC spending allowance so you can purchase without wallet popups. Use when allowance is 0 or insufficient.
 - agent_checkout: Execute checkout using the pre-approved USDC allowance — INSTANT, NO wallet popup. Only works when allowance >= cart total.
 - create_reorder: Set up automatic reorder for a product at a regular interval. The user will receive a confirmation notification before each reorder executes.
+- add_to_wishlist: Add a product to the user's wishlist by ID.
+- remove_from_wishlist: Remove a product from the user's wishlist by ID.
+- view_wishlist: View the user's wishlist contents.
 
 CHECKOUT FLOW (IMPORTANT):
 1. Look at the pre-approved USDC Allowance provided under CURRENT USER STATUS. If the allowance is 0 or less than the cart total, do NOT call 'check_allowance' or 'agent_checkout'. Instead, immediately call the 'request_approval' tool to request a spending allowance from the user.
@@ -51,8 +59,13 @@ REORDER RULES:
 - Reorders send a confirmation notification BEFORE executing — user has 24h to cancel
 - Be proactive: if a user buys the same item repeatedly, suggest a reorder
 
+WISHLIST RULES:
+- Under CURRENT USER STATUS, you can see the user's wishlist of products.
+- When the user asks for suggestions, recommendations, or outfit looks, you MUST reference items in their wishlist if they are relevant, or recommend matching items that complement the wishlisted products.
+- If the user asks to add or remove items from the wishlist, you MUST call 'add_to_wishlist' or 'remove_from_wishlist' tool respectively. Do not just say you are doing it in text.
+
 TOOL CALLING RULES (CRITICAL):
-1. Whenever you want to search products, add items to the cart, view the cart, remove items from the cart, checkout, or request allowance approvals, you MUST call the corresponding tool. Do NOT just write in text that you are doing it. You must generate the tool call block so the system actually performs the action.
+1. Whenever you want to search products, add items to the cart, view the cart, remove items from the cart, checkout, or request allowance approvals, or manage the wishlist, you MUST call the corresponding tool. Do NOT just write in text that you are doing it. You must generate the tool call block so the system actually performs the action.
 2. If you state "Adding X to cart" or "I'll add X to your cart", you MUST emit the 'add_to_cart' tool call for that item. Do not pretend to add items without calling the tool.
 
 TONE: Helpful, concise, confident. Always show USDC prices. After adding items, summarise with prices.`,
