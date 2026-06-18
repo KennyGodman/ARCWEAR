@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
-import { USDC_ADDRESS, AGENT_WALLET } from "../config";
+import { USDC_ADDRESS, APPROVAL_TARGET } from "../config";
 
 /**
- * useAllowance — reads USDC allowance granted to the Circle Agent Wallet.
+ * useAllowance — reads USDC allowance granted to the APPROVAL_TARGET (escrow contract or agent wallet).
  *
  * The ERC-20 allowance(owner, spender) is read on-chain via eth_call.
- * When allowance > 0, the agent can call transferFrom() without a wallet popup.
+ * When allowance > 0, the agent can trigger autonomous checkout without a wallet popup.
  *
  * @param {string|null} wallet - The connected user wallet address
  * @returns {{ allowance, isApproved, loading, refresh, approveAgent }}
@@ -24,7 +24,7 @@ export default function useAllowance(wallet) {
     setLoading(true);
     try {
       const owner = wallet.toLowerCase().replace("0x", "").padStart(64, "0");
-      const spender = AGENT_WALLET.toLowerCase().replace("0x", "").padStart(64, "0");
+      const spender = APPROVAL_TARGET.toLowerCase().replace("0x", "").padStart(64, "0");
 
       // allowance(address owner, address spender) → function selector 0xdd62ed3e
       const data = "0xdd62ed3e" + owner + spender;
@@ -50,7 +50,7 @@ export default function useAllowance(wallet) {
     refresh();
   }, [refresh]);
 
-  // ── Approve agent to spend USDC ───────────────────────────
+  // ── Approve spender to spend USDC ───────────────────────────
   const approveAgent = useCallback(
     async (amountUSDC) => {
       if (!wallet || !window.ethereum) {
@@ -61,7 +61,7 @@ export default function useAllowance(wallet) {
       // approve(address spender, uint256 amount) → function selector 0x095ea7b3
       const data =
         "0x095ea7b3" +
-        AGENT_WALLET.slice(2).toLowerCase().padStart(64, "0") +
+        APPROVAL_TARGET.slice(2).toLowerCase().padStart(64, "0") +
         amt.toString(16).padStart(64, "0");
 
       const hash = await window.ethereum.request({
@@ -90,6 +90,7 @@ export default function useAllowance(wallet) {
     },
     [wallet, refresh]
   );
+
 
   return {
     allowance,
