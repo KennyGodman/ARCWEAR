@@ -1,9 +1,30 @@
+function getSafeMessagesSlice(messages, limit = 10) {
+  if (!Array.isArray(messages) || messages.length <= limit) return messages;
+  
+  let startIndex = messages.length - limit;
+  
+  // Ensure we don't slice in the middle of a tool call/response pair.
+  // If the first message in our slice is a user message containing tool results,
+  // we must move startIndex backward to include the assistant message that called the tool.
+  while (startIndex > 0) {
+    const msg = messages[startIndex];
+    if (msg.role === "user" && Array.isArray(msg.content) && msg.content.some(b => b.type === "tool_result")) {
+      startIndex--;
+    } else {
+      break;
+    }
+  }
+  
+  return messages.slice(startIndex);
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
   const { messages, tools, allowance, wallet, wishlist } = req.body;
+  const slicedMessages = getSafeMessagesSlice(messages, 10);
 
   if (!process.env.GROQ_API_KEY) {
     return res.status(500).json({ error: "GROQ_API_KEY not configured" });
@@ -72,7 +93,7 @@ TONE: Helpful, concise, confident. Always show USDC prices. After adding items, 
     });
 
     // Convert message history
-    for (const msg of messages) {
+    for (const msg of slicedMessages) {
       if (msg.role === "user") {
         // Handle tool results in user messages (Anthropic format)
         if (Array.isArray(msg.content)) {
@@ -128,53 +149,77 @@ TONE: Helpful, concise, confident. Always show USDC prices. After adding items, 
       },
     }));
 
-    // Call Groq API with retry logic for rate limits
-    const MAX_RETRIES = 3;
-    let data, response;
-    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-      response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "llama-3.1-8b-instant",
-          messages: groqMessages,
-          tools: groqTools.length > 0 ? groqTools : undefined,
-          tool_choice: groqTools.length > 0 ? "auto" : undefined,
-          max_tokens: 1000,
-          temperature: 0.3,
-        }),
-      });
+    // Call Groq API with fallback and retry logic
+    const candidateModels = [
+      "llama-3.3-70b-versatile",
+      "llama-3.1-8b-instant"
+    ];
 
-      data = await response.json();
+    let lastError = null;
+    let data = null;
+    let response = null;
+    let successfulModel = null;
 
-      // If rate limited, wait and retry
-      if (response.status === 429) {
-        const retryAfterMs = (() => {
-          // Groq returns retry-after in seconds
-          const header = response.headers.get("retry-after");
-          if (header) return parseFloat(header) * 1000;
-          // Fall back to extracting from error message e.g. "try again in 750ms"
-          const match = data.error?.message?.match(/(\d+(?:\.\d+)?)\s*s/);
-          if (match) return parseFloat(match[1]) * 1000;
-          return (attempt + 1) * 1500; // exponential backoff fallback
-        })();
-        console.warn(`[agent] Rate limited. Retrying in ${retryAfterMs}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
-        await new Promise(r => setTimeout(r, Math.min(retryAfterMs + 200, 8000)));
-        continue;
+    for (const model of candidateModels) {
+      console.log(`[agent] Attempting chat completion with model: ${model}`);
+      const MAX_RETRIES = 3;
+      let modelSucceeded = false;
+
+      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+        try {
+          response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+            },
+            body: JSON.stringify({
+              model,
+              messages: groqMessages,
+              tools: groqTools.length > 0 ? groqTools : undefined,
+              tool_choice: groqTools.length > 0 ? "auto" : undefined,
+              max_tokens: 1000,
+              temperature: 0.3,
+            }),
+          });
+
+          data = await response.json();
+
+          if (response.status === 429) {
+            const retryAfterMs = (() => {
+              const header = response.headers.get("retry-after");
+              if (header) return parseFloat(header) * 1000;
+              const match = data.error?.message?.match(/(\d+(?:\.\d+)?)\s*s/);
+              if (match) return parseFloat(match[1]) * 1000;
+              return (attempt + 1) * 1500;
+            })();
+            console.warn(`[agent] Model ${model} rate limited (429). Retrying in ${retryAfterMs}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
+            await new Promise(r => setTimeout(r, Math.min(retryAfterMs + 200, 15000)));
+            continue;
+          }
+
+          if (!response.ok) {
+            throw new Error(data.error?.message || `API error (${response.status})`);
+          }
+
+          modelSucceeded = true;
+          successfulModel = model;
+          break; // success
+        } catch (err) {
+          console.error(`[agent] Attempt with model ${model} failed on attempt ${attempt + 1}:`, err.message);
+          lastError = err;
+        }
       }
 
-      break; // success or non-retryable error
+      if (modelSucceeded) {
+        console.log(`[agent] Successfully generated response using model: ${successfulModel}`);
+        break;
+      }
     }
 
-    if (!response.ok) {
-      console.error("Groq error:", data);
-      return res.status(response.status).json({
-        error: data.error?.message || "Groq API error",
-        details: data,
-      });
+    if (!successfulModel) {
+      console.error("[agent] All models failed. Last error:", lastError?.message);
+      return res.status(500).json({ error: lastError?.message || "All Groq models failed" });
     }
 
     const message = data.choices?.[0]?.message;

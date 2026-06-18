@@ -1081,8 +1081,8 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
 
   // Auto-resume agent checkout when allowance is approved
   useEffect(() => {
-    const total = cartRef.current.reduce((s, i) => s + i.price * i.qty, 0);
-    if (waitingForApproval.current && allowance >= total && total > 0 && !loading) {
+    const totalAmount = cartRef.current.reduce((s, i) => s + i.price * i.qty, 0);
+    if (waitingForApproval.current && allowance >= totalAmount && totalAmount > 0 && !loading) {
       waitingForApproval.current = false;
       
       const triggerAutoCheckout = async () => {
@@ -1090,16 +1090,55 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
         const autoText = "Approved! Proceeding with checkout.";
         setMsgs(p => [...p, { role: "user", text: autoText }]);
 
-        const apiMsgs = msgs
-          .filter(m => m.role === "assistant" || m.role === "user")
-          .map(m => ({ role: m.role, content: m.text }));
-        apiMsgs.push({ role: "user", content: autoText });
-
+        const c = cartRef.current;
         try {
-          const r = await runAgent(apiMsgs);
-          setMsgs(p => [...p, { role: "assistant", text: r || "Done! Anything else?" }]);
-        } catch {
-          setMsgs(p => [...p, { role: "assistant", text: "Something went wrong. Please try again." }]);
+          addToast("🤖 Agent executing purchase...", "agent");
+          const res = await fetch("/api/agent-pay", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userWallet: wallet,
+              items: c.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price })),
+              total: totalAmount,
+            }),
+          });
+          const data = await res.json();
+          if (!res.ok || data.error) {
+            const errMsg = data.error || data.message || "Agent payment failed";
+            setMsgs(p => [...p, {
+              role: "assistant",
+              text: `Sorry, the autonomous checkout failed: ${errMsg}. Please try again.`
+            }]);
+            addToast(`❌ Agent purchase failed: ${errMsg}`, "error");
+          } else {
+            if (onSaveOrder) {
+              onSaveOrder(data.txHash, totalAmount, c, {
+                jobId: data.jobId,
+                escrowStatus: data.escrowStatus || "completed",
+                escrow: data.escrow
+              });
+            }
+            setCart([]);
+            if (onRefreshAllowance) setTimeout(onRefreshAllowance, 2000);
+            
+            const successMsg = `✓ Purchase confirmed! I've autonomously executed the transaction via the escrow contract.
+
+Ordered: ${c.map(i => `${i.name} (x${i.qty})`).join(", ")}
+Total: ${totalAmount.toFixed(2)} USDC
+Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : ""}`;
+            
+            setMsgs(p => [...p, {
+              role: "assistant",
+              text: successMsg
+            }]);
+            addToast(`✓ Agent purchased ${c.length} items for ${totalAmount.toFixed(2)} USDC!`, "success");
+          }
+        } catch (err) {
+          const errMsg = err.message || "Unknown network error";
+          setMsgs(p => [...p, {
+            role: "assistant",
+            text: `Sorry, I ran into a request failure: ${errMsg}. Please try again.`
+          }]);
         }
         setLoading(false);
       };
