@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { messages, tools, allowance, wallet, wishlist } = req.body;
+  const { messages, tools, allowance, wallet, wishlist, cart } = req.body;
   const slicedMessages = getSafeMessagesSlice(messages, 10);
 
   if (!process.env.GROQ_API_KEY) {
@@ -40,6 +40,11 @@ export default async function handler(req, res) {
     const wishlistStr = wishlistItems.length > 0
       ? wishlistItems.map(item => `${item.name} (${item.price} USDC, ID: ${item.id})`).join(", ")
       : "No items in wishlist";
+    const cartItems = Array.isArray(cart) ? cart : [];
+    const cartTotal = cartItems.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const cartStr = cartItems.length > 0
+      ? cartItems.map(item => `${item.name} (Qty: ${item.qty}, Price: ${item.price} USDC)`).join(", ") + ` — Total: ${cartTotal} USDC`
+      : "Empty";
 
     // Add system message first
     groqMessages.push({
@@ -49,6 +54,7 @@ export default async function handler(req, res) {
 CURRENT USER STATUS:
 - Connected Wallet: ${walletStr}
 - Pre-approved USDC Allowance: ${allowanceStr}
+- Current Cart: ${cartStr}
 - User's Wishlist: ${wishlistStr}
 
 CORE TOOLS:

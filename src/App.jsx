@@ -1352,7 +1352,14 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
     const res = await fetch("/api/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tools: availableTools, messages: apiMsgs, allowance, wallet, wishlist: ALL_PRODUCTS.filter(p => wishlistRef.current.includes(p.id)) }),
+      body: JSON.stringify({
+        tools: availableTools,
+        messages: apiMsgs,
+        allowance,
+        wallet,
+        cart: cartRef.current,
+        wishlist: ALL_PRODUCTS.filter(p => wishlistRef.current.includes(p.id))
+      }),
     });
     const data = await res.json();
     if (data.error) { setTools([]); return "Sorry, I ran into an issue. Please try again."; }
@@ -1393,6 +1400,24 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
       }
 
       return runAgent([...apiMsgs, { role: "assistant", content: data.content }, { role: "user", content: results }], depth + 1);
+    }
+
+    // Fail-safe: if the agent explains it's going to request approval but forgot the tool call
+    const lowerText = text.toLowerCase();
+    if (
+      (lowerText.includes("allowance") || lowerText.includes("spending limit") || lowerText.includes("approve")) &&
+      (lowerText.includes("request") || lowerText.includes("popup") || lowerText.includes("pop up") || lowerText.includes("modal"))
+    ) {
+      const totalAmount = cartRef.current.reduce((s, i) => s + i.price * i.qty, 0);
+      if (totalAmount > 0 && allowance < totalAmount) {
+        console.log("[runAgent] Fail-safe: Triggering request_approval from text response");
+        waitingForApproval.current = true;
+        if (onRequestApproval) {
+          onRequestApproval(totalAmount || 500);
+        }
+        setTools([]);
+        return text || `I have popped up the Agent Approval modal for ${totalAmount} USDC. Please approve the spending limit in your wallet to enable instant agent checkout!`;
+      }
     }
 
     setTools([]);
