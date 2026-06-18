@@ -166,10 +166,11 @@ async function getOnChainJobStatus(jobId) {
 async function getTotalJobs() {
   const escrowAddr = ESCROW_CONTRACT();
   if (!escrowAddr) return null;
-  const selector = "52c01b37"; // totalJobs()
+  const selector = "1ace87b3"; // totalJobs()
   const raw = await ethCall(escrowAddr, "0x" + selector);
   return parseInt(raw, 16);
 }
+
 
 // ── Main Escrow Flow ───────────────────────────────────────────────────────────
 

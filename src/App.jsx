@@ -1073,10 +1073,40 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
   const cartRef = useRef(cart);
   const wishlistRef = useRef(wishlist);
   const bottomRef = useRef(null);
+  const waitingForApproval = useRef(false);
 
   useEffect(() => { cartRef.current = cart; }, [cart]);
   useEffect(() => { wishlistRef.current = wishlist; }, [wishlist]);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, loading]);
+
+  // Auto-resume agent checkout when allowance is approved
+  useEffect(() => {
+    const total = cartRef.current.reduce((s, i) => s + i.price * i.qty, 0);
+    if (waitingForApproval.current && allowance >= total && total > 0 && !loading) {
+      waitingForApproval.current = false;
+      
+      const triggerAutoCheckout = async () => {
+        setLoading(true);
+        const autoText = "Approved! Proceeding with checkout.";
+        setMsgs(p => [...p, { role: "user", text: autoText }]);
+
+        const apiMsgs = msgs
+          .filter(m => m.role === "assistant" || m.role === "user")
+          .map(m => ({ role: m.role, content: m.text }));
+        apiMsgs.push({ role: "user", content: autoText });
+
+        try {
+          const r = await runAgent(apiMsgs);
+          setMsgs(p => [...p, { role: "assistant", text: r || "Done! Anything else?" }]);
+        } catch {
+          setMsgs(p => [...p, { role: "assistant", text: "Something went wrong. Please try again." }]);
+        }
+        setLoading(false);
+      };
+
+      triggerAutoCheckout();
+    }
+  }, [allowance, loading, msgs]);
 
   // Execute a tool call locally
   const exec = async (name, inp) => {
@@ -1165,6 +1195,7 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
       };
     }
     if (name === "request_approval") {
+      waitingForApproval.current = true;
       if (onRequestApproval) onRequestApproval(inp.amount || 500);
       return {
         success: true,
@@ -1199,7 +1230,7 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
           return { error: data.error || data.message || "Agent payment failed" };
         }
         // Success — clear cart and refresh allowance
-        if (onSaveOrder) onSaveOrder(data.txHash, total, c);
+        if (onSaveOrder) onSaveOrder(data.txHash, total, c, { jobId: data.jobId, escrowStatus: data.escrowStatus || "completed", escrow: data.escrow });
         setCart([]);
         if (onRefreshAllowance) setTimeout(onRefreshAllowance, 2000);
         addToast(`✓ Agent purchased ${c.length} items for ${total.toFixed(2)} USDC!`, "success");
@@ -2150,14 +2181,17 @@ export default function ArcWear() {
   }, [wallet]);
 
   // Function to save new order to API & local state
-  const saveOrder = async (txHash, totalAmount, orderItems) => {
+  const saveOrder = async (txHash, totalAmount, orderItems, extra = {}) => {
     const newOrderData = {
       userWallet: wallet || "0x0000000000000000000000000000000000000000",
       items: orderItems.map(i => ({ id: i.id, name: i.name, price: i.price, qty: i.qty, img: i.img, size: i.size, color: i.color })),
       total: totalAmount,
       txHash: txHash,
       status: "pending",
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      jobId: extra.jobId ?? null,
+      escrowStatus: extra.escrowStatus ?? (extra.escrow ? "completed" : null),
+      escrow: extra.escrow ?? false
     };
 
     // Add locally immediately
