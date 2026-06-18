@@ -1,16 +1,33 @@
 import { useState } from "react";
-import { fmt, trunc } from "../utils";
-import { ARC_CHAIN_ID, ARC_CHAIN_CONFIG, USDC_ADDRESS, MERCHANT_ADDR } from "../config";
+import { fmt, trunc, encodeMemoUSDC } from "../utils";
+import { ARC_CHAIN_ID, ARC_CHAIN_CONFIG, USDC_ADDRESS, MERCHANT_ADDR, MEMO_ADDRESS } from "../config";
 
-export default function CheckoutModal({ cart, wallet, onClose, onSuccess, addToast }) {
+const generateTempTxHash = () => "pending_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7);
+
+export default function CheckoutModal({ cart, wallet, onClose, onSuccess, onTxSent, onTxHashUpdated, addToast }) {
   const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const [step, setStep] = useState("review");
   const [txHash, setTxHash] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
+  const [createdOrderId, setCreatedOrderId] = useState(null);
 
   const pay = async () => {
     if (!window.ethereum) { addToast("No wallet detected", "error"); return; }
     setStep("signing");
+
+    // Initialize the order as pending immediately on click!
+    let orderId = createdOrderId;
+    if (!orderId) {
+      const tempTxHash = generateTempTxHash();
+      if (onTxSent) {
+        const saved = await onTxSent(tempTxHash);
+        if (saved && saved.id) {
+          orderId = saved.id;
+          setCreatedOrderId(saved.id);
+        }
+      }
+    }
+
     try {
       const currentChain = await window.ethereum.request({ method: "eth_chainId" });
       if (currentChain !== ARC_CHAIN_ID) {
@@ -52,15 +69,20 @@ export default function CheckoutModal({ cart, wallet, onClose, onSuccess, addToa
         return;
       }
 
-      const amt = Math.round(total * 1e6);
-      const data = "0xa9059cbb" + MERCHANT_ADDR.slice(2).padStart(64, "0") + amt.toString(16).padStart(64, "0");
+      // Wrap the transfer in a Memo transaction carrying the order ID
+      const data = encodeMemoUSDC(MERCHANT_ADDR, total, orderId || "00000000000000000000000000000000");
       const hash = await window.ethereum.request({
         method: "eth_sendTransaction",
-        params: [{ from: wallet, to: USDC_ADDRESS, data, gas: "0x186A0" }],
+        params: [{ from: wallet, to: MEMO_ADDRESS, data, gas: "0x30D40" }],
       });
 
       setTxHash(hash);
       setStep("confirming");
+      
+      // Update the order in the database with the real txHash!
+      if (onTxHashUpdated && orderId) {
+        onTxHashUpdated(orderId, hash);
+      }
 
       // 3. Wait for transaction to be mined
       const waitForTransactionReceipt = async (txHash) => {
@@ -202,7 +224,20 @@ export default function CheckoutModal({ cart, wallet, onClose, onSuccess, addToa
         {/* ── Signing step ── */}
         {step === "signing" && (
           <div style={{ textAlign: "center", padding: "44px 0" }}>
-            <div style={{ fontSize: 44, marginBottom: 14, animation: "spin 1s linear infinite", display: "inline-block" }}>⚡</div>
+            <img
+              src="/arc-logo-signing.jpg"
+              alt="Signing Transaction"
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: "50%",
+                marginBottom: 14,
+                animation: "spin 1.5s linear infinite",
+                display: "inline-block",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                border: "2px solid #e7e4e0",
+              }}
+            />
             <h3 style={{ fontSize: 24, fontWeight: 700, color: "#1c1917", marginBottom: 6 }}>Signing Transaction</h3>
             <p style={{ fontSize: 14, color: "#a8a29e" }}>Approve in your wallet</p>
             <p style={{ fontSize: 12, color: "#c47d2a", letterSpacing: 1.5, textTransform: "uppercase", marginTop: 6 }}>Arc finality &lt;1 second</p>

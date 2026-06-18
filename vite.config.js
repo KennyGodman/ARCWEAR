@@ -10,6 +10,14 @@ export default defineConfig(({ mode }) => {
   Object.assign(process.env, env)
 
   return {
+    optimizeDeps: {
+      exclude: ['@vercel/kv'],
+    },
+    build: {
+      rollupOptions: {
+        external: ['@vercel/kv'],
+      },
+    },
     plugins: [
       react(),
       // Inline API plugin — handles /api/* routes during dev
@@ -219,6 +227,45 @@ export default defineConfig(({ mode }) => {
                 await handler(fakeReq, fakeRes)
               } catch (err) {
                 console.error('[api/agent-pay] Dev error:', err)
+                res.statusCode = 500
+                res.setHeader('Content-Type', 'application/json')
+                res.end(JSON.stringify({ error: err.message }))
+              }
+            })
+          })
+
+          // ── Orders API ──
+          server.middlewares.use('/api/orders', async (req, res) => {
+            let body = ''
+            req.on('data', chunk => { body += chunk.toString() })
+            req.on('end', async () => {
+              try {
+                const { default: handler } = await import('./api/orders.js')
+                const url = new URL(req.url, 'http://localhost')
+                const fakeReq = {
+                  method: req.method,
+                  query: Object.fromEntries(url.searchParams.entries()),
+                  body: body ? JSON.parse(body) : {},
+                }
+                const fakeRes = {
+                  statusCode: 200,
+                  _headers: {},
+                  status(code) { this.statusCode = code; return this },
+                  setHeader(k, v) { this._headers[k] = v },
+                  end(data) {
+                    res.statusCode = this.statusCode
+                    Object.entries(this._headers).forEach(([k, v]) => res.setHeader(k, v))
+                    res.end(data)
+                  },
+                  json(data) {
+                    res.statusCode = this.statusCode
+                    res.setHeader('Content-Type', 'application/json')
+                    res.end(JSON.stringify(data))
+                  },
+                }
+                await handler(fakeReq, fakeRes)
+              } catch (err) {
+                console.error('[api/orders] Dev error:', err)
                 res.statusCode = 500
                 res.setHeader('Content-Type', 'application/json')
                 res.end(JSON.stringify({ error: err.message }))

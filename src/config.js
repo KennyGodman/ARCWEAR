@@ -15,3 +15,6 @@ export const AGENT_WALLET = "0x51894a584a1e186151b31b23ea3add16fce5ff56";
 
 // Default spending cap for agent approval (in USDC)
 export const DEFAULT_AGENT_ALLOWANCE = 500;
+
+// Arc Testnet transaction Memo contract address
+export const MEMO_ADDRESS = "0x5294E9927c3306DcBaDb03fe70b92e01cCede505";

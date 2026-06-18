@@ -6,7 +6,11 @@ let _kv = null;
 async function getKV() {
   if (_kv) return _kv;
   try {
-    const { kv } = await import("@vercel/kv");
+    // Use a variable so Vite's static import-analysis doesn't try to resolve
+    // this package locally — it only exists in the Vercel runtime environment.
+    const pkg = "@vercel/kv";
+    // eslint-disable-next-line
+    const { kv } = await import(/* @vite-ignore */ pkg);
     _kv = kv;
     return _kv;
   } catch {
@@ -63,7 +67,7 @@ async function listOrders(wallet) {
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") return res.status(200).end();
@@ -93,16 +97,29 @@ export default async function handler(req, res) {
 
     // ── PATCH /api/orders ─────────────────────────────
     if (req.method === "PATCH") {
-      const { id, status } = req.body;
-      if (!id || !status) {
-        return res.status(400).json({ error: "Required: id, status" });
+      const { id, status, txHash } = req.body;
+      if (!id) {
+        return res.status(400).json({ error: "Required: id" });
       }
       const kv = await getKV();
       const order = await kv.get(`order:${id}`);
       if (!order) return res.status(404).json({ error: "Order not found" });
-      order.status = status;
+      if (status) order.status = status;
+      if (txHash) order.txHash = txHash;
       await kv.set(`order:${id}`, order);
       return res.status(200).json({ order });
+    }
+
+    // ── DELETE /api/orders ────────────────────────────
+    if (req.method === "DELETE") {
+      const { id, wallet } = req.body;
+      if (!id || !wallet) {
+        return res.status(400).json({ error: "Required: id, wallet" });
+      }
+      const kv = await getKV();
+      await kv.del(`order:${id}`);
+      await kv.srem(`wallet-orders:${wallet.toLowerCase()}`, id);
+      return res.status(200).json({ success: true });
     }
 
     return res.status(405).json({ error: "Method not allowed" });

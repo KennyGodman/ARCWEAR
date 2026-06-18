@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import useAllowance from "./hooks/useAllowance";
 import ApprovalModal from "./components/ApprovalModal";
 import ProductDetailPage from "./components/ProductDetailPage";
+import { encodeMemoUSDC } from "./utils";
 
 /* =========================================================
    ARCWEAR — Main Application
@@ -19,6 +20,7 @@ const ARC_CHAIN_CONFIG = {
 };
 const USDC_ADDRESS = "0x3600000000000000000000000000000000000000";
 const MERCHANT_ADDR = "0x627148dF4DE3b44Aa624e7592d3A47485777A6Bb";
+const MEMO_ADDRESS = "0x5294E9927c3306DcBaDb03fe70b92e01cCede505";
 
 // ── Helpers ───────────────────────────────────────────────
 const fmt = (n) => `${Number(n).toFixed(2)} USDC`;
@@ -736,18 +738,35 @@ function CartDrawer({ cart, onRemove, onCheckout, onClose, wallet }) {
   );
 }
 
+const generateTempTxHash = () => "pending_" + Date.now() + "_" + Math.random().toString(36).substring(2, 7);
+
 /* =========================================================
    CheckoutModal
    ========================================================= */
-function CheckoutModal({ cart, wallet, onClose, onSuccess, addToast }) {
+function CheckoutModal({ cart, wallet, onClose, onSuccess, onTxSent, onTxHashUpdated, addToast }) {
   const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const [step, setStep] = useState("review");
   const [txHash, setTxHash] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
+  const [createdOrderId, setCreatedOrderId] = useState(null);
 
   const pay = async () => {
     if (!window.ethereum) { addToast("No wallet detected", "error"); return; }
     setStep("signing");
+
+    // Initialize the order as pending immediately on click!
+    let orderId = createdOrderId;
+    if (!orderId) {
+      const tempTxHash = generateTempTxHash();
+      if (onTxSent) {
+        const saved = await onTxSent(tempTxHash);
+        if (saved && saved.id) {
+          orderId = saved.id;
+          setCreatedOrderId(saved.id);
+        }
+      }
+    }
+
     try {
       const currentChain = await window.ethereum.request({ method: "eth_chainId" });
       if (currentChain !== ARC_CHAIN_ID) {
@@ -791,15 +810,20 @@ function CheckoutModal({ cart, wallet, onClose, onSuccess, addToast }) {
         return;
       }
 
-      const amt = Math.round(total * 1e6);
-      const data = "0xa9059cbb" + MERCHANT_ADDR.slice(2).padStart(64, "0") + amt.toString(16).padStart(64, "0");
+      // Wrap the transfer in a Memo transaction carrying the order ID
+      const data = encodeMemoUSDC(MERCHANT_ADDR, total, orderId || "00000000000000000000000000000000");
       const hash = await window.ethereum.request({
         method: "eth_sendTransaction",
-        params: [{ from: wallet, to: USDC_ADDRESS, data, gas: "0x186A0" }],
+        params: [{ from: wallet, to: MEMO_ADDRESS, data, gas: "0x30D40" }],
       });
 
       setTxHash(hash);
       setStep("confirming");
+      
+      // Update the order in the database with the real txHash!
+      if (onTxHashUpdated && orderId) {
+        onTxHashUpdated(orderId, hash);
+      }
 
       // 3. Wait for transaction to be mined
       const waitForTransactionReceipt = async (txHash) => {
@@ -950,7 +974,20 @@ function CheckoutModal({ cart, wallet, onClose, onSuccess, addToast }) {
         {/* ── Signing step ── */}
         {step === "signing" && (
           <div style={{ textAlign: "center", padding: "44px 0" }}>
-            <div style={{ fontSize: 44, marginBottom: 14, animation: "spin 1s linear infinite", display: "inline-block" }}>⚡</div>
+            <img
+              src="/arc-logo-signing.jpg"
+              alt="Signing Transaction"
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: "50%",
+                marginBottom: 14,
+                animation: "spin 1.5s linear infinite",
+                display: "inline-block",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                border: "2px solid #e7e4e0",
+              }}
+            />
             <h3 style={{ fontSize: 24, fontWeight: 700, color: "#1c1917", marginBottom: 6 }}>Signing Transaction</h3>
             <p style={{ fontSize: 14, color: "#a8a29e" }}>Approve in your wallet</p>
             <p style={{ fontSize: 12, color: "#c47d2a", letterSpacing: 1.5, textTransform: "uppercase", marginTop: 6 }}>Arc finality &lt;1 second</p>
@@ -1525,7 +1562,13 @@ function WishlistDrawer({ wishlist, onClose, onRemove, onAddToCart, allProducts 
 /* =========================================================
    OrderDrawer — slide-out panel for order history
    ========================================================= */
-function OrderDrawer({ orders, onClose }) {
+function OrderDrawer({ orders, onClose, onRetryOrder, onCancelOrder, onDeleteOrder }) {
+  const [expandedOrders, setExpandedOrders] = useState({});
+
+  const toggleExpand = (id) => {
+    setExpandedOrders(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
   return (
     <>
       <div className="backdrop" onClick={onClose} aria-label="Close orders" />
@@ -1560,43 +1603,193 @@ function OrderDrawer({ orders, onClose }) {
             </div>
           ) : orders.map(order => {
             let bg = "#fef3c7", color = "#d97706";
-            if (order.status === "success") { bg = "#dcfce7"; color = "#15803d"; }
+            if (order.status === "success" || order.status === "confirmed") { bg = "#dcfce7"; color = "#15803d"; }
             if (order.status === "failed") { bg = "#fee2e2"; color = "#b91c1c"; }
+            if (order.status === "cancelled" || order.status === "canceled") { bg = "#f5f5f4"; color = "#78716c"; }
+
+            const isExpanded = !!expandedOrders[order.id];
+            const itemCount = order.items ? order.items.reduce((s, i) => s + i.qty, 0) : 0;
+            const isPlaceholderTx = order.status === "pending" && order.txHash && order.txHash.startsWith("pending_");
 
             return (
-              <div key={order.id || order.txHash} className="order-row">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+              <div
+                key={order.id || order.txHash}
+                style={{
+                  border: "1px solid #e7e4e0",
+                  borderRadius: 12,
+                  padding: 16,
+                  marginBottom: 12,
+                  background: "#fff",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                }}
+                onClick={() => toggleExpand(order.id)}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                   <span style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: "#a8a29e" }}>
                     {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}
                   </span>
-                  <span className="order-status-badge" style={{ background: bg, color: color }}>
-                    {order.status === "pending" ? "⏳ Confirming" : order.status === "success" ? "✓ Confirmed" : "✕ Failed"}
+                  <span className="order-status-badge" style={{ background: bg, color: color, fontSize: 11, padding: "2px 8px", borderRadius: 12, fontWeight: 600 }}>
+                    {order.status === "pending"
+                      ? (isPlaceholderTx ? "⏳ Payment Pending" : "⏳ Confirming")
+                      : (order.status === "success" || order.status === "confirmed")
+                      ? "✓ Confirmed"
+                      : (order.status === "cancelled" || order.status === "canceled")
+                      ? "✕ Cancelled"
+                      : "✕ Failed"}
                   </span>
                 </div>
 
-                <div style={{ marginBottom: 8 }}>
-                  {order.items && order.items.map((item, idx) => (
-                    <div key={idx} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#1c1917", margin: "2px 0" }}>
-                      <span>{item.name} <span style={{ color: "#a8a29e" }}>×{item.qty}</span></span>
-                      <span style={{ fontFamily: "var(--font-mono)", color: "#78716c" }}>{fmt(item.price * item.qty)}</span>
-                    </div>
-                  ))}
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <span style={{ fontSize: 13, color: "#1c1917", fontWeight: 600 }}>
+                      {itemCount} {itemCount === 1 ? "item" : "items"}
+                    </span>
+                    <span style={{ fontSize: 12, color: "#a8a29e", marginLeft: 8 }}>· {fmt(order.total)}</span>
+                  </div>
+                  <span style={{ fontSize: 12, color: "#a8a29e", fontFamily: "var(--font-mono)" }}>
+                    {isExpanded ? "▲" : "▼"}
+                  </span>
                 </div>
 
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #e7e4e0", paddingTop: 8, marginTop: 4 }}>
-                  <div>
-                    <span style={{ fontSize: 12, color: "#a8a29e" }}>Total: </span>
-                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 14, fontWeight: 700, color: "#1c1917" }}>{fmt(order.total)}</span>
-                  </div>
-                  <a
-                    href={`https://testnet.arcscan.app/tx/${order.txHash}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ fontSize: 11, color: "#f97316", textDecoration: "underline", fontFamily: "var(--font-mono)" }}
+                {isExpanded && (
+                  <div
+                    style={{ borderTop: "1px solid #e7e4e0", marginTop: 12, paddingTop: 12 }}
+                    onClick={(e) => e.stopPropagation()} // Prevent collapse when clicking details
                   >
-                    ArcScan ↗
-                  </a>
-                </div>
+                    <div style={{ marginBottom: 12 }}>
+                      {order.items && order.items.map((item, idx) => (
+                        <div key={idx} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#1c1917", margin: "4px 0" }}>
+                          <span>{item.name} <span style={{ color: "#a8a29e" }}>×{item.qty}</span></span>
+                          <span style={{ fontFamily: "var(--font-mono)", color: "#78716c" }}>{fmt(item.price * item.qty)}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+                      {isPlaceholderTx ? (
+                        <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 8 }}>
+                          <p style={{ fontSize: 11, color: "#d97706", margin: 0 }}>
+                            ⚠️ Checkout wasn't completed (Insufficient balance or rejected).
+                          </p>
+                          <div style={{ display: "flex", gap: 8 }}>
+                            <button
+                              onClick={() => onCancelOrder(order)}
+                              style={{
+                                flex: 1,
+                                background: "#f5f3f0",
+                                color: "#78716c",
+                                border: "1px solid #e7e4e0",
+                                borderRadius: 8,
+                                padding: "6px 12px",
+                                fontSize: 12,
+                                fontWeight: 700,
+                                cursor: "pointer",
+                                textAlign: "center",
+                                letterSpacing: 0.5,
+                                textTransform: "uppercase",
+                                transition: "all 0.2s",
+                              }}
+                              onMouseEnter={e => {
+                                e.currentTarget.style.background = "#fee2e2";
+                                e.currentTarget.style.color = "#b91c1c";
+                                e.currentTarget.style.borderColor = "#fecaca";
+                              }}
+                              onMouseLeave={e => {
+                                e.currentTarget.style.background = "#f5f3f0";
+                                e.currentTarget.style.color = "#78716c";
+                                e.currentTarget.style.borderColor = "#e7e4e0";
+                              }}
+                            >
+                              Cancel Order
+                            </button>
+                            <button
+                              onClick={() => onRetryOrder(order)}
+                              style={{
+                                flex: 2,
+                                background: "#f97316",
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: 8,
+                                padding: "6px 12px",
+                                fontSize: 12,
+                                fontWeight: 700,
+                                cursor: "pointer",
+                                textAlign: "center",
+                                letterSpacing: 0.5,
+                                textTransform: "uppercase",
+                                transition: "background 0.2s",
+                              }}
+                              onMouseEnter={e => e.currentTarget.style.background = "#ea6c0a"}
+                              onMouseLeave={e => e.currentTarget.style.background = "#f97316"}
+                            >
+                              Resume Checkout
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div style={{ display: "flex", gap: 8, width: "100%", justifyContent: "space-between", alignItems: "center" }}>
+                          {order.txHash && !order.txHash.startsWith("pending_") ? (
+                            <a
+                              href={`https://testnet.arcscan.app/tx/${order.txHash}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              style={{ fontSize: 11, color: "#f97316", textDecoration: "underline", fontFamily: "var(--font-mono)" }}
+                            >
+                              ArcScan ↗
+                            </a>
+                          ) : <div />}
+                          <div style={{ display: "flex", gap: 6 }}>
+                            {(order.status === "failed" || order.status === "cancelled" || order.status === "canceled") && (
+                              <button
+                                onClick={() => onDeleteOrder(order)}
+                                style={{
+                                  background: "#fff",
+                                  color: "#ef4444",
+                                  border: "1px solid #fee2e2",
+                                  borderRadius: 6,
+                                  padding: "4px 10px",
+                                  fontSize: 11,
+                                  fontWeight: 600,
+                                  cursor: "pointer",
+                                  transition: "all 0.2s",
+                                }}
+                                onMouseEnter={e => {
+                                  e.currentTarget.style.background = "#fee2e2";
+                                  e.currentTarget.style.borderColor = "#fecaca";
+                                }}
+                                onMouseLeave={e => {
+                                  e.currentTarget.style.background = "#fff";
+                                  e.currentTarget.style.borderColor = "#fee2e2";
+                                }}
+                              >
+                                Delete
+                              </button>
+                            )}
+                            <button
+                              onClick={() => onRetryOrder(order)}
+                              style={{
+                                background: "#f5f3f0",
+                                color: "#1c1917",
+                                border: "1px solid #e7e4e0",
+                                borderRadius: 6,
+                                padding: "4px 10px",
+                                fontSize: 11,
+                                fontWeight: 600,
+                                cursor: "pointer",
+                                transition: "background 0.2s",
+                              }}
+                              onMouseEnter={e => e.currentTarget.style.background = "#e7e4e0"}
+                              onMouseLeave={e => e.currentTarget.style.background = "#f5f3f0"}
+                            >
+                              Buy Again
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -1941,10 +2134,87 @@ export default function ArcWear() {
         if (data.order) {
           // Replace local temp order with saved order containing its ID
           setOrders(prev => prev.map(o => o.txHash === txHash ? data.order : o));
+          return data.order;
         }
       }
     } catch (e) {
       console.error("Error saving order:", e);
+    }
+    return newOrderData;
+  };
+
+  const updateOrderTxHash = async (orderId, realTxHash) => {
+    // Update locally
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, txHash: realTxHash } : o));
+
+    // Update DB
+    try {
+      await fetch("/api/orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: orderId, txHash: realTxHash })
+      });
+    } catch (e) {
+      console.error("Error updating order txHash:", e);
+    }
+  };
+
+  const handleRetryOrder = (order) => {
+    if (order.items && order.items.length > 0) {
+      setCart(order.items);
+      setCheckout(true);
+      setOrdersOpen(false);
+      addToast("Resumed checkout for your pending order.", "info");
+    }
+  };
+
+  const handleCancelOrder = async (order) => {
+    // Update locally
+    setOrders(prev => prev.map(o => {
+      const match = (order.id && o.id === order.id) || (order.txHash && o.txHash === order.txHash);
+      return match ? { ...o, status: "cancelled" } : o;
+    }));
+
+    // Update DB if the order has an ID
+    if (order.id) {
+      try {
+        await fetch("/api/orders", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: order.id, status: "cancelled" })
+        });
+        addToast("Order cancelled successfully.", "success");
+      } catch (e) {
+        console.error("Error cancelling order:", e);
+        addToast("Error updating order status in API", "error");
+      }
+    } else {
+      addToast("Order cancelled locally.", "success");
+    }
+  };
+
+  const handleDeleteOrder = async (order) => {
+    // Update locally
+    setOrders(prev => prev.filter(o => {
+      const match = (order.id && o.id === order.id) || (order.txHash && o.txHash === order.txHash);
+      return !match;
+    }));
+
+    // Update DB if the order has an ID
+    if (order.id) {
+      try {
+        await fetch("/api/orders", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: order.id, wallet: wallet })
+        });
+        addToast("Order deleted from history.", "success");
+      } catch (e) {
+        console.error("Error deleting order:", e);
+        addToast("Error deleting order from database.", "error");
+      }
+    } else {
+      addToast("Order deleted locally.", "success");
     }
   };
 
@@ -2861,11 +3131,28 @@ export default function ArcWear() {
       )}
       {editItem && <EditModal item={editItem} onClose={() => setEditItem(null)} onSave={addToCartWithOptions} />}
       {cartOpen && <CartDrawer cart={cart} onRemove={id => setCart(p => p.filter(x => x.id !== id))} onCheckout={() => { if (!wallet) { connectWallet(); return; } setCartOpen(false); setCheckout(true); }} onClose={() => setCartOpen(false)} wallet={wallet} />}
-      {checkout && <CheckoutModal cart={cart} wallet={wallet} onClose={() => setCheckout(false)} onSuccess={(hash) => { saveOrder(hash, cart.reduce((s, i) => s + i.price * i.qty, 0), cart); setCart([]); setCheckout(false); }} addToast={addToast} />}
+      {checkout && (
+        <CheckoutModal
+          cart={cart}
+          wallet={wallet}
+          onClose={() => setCheckout(false)}
+          onTxSent={(hash) => {
+            const saved = saveOrder(hash, cart.reduce((s, i) => s + i.price * i.qty, 0), cart);
+            setCart([]);
+            return saved;
+          }}
+          onTxHashUpdated={updateOrderTxHash}
+          onSuccess={() => {
+            setCheckout(false);
+            setOrdersOpen(true);
+          }}
+          addToast={addToast}
+        />
+      )}
       {agentOpen && <AgentChat cart={cart} setCart={setCart} setActiveSection={setSection} setCheckoutOpen={setCheckout} addToast={addToast} onClose={() => setAgentOpen(false)} wallet={wallet} allowance={allowance} onRequestApproval={(amt) => { setApprovalAmount(amt); setApprovalOpen(true); }} onRefreshAllowance={refreshAllowance} onSaveOrder={saveOrder} wishlist={wishlist} onToggleWishlist={toggleWishlist} />}
       {approvalOpen && <ApprovalModal wallet={wallet} requestedAmount={approvalAmount} onApprove={async (amt) => { const hash = await approveAgent(amt); setApprovalOpen(false); addToast(`✓ Agent mode enabled — ${amt} USDC approved`, "success"); return hash; }} onClose={() => setApprovalOpen(false)} />}
       {wishlistOpen && <WishlistDrawer wishlist={wishlist} allProducts={ALL_PRODUCTS} onClose={() => setWishlistOpen(false)} onRemove={toggleWishlist} onAddToCart={addToCart} />}
-      {ordersOpen && <OrderDrawer orders={orders} onClose={() => setOrdersOpen(false)} />}
+      {ordersOpen && <OrderDrawer orders={orders} onClose={() => setOrdersOpen(false)} onRetryOrder={handleRetryOrder} onCancelOrder={handleCancelOrder} onDeleteOrder={handleDeleteOrder} />}
 
       <Toasts list={toasts} />
     </div>

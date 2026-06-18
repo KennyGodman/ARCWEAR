@@ -128,24 +128,46 @@ TONE: Helpful, concise, confident. Always show USDC prices. After adding items, 
       },
     }));
 
-    // Call Groq API
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
-        messages: groqMessages,
-        tools: groqTools.length > 0 ? groqTools : undefined,
-        tool_choice: groqTools.length > 0 ? "auto" : undefined,
-        max_tokens: 1000,
-        temperature: 0.3,
-      }),
-    });
+    // Call Groq API with retry logic for rate limits
+    const MAX_RETRIES = 3;
+    let data, response;
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: groqMessages,
+          tools: groqTools.length > 0 ? groqTools : undefined,
+          tool_choice: groqTools.length > 0 ? "auto" : undefined,
+          max_tokens: 1000,
+          temperature: 0.3,
+        }),
+      });
 
-    const data = await response.json();
+      data = await response.json();
+
+      // If rate limited, wait and retry
+      if (response.status === 429) {
+        const retryAfterMs = (() => {
+          // Groq returns retry-after in seconds
+          const header = response.headers.get("retry-after");
+          if (header) return parseFloat(header) * 1000;
+          // Fall back to extracting from error message e.g. "try again in 750ms"
+          const match = data.error?.message?.match(/(\d+(?:\.\d+)?)\s*s/);
+          if (match) return parseFloat(match[1]) * 1000;
+          return (attempt + 1) * 1500; // exponential backoff fallback
+        })();
+        console.warn(`[agent] Rate limited. Retrying in ${retryAfterMs}ms (attempt ${attempt + 1}/${MAX_RETRIES})`);
+        await new Promise(r => setTimeout(r, Math.min(retryAfterMs + 200, 8000)));
+        continue;
+      }
+
+      break; // success or non-retryable error
+    }
 
     if (!response.ok) {
       console.error("Groq error:", data);
