@@ -209,7 +209,7 @@ export default async function handler(req, res) {
       });
     }
 
-    let txHash, jobId;
+    let txHash, jobId, escrowStatus;
 
     if (ESCROW_CONTRACT()) {
       // ── 2a. ERC-8183 Escrow Flow ───────────────────────────────────────
@@ -233,6 +233,7 @@ export default async function handler(req, res) {
       );
       txHash = escrowResult.txHash;
       jobId  = escrowResult.jobId;
+      escrowStatus = escrowResult.escrowStatus || "submitted";
       console.log(`[agent-pay] ERC-8183 complete. JobId: ${jobId}, txHash: ${txHash}`);
 
     } else {
@@ -259,6 +260,7 @@ export default async function handler(req, res) {
       txHash,
       jobId:   jobId ?? null,
       escrow:  !!ESCROW_CONTRACT(),
+      escrowStatus: escrowStatus ?? "completed",
       total,
       message: `Agent purchased ${items?.length || 0} item(s) for ${total.toFixed(2)} USDC${jobId ? ` (ERC-8183 job #${jobId})` : ""}`,
     });

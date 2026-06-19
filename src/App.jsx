@@ -1657,7 +1657,7 @@ function WishlistDrawer({ wishlist, onClose, onRemove, onAddToCart, allProducts 
 /* =========================================================
    OrderDrawer — slide-out panel for order history
    ========================================================= */
-function OrderDrawer({ orders, onClose, onRetryOrder, onCancelOrder, onDeleteOrder }) {
+function OrderDrawer({ orders, onClose, onRetryOrder, onCancelOrder, onDeleteOrder, onConfirmDelivery }) {
   const [expandedOrders, setExpandedOrders] = useState({});
 
   const toggleExpand = (id) => {
@@ -1875,6 +1875,30 @@ function OrderDrawer({ orders, onClose, onRetryOrder, onCancelOrder, onDeleteOrd
                             </a>
                           ) : <div />}
                           <div style={{ display: "flex", gap: 6 }}>
+                            {order.escrow && order.escrowStatus === "submitted" && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onConfirmDelivery(order);
+                                }}
+                                style={{
+                                  background: "linear-gradient(135deg, #10b981, #059669)",
+                                  color: "#fff",
+                                  border: "none",
+                                  borderRadius: 6,
+                                  padding: "4px 10px",
+                                  fontSize: 11,
+                                  fontWeight: 600,
+                                  cursor: "pointer",
+                                  boxShadow: "0 2px 8px rgba(16,185,129,0.2)",
+                                  transition: "background 0.2s",
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.background = "#047857"}
+                                onMouseLeave={e => e.currentTarget.style.background = "linear-gradient(135deg, #10b981, #059669)"}
+                              >
+                                🤝 Confirm Delivery
+                              </button>
+                            )}
                             {(order.status === "failed" || order.status === "cancelled" || order.status === "canceled") && (
                               <button
                                 onClick={() => onDeleteOrder(order)}
@@ -2414,6 +2438,42 @@ export default function ArcWear() {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [sortBy, setSortBy] = useState("default");
+
+  const handleConfirmDelivery = async (order) => {
+    if (!order.jobId) return;
+    try {
+      addToast("Releasing escrowed USDC to merchant...", "agent");
+      const res = await fetch("/api/escrow?action=complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobId: order.jobId, reason: "Buyer confirmed delivery" }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || "Failed to complete escrow");
+      }
+      
+      // Update locally
+      setOrders(prev => prev.map(o => {
+        const match = (order.id && o.id === order.id) || (order.txHash && o.txHash === order.txHash);
+        return match ? { ...o, escrowStatus: "completed", status: "success" } : o;
+      }));
+
+      // Update DB if order has an ID
+      if (order.id) {
+        await fetch("/api/orders", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: order.id, escrowStatus: "completed", status: "success" })
+        });
+      }
+
+      addToast("✓ Delivery confirmed! Escrow funds released to merchant.", "success");
+    } catch (err) {
+      console.error("Error confirming delivery:", err);
+      addToast("Failed to release escrow: " + err.message, "error");
+    }
+  };
 
   // ── Agent Allowance (ERC-20 approve/transferFrom) ─────────
   const { allowance, isApproved, approveAgent, refresh: refreshAllowance } = useAllowance(wallet);
@@ -3290,7 +3350,16 @@ export default function ArcWear() {
       {agentOpen && <AgentChat cart={cart} setCart={setCart} setActiveSection={setSection} setCheckoutOpen={setCheckout} addToast={addToast} onClose={() => setAgentOpen(false)} wallet={wallet} allowance={allowance} onRequestApproval={(amt) => { setApprovalAmount(amt); setApprovalOpen(true); }} onRefreshAllowance={refreshAllowance} onSaveOrder={saveOrder} wishlist={wishlist} onToggleWishlist={toggleWishlist} />}
       {approvalOpen && <ApprovalModal wallet={wallet} requestedAmount={approvalAmount} onApprove={async (amt) => { const hash = await approveAgent(amt); setApprovalOpen(false); addToast(`✓ Agent mode enabled — ${amt} USDC approved`, "success"); return hash; }} onClose={() => setApprovalOpen(false)} />}
       {wishlistOpen && <WishlistDrawer wishlist={wishlist} allProducts={ALL_PRODUCTS} onClose={() => setWishlistOpen(false)} onRemove={toggleWishlist} onAddToCart={addToCart} />}
-      {ordersOpen && <OrderDrawer orders={orders} onClose={() => setOrdersOpen(false)} onRetryOrder={handleRetryOrder} onCancelOrder={handleCancelOrder} onDeleteOrder={handleDeleteOrder} />}
+      {ordersOpen && (
+        <OrderDrawer
+          orders={orders}
+          onClose={() => setOrdersOpen(false)}
+          onRetryOrder={handleRetryOrder}
+          onCancelOrder={handleCancelOrder}
+          onDeleteOrder={handleDeleteOrder}
+          onConfirmDelivery={handleConfirmDelivery}
+        />
+      )}
 
       <Toasts list={toasts} />
     </div>

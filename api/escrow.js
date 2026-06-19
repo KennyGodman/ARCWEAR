@@ -238,29 +238,12 @@ async function executeEscrowFlow(userWallet, total, orderId, apiKey, entitySecre
   const { txHash: submitTxHash } = await pollForHash(submitTxId, apiKey);
   console.log(`[escrow] submit confirmed: ${submitTxHash}`);
 
-  // ── Step 4: complete ──────────────────────────────────────────────────────
-  // Evaluator (agent wallet / ArcWear backend) releases USDC to merchant
-  const completionReason = "0x" + crypto
-    .createHash("sha256")
-    .update(`completed:${orderId}:${Date.now()}`)
-    .digest("hex");
-
-  console.log(`[escrow] Step 4: complete(jobId=${jobId})`);
-  const completeTxId = await callEscrowContract(
-    "complete(uint256,bytes32)",
-    [jobId.toString(), completionReason],
-    apiKey, entitySecret, walletId
-  );
-  const { txHash: completeTxHash } = await pollForHash(completeTxId, apiKey);
-  console.log(`[escrow] complete confirmed: ${completeTxHash}  ✓ USDC released to merchant`);
-
   return {
     jobId,
     txHashes: {
       create:   createTxHash,
       fund:     fundTxHash,
       submit:   submitTxHash,
-      complete: completeTxHash,
     },
     // The "primary" txHash for order records — the fund tx (when USDC moved)
     txHash: fundTxHash,
@@ -327,7 +310,8 @@ export default async function handler(req, res) {
       return res.status(200).json({
         success: true,
         ...result,
-        message: `ERC-8183 escrow completed. JobId: ${result.jobId}, USDC settled to merchant.`,
+        escrowStatus: "submitted",
+        message: `ERC-8183 escrow job #${result.jobId} created and funded. USDC held in contract.`,
       });
     }
 
