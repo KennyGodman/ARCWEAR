@@ -1591,21 +1591,24 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
               }}
               aria-label={voiceEnabled ? "Mute agent voice" : "Enable agent voice"}
               style={{
-                background: voiceEnabled ? "rgba(249,115,22,0.15)" : "rgba(255,255,255,0.08)",
-                border: voiceEnabled ? "1px solid #f97316" : "none",
-                borderRadius: 8,
-                color: voiceEnabled ? "#f97316" : "#888",
-                width: 32,
-                height: 26,
+                background: voiceEnabled 
+                  ? "linear-gradient(135deg, #c47d2a, #f97316)" 
+                  : "rgba(255,255,255,0.08)",
+                border: voiceEnabled ? "1px solid #f97316" : "1px solid rgba(255,255,255,0.15)",
+                borderRadius: 10,
+                color: voiceEnabled ? "#fff" : "#a8a29e",
+                width: 34,
+                height: 34,
                 cursor: "pointer",
-                fontSize: 13,
+                fontSize: 16,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                transition: "all 0.2s ease"
+                transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+                boxShadow: voiceEnabled ? "0 0 14px rgba(249,115,22,0.45)" : "none",
               }}
             >
-              {voiceEnabled ? "🔊" : "🔇"}
+              🎧
             </button>
             <button
               onClick={onClose}
