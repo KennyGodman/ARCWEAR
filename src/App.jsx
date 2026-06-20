@@ -1962,7 +1962,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
                   }}
                   style={{
                     flex: 1,
-                    background: "#ef4444",
+                    background: "#f97316",
                     border: "none",
                     borderRadius: 10,
                     padding: "9px 16px",
@@ -1971,10 +1971,10 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
                     color: "#fff",
                     cursor: "pointer",
                     transition: "all 0.2s",
-                    boxShadow: "0 4px 12px rgba(239, 68, 68, 0.2)"
+                    boxShadow: "0 4px 12px rgba(249, 115, 22, 0.2)"
                   }}
-                  onMouseEnter={e => e.currentTarget.style.background = "#dc2626"}
-                  onMouseLeave={e => e.currentTarget.style.background = "#ef4444"}
+                  onMouseEnter={e => e.currentTarget.style.background = "#ea6c0a"}
+                  onMouseLeave={e => e.currentTarget.style.background = "#f97316"}
                 >
                   Clear Chat
                 </button>
