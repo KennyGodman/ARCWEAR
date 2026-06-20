@@ -1173,6 +1173,75 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
     };
   }, []);
 
+  const welcomeMsgText = "Hi! I'm your ArcWear AI agent 👋\n\nTell me what you're looking for — an outfit, a budget, an occasion — and I'll search, add items to your cart, and handle USDC checkout on Arc." + (allowance > 0 ? `\n\n🔓 Agent mode active — ${allowance.toFixed(2)} USDC remaining allowance.` : "");
+
+  // Load chat history from Vercel KV or localStorage
+  useEffect(() => {
+    const fetchHistory = async () => {
+      if (wallet) {
+        try {
+          const res = await fetch(`/api/history?wallet=${wallet}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.messages && data.messages.length > 0) {
+              setMsgs(data.messages);
+              return;
+            }
+          }
+        } catch (e) {
+          console.error("Failed to load chat history from API:", e);
+        }
+      }
+      
+      try {
+        const local = localStorage.getItem(wallet ? `arcwear_chat_history_${wallet.toLowerCase()}` : "arcwear_chat_history");
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setMsgs(parsed);
+            return;
+          }
+        }
+      } catch (e) {
+        console.error("Failed to load chat history from localStorage:", e);
+      }
+
+      setMsgs([{
+        role: "assistant",
+        text: welcomeMsgText
+      }]);
+    };
+
+    fetchHistory();
+  }, [wallet]);
+
+  // Save chat history
+  useEffect(() => {
+    if (msgs.length === 1 && msgs[0].text === welcomeMsgText) {
+      return;
+    }
+
+    const saveHistory = async () => {
+      const key = wallet ? `arcwear_chat_history_${wallet.toLowerCase()}` : "arcwear_chat_history";
+      localStorage.setItem(key, JSON.stringify(msgs));
+
+      if (wallet) {
+        try {
+          await fetch("/api/history", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ wallet, messages: msgs })
+          });
+        } catch (e) {
+          console.error("Failed to save chat history to API:", e);
+        }
+      }
+    };
+
+    const timeout = setTimeout(saveHistory, 1000);
+    return () => clearTimeout(timeout);
+  }, [msgs, wallet]);
+
   useEffect(() => { cartRef.current = cart; }, [cart]);
   useEffect(() => { wishlistRef.current = wishlist; }, [wishlist]);
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, loading]);
@@ -1580,6 +1649,58 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {msgs.length > 1 && (
+              <button
+                onClick={async () => {
+                  if (window.confirm("Are you sure you want to clear chat history?")) {
+                    stopSpeaking();
+                    stopListening();
+                    setMsgs([{ role: "assistant", text: welcomeMsgText }]);
+                    
+                    const key = wallet ? `arcwear_chat_history_${wallet.toLowerCase()}` : "arcwear_chat_history";
+                    localStorage.removeItem(key);
+
+                    if (wallet) {
+                      try {
+                        await fetch("/api/history", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ wallet, messages: [] })
+                        });
+                      } catch (e) {
+                        console.error("Failed to clear chat history on API:", e);
+                      }
+                    }
+                    addToast("✓ Chat history cleared", "success");
+                  }
+                }}
+                aria-label="Clear chat history"
+                style={{
+                  background: "rgba(255,255,255,0.08)",
+                  border: "none",
+                  borderRadius: 8,
+                  color: "#888",
+                  width: 32,
+                  height: 26,
+                  cursor: "pointer",
+                  fontSize: 13,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.2s ease"
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = "rgba(239, 68, 68, 0.15)";
+                  e.currentTarget.style.color = "#ef4444";
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                  e.currentTarget.style.color = "#888";
+                }}
+              >
+                🗑️
+              </button>
+            )}
             <button
               onClick={() => {
                 const newVal = !voiceEnabled;
