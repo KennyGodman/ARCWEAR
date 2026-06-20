@@ -997,7 +997,20 @@ function CheckoutModal({ cart, wallet, onClose, onSuccess, onTxSent, onTxHashUpd
         {/* ── Confirming step ── */}
         {step === "confirming" && (
           <div style={{ textAlign: "center", padding: "44px 0" }}>
-            <div style={{ fontSize: 44, marginBottom: 14, animation: "spin 1s linear infinite", display: "inline-block" }}>⏳</div>
+            <img
+              src="/arc-logo-signing.jpg"
+              alt="Confirming Payment"
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: "50%",
+                marginBottom: 14,
+                animation: "spin 1.5s linear infinite",
+                display: "inline-block",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                border: "2px solid #e7e4e0",
+              }}
+            />
             <h3 style={{ fontSize: 24, fontWeight: 700, color: "#1c1917", marginBottom: 6 }}>Confirming Payment</h3>
             <p style={{ fontSize: 14, color: "#a8a29e" }}>Waiting for block finalization on Arc...</p>
             {txHash && (
@@ -1178,14 +1191,14 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
   // Load chat history from Vercel KV or localStorage
   useEffect(() => {
     const fetchHistory = async () => {
+      let loadedMsgs = null;
       if (wallet) {
         try {
           const res = await fetch(`/api/history?wallet=${wallet}`);
           if (res.ok) {
             const data = await res.json();
             if (data.messages && data.messages.length > 0) {
-              setMsgs(data.messages);
-              return;
+              loadedMsgs = data.messages;
             }
           }
         } catch (e) {
@@ -1193,23 +1206,43 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
         }
       }
       
-      try {
-        const local = localStorage.getItem(wallet ? `arcwear_chat_history_${wallet.toLowerCase()}` : "arcwear_chat_history");
-        if (local) {
-          const parsed = JSON.parse(local);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setMsgs(parsed);
-            return;
+      if (!loadedMsgs) {
+        try {
+          const local = localStorage.getItem(wallet ? `arcwear_chat_history_${wallet.toLowerCase()}` : "arcwear_chat_history");
+          if (local) {
+            const parsed = JSON.parse(local);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              loadedMsgs = parsed;
+            }
           }
+        } catch (e) {
+          console.error("Failed to load chat history from localStorage:", e);
         }
-      } catch (e) {
-        console.error("Failed to load chat history from localStorage:", e);
       }
 
-      setMsgs([{
-        role: "assistant",
-        text: welcomeMsgText
-      }]);
+      if (loadedMsgs && loadedMsgs.length > 0) {
+        const sanitized = loadedMsgs
+          .filter(m => (m.text || m.content || "") !== welcomeMsgText)
+          .map(m => ({
+            role: m.role,
+            text: m.text || m.content || "",
+            content: m.content || m.text || ""
+          }));
+        setMsgs([
+          { role: "assistant", text: welcomeMsgText },
+          ...sanitized
+        ]);
+      } else {
+        setMsgs(current => {
+          if (current.length > 1) {
+            return current;
+          }
+          return [{
+            role: "assistant",
+            text: welcomeMsgText
+          }];
+        });
+      }
     };
 
     fetchHistory();
@@ -1217,20 +1250,27 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
 
   // Save chat history
   useEffect(() => {
-    if (msgs.length === 1 && msgs[0].text === welcomeMsgText) {
+    if (msgs.length === 1 && (msgs[0].text || msgs[0].content) === welcomeMsgText) {
       return;
     }
 
     const saveHistory = async () => {
       const key = wallet ? `arcwear_chat_history_${wallet.toLowerCase()}` : "arcwear_chat_history";
-      localStorage.setItem(key, JSON.stringify(msgs));
+      const userAndAgentMsgs = msgs.filter(m => (m.text || m.content) !== welcomeMsgText);
+      const sanitizedMsgs = userAndAgentMsgs.map(m => ({
+        role: m.role,
+        text: m.text || m.content || "",
+        content: m.content || m.text || ""
+      }));
+
+      localStorage.setItem(key, JSON.stringify(sanitizedMsgs));
 
       if (wallet) {
         try {
           await fetch("/api/history", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ wallet, messages: msgs })
+            body: JSON.stringify({ wallet, messages: sanitizedMsgs })
           });
         } catch (e) {
           console.error("Failed to save chat history to API:", e);
@@ -1603,7 +1643,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
     const apiMsgs = msgs
       .filter(m => m.role === "assistant" || m.role === "user")
       .slice(-4)
-      .map(m => ({ role: m.role, content: m.text }));
+      .map(m => ({ role: m.role, content: m.text || m.content }));
     apiMsgs.push({ role: "user", content: txt });
 
     try {
@@ -1757,7 +1797,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
           {msgs.map((m, i) => (
             <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start", gap: 8, alignItems: "flex-end" }}>
               {m.role === "assistant" && <div className="agent-avatar" aria-hidden="true">◎</div>}
-              <div className={`chat-bubble chat-bubble--${m.role}`}>{m.text}</div>
+              <div className={`chat-bubble chat-bubble--${m.role}`}>{m.text || m.content}</div>
               {m.role === "user" && (
                 <div style={{ width: 26, height: 26, background: "#e7e4e0", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#78716c", fontWeight: 700, flexShrink: 0 }} aria-hidden="true">
                   U

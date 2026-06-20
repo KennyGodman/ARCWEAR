@@ -247,7 +247,20 @@ export default function CheckoutModal({ cart, wallet, onClose, onSuccess, onTxSe
         {/* ── Confirming step ── */}
         {step === "confirming" && (
           <div style={{ textAlign: "center", padding: "44px 0" }}>
-            <div style={{ fontSize: 44, marginBottom: 14, animation: "spin 1s linear infinite", display: "inline-block" }}>⏳</div>
+            <img
+              src="/arc-logo-signing.jpg"
+              alt="Confirming Payment"
+              style={{
+                width: 64,
+                height: 64,
+                borderRadius: "50%",
+                marginBottom: 14,
+                animation: "spin 1.5s linear infinite",
+                display: "inline-block",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                border: "2px solid #e7e4e0",
+              }}
+            />
             <h3 style={{ fontSize: 24, fontWeight: 700, color: "#1c1917", marginBottom: 6 }}>Confirming Payment</h3>
             <p style={{ fontSize: 14, color: "#a8a29e" }}>Waiting for block finalization on Arc...</p>
             {txHash && (
