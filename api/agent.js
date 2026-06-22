@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { messages, tools, allowance, wallet, wishlist, cart } = req.body;
+  const { messages, tools, allowance, wallet, wishlist, cart, customerEmail } = req.body;
   const slicedMessages = getSafeMessagesSlice(messages, 10);
 
   if (!process.env.GROQ_API_KEY) {
@@ -36,6 +36,7 @@ export default async function handler(req, res) {
 
     const walletStr = wallet ? wallet : "Not Connected";
     const allowanceStr = allowance !== undefined && allowance !== null ? `${allowance} USDC` : "0 USDC";
+    const emailStr = customerEmail ? customerEmail : "Not Configured";
     const wishlistItems = Array.isArray(wishlist) ? wishlist : [];
     const wishlistStr = wishlistItems.length > 0
       ? wishlistItems.map(item => `${item.name} (${item.price} USDC, ID: ${item.id})`).join(", ")
@@ -54,6 +55,7 @@ export default async function handler(req, res) {
 CURRENT USER STATUS:
 - Connected Wallet: ${walletStr}
 - Pre-approved USDC Allowance: ${allowanceStr}
+- Customer Email: ${emailStr}
 - Current Cart: ${cartStr}
 - User's Wishlist: ${wishlistStr}
 

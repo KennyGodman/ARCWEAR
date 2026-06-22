@@ -743,11 +743,10 @@ const generateTempTxHash = () => "pending_" + Date.now() + "_" + Math.random().t
 /* =========================================================
    CheckoutModal
    ========================================================= */
-function CheckoutModal({ cart, wallet, onClose, onSuccess, onTxSent, onTxHashUpdated, addToast }) {
+function CheckoutModal({ cart, wallet, onClose, onSuccess, onTxSent, onTxHashUpdated, addToast, customerEmail, setCustomerEmail }) {
   const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
   const [step, setStep] = useState("review");
   const [txHash, setTxHash] = useState("");
-  const [customerEmail, setCustomerEmail] = useState("");
   const [createdOrderId, setCreatedOrderId] = useState(null);
 
   const pay = async () => {
@@ -1075,7 +1074,7 @@ function CheckoutModal({ cart, wallet, onClose, onSuccess, onTxSent, onTxHashUpd
 /* =========================================================
    AgentChat — AI shopping assistant panel
    ========================================================= */
-function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast, onClose, wallet, allowance, onRequestApproval, onRefreshAllowance, onSaveOrder, wishlist, onToggleWishlist }) {
+function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast, onClose, wallet, allowance, onRequestApproval, onRefreshAllowance, onSaveOrder, wishlist, onToggleWishlist, customerEmail, setCustomerEmail }) {
   const [msgs, setMsgs] = useState([{
     role: "assistant",
     text: "Hi! I'm your ArcWear AI agent 👋\n\nTell me what you're looking for — an outfit, a budget, an occasion — and I'll search, add items to your cart, and handle USDC checkout on Arc." + (allowance > 0 ? `\n\n🔓 Agent mode active — ${allowance.toFixed(2)} USDC remaining allowance.` : ""),
@@ -1308,6 +1307,7 @@ function AgentChat({ cart, setCart, setActiveSection, setCheckoutOpen, addToast,
               userWallet: wallet,
               items: c.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price })),
               total: totalAmount,
+              customerEmail,
             }),
           });
           const data = await res.json();
@@ -1470,6 +1470,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
             userWallet: wallet,
             items: c.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price })),
             total,
+            customerEmail,
           }),
         });
         const data = await res.json();
@@ -1566,7 +1567,8 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
         allowance,
         wallet,
         cart: cartRef.current,
-        wishlist: ALL_PRODUCTS.filter(p => wishlistRef.current.includes(p.id))
+        wishlist: ALL_PRODUCTS.filter(p => wishlistRef.current.includes(p.id)),
+        customerEmail
       }),
     });
     const data = await res.json();
@@ -1776,6 +1778,32 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
             ))}
           </div>
         )}
+
+        {/* Email settings banner */}
+        <div style={{ background: "#faf9f7", borderBottom: "1px solid #e7e4e0", padding: "8px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%" }}>
+            <span style={{ fontSize: 13, userSelect: "none" }}>📧</span>
+            <input
+              type="email"
+              value={customerEmail}
+              onChange={e => setCustomerEmail(e.target.value)}
+              placeholder="Set email for agent receipts"
+              style={{
+                border: "none",
+                background: "transparent",
+                fontSize: 12,
+                color: "#1c1917",
+                width: "100%",
+                outline: "none",
+                padding: "2px 0",
+                fontFamily: "var(--font-sans)",
+              }}
+            />
+          </div>
+          {customerEmail && customerEmail.includes("@") && (
+            <span style={{ fontSize: 10, color: "#16a34a", fontWeight: 700, whiteSpace: "nowrap" }}>✓ Active</span>
+          )}
+        </div>
 
         {/* Messages */}
         <div style={{ flex: 1, overflowY: "auto", padding: "13px 14px", display: "flex", flexDirection: "column", gap: 10 }}>
@@ -2610,6 +2638,14 @@ export default function ArcWear() {
   const [approvalOpen, setApprovalOpen] = useState(false);
   const [approvalAmount, setApprovalAmount] = useState(500);
   const [detailItem, setDetailItem] = useState(null);
+  const [customerEmail, setCustomerEmail] = useState(() => {
+    return localStorage.getItem("arcwear_customer_email") || "";
+  });
+
+  const changeCustomerEmail = (val) => {
+    setCustomerEmail(val);
+    localStorage.setItem("arcwear_customer_email", val);
+  };
 
   // ── Wishlist State ──
   const [wishlist, setWishlist] = useState(() => {
@@ -3760,9 +3796,11 @@ export default function ArcWear() {
             setOrdersOpen(true);
           }}
           addToast={addToast}
+          customerEmail={customerEmail}
+          setCustomerEmail={changeCustomerEmail}
         />
       )}
-      {agentOpen && <AgentChat cart={cart} setCart={setCart} setActiveSection={setSection} setCheckoutOpen={setCheckout} addToast={addToast} onClose={() => setAgentOpen(false)} wallet={wallet} allowance={allowance} onRequestApproval={(amt) => { setApprovalAmount(amt); setApprovalOpen(true); }} onRefreshAllowance={refreshAllowance} onSaveOrder={saveOrder} wishlist={wishlist} onToggleWishlist={toggleWishlist} />}
+      {agentOpen && <AgentChat cart={cart} setCart={setCart} setActiveSection={setSection} setCheckoutOpen={setCheckout} addToast={addToast} onClose={() => setAgentOpen(false)} wallet={wallet} allowance={allowance} onRequestApproval={(amt) => { setApprovalAmount(amt); setApprovalOpen(true); }} onRefreshAllowance={refreshAllowance} onSaveOrder={saveOrder} wishlist={wishlist} onToggleWishlist={toggleWishlist} customerEmail={customerEmail} setCustomerEmail={changeCustomerEmail} />}
       {approvalOpen && <ApprovalModal wallet={wallet} requestedAmount={approvalAmount} onApprove={async (amt) => { const hash = await approveAgent(amt); setApprovalOpen(false); addToast(`✓ Agent mode enabled — ${amt} USDC approved`, "success"); return hash; }} onClose={() => setApprovalOpen(false)} />}
       {wishlistOpen && <WishlistDrawer wishlist={wishlist} allProducts={ALL_PRODUCTS} onClose={() => setWishlistOpen(false)} onRemove={toggleWishlist} onAddToCart={addToCart} />}
       {ordersOpen && (
