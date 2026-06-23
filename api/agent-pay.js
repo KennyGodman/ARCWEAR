@@ -29,6 +29,34 @@ const MERCHANT_ADDR   = "0x627148dF4DE3b44Aa624e7592d3A47485777A6Bb";
 const AGENT_ADDRESS   = process.env.CIRCLE_AGENT_ADDRESS || "0xc83e6b9a6aa46a09b1fb28c5bce7e8e74bacd488";
 const ARC_RPC         = "https://rpc.testnet.arc.network";
 const CIRCLE_BASE     = "https://api.circle.com/v1/w3s";
+const MEMO_ADDRESS    = "0x5294E9927c3306DcBaDb03fe70b92e01cCede505";
+
+// ── ABI / Hex Encoding Helpers for Memos ──────────────────────────────────────
+function padAddress(addr) {
+  return addr.toLowerCase().replace("0x", "").padStart(64, "0");
+}
+
+function padUint256(val) {
+  return BigInt(val).toString(16).padStart(64, "0");
+}
+
+function encodeTransferFrom(from, to, amountRaw) {
+  return "0x23b872dd" + padAddress(from) + padAddress(to) + padUint256(amountRaw);
+}
+
+function encodeMemoId(uuid) {
+  const clean = uuid.replace(/-/g, "").toLowerCase();
+  return "0x" + clean.padEnd(64, "0");
+}
+
+function encodeMemoData(text) {
+  let hex = "";
+  for (let i = 0; i < text.length; i++) {
+    hex += text.charCodeAt(i).toString(16);
+  }
+  return "0x" + hex;
+}
+
 
 // ERC-8183 escrow — set after deploying AgenticCommerce.sol
 const ESCROW_CONTRACT = () => process.env.ESCROW_CONTRACT_ADDRESS || null;
@@ -103,9 +131,13 @@ async function getAllowance(ownerAddr) {
  * Submit a USDC.transferFrom(user, merchant, amount) call via Circle REST API.
  * The Circle agent wallet signs the transaction server-side — no user wallet popup.
  */
-async function submitTransferFrom(userWallet, amount, apiKey, entitySecret, walletId) {
+async function submitTransferFrom(userWallet, amount, orderId, apiKey, entitySecret, walletId) {
   const amountRaw = Math.round(amount * 1e6).toString(); // 6-decimal raw units
   const ciphertext = await buildCiphertext(apiKey, entitySecret);
+
+  const innerData = encodeTransferFrom(userWallet, MERCHANT_ADDR, amountRaw);
+  const memoId = encodeMemoId(orderId);
+  const memoData = encodeMemoData("ArcWear Order");
 
   const res = await fetch(`${CIRCLE_BASE}/developer/transactions/contractExecution`, {
     method: "POST",
@@ -117,9 +149,9 @@ async function submitTransferFrom(userWallet, amount, apiKey, entitySecret, wall
       idempotencyKey:        crypto.randomUUID(),
       entitySecretCiphertext: ciphertext,
       walletId,
-      contractAddress:       USDC_ADDRESS,
-      abiFunctionSignature:  "transferFrom(address,address,uint256)",
-      abiParameters:         [userWallet, MERCHANT_ADDR, amountRaw],
+      contractAddress:       MEMO_ADDRESS,
+      abiFunctionSignature:  "memo(address,bytes,bytes32,bytes)",
+      abiParameters:         [USDC_ADDRESS, innerData, memoId, memoData],
       feeLevel:              "MEDIUM",
     }),
   });
@@ -169,7 +201,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { userWallet, items, total, customerEmail } = req.body;
+  const { userWallet, items, total, customerEmail, orderId: reqOrderId } = req.body;
+  const orderId = reqOrderId || crypto.randomUUID();
 
   if (!userWallet || !total || total <= 0) {
     return res.status(400).json({ error: "Missing userWallet or invalid total" });
@@ -213,7 +246,6 @@ export default async function handler(req, res) {
 
     if (ESCROW_CONTRACT()) {
       // ── 2a. ERC-8183 Escrow Flow ───────────────────────────────────────
-      const orderId = crypto.randomUUID();
       console.log(`[agent-pay] ERC-8183 escrow flow. OrderId: ${orderId}`);
 
       const { default: escrowHandler } = await import("./escrow.js");
@@ -238,8 +270,8 @@ export default async function handler(req, res) {
 
     } else {
       // ── 2b. Legacy Direct transferFrom (fallback) ──────────────────────
-      console.log(`[agent-pay] Submitting transferFrom: ${userWallet} → ${MERCHANT_ADDR}, ${total} USDC`);
-      const txId = await submitTransferFrom(userWallet, total, apiKey, entitySecret, walletId);
+      console.log(`[agent-pay] Submitting transferFrom: ${userWallet} → ${MERCHANT_ADDR}, ${total} USDC (orderId: ${orderId})`);
+      const txId = await submitTransferFrom(userWallet, total, orderId, apiKey, entitySecret, walletId);
       console.log(`[agent-pay] Transaction submitted. ID: ${txId}`);
       const result = await pollForHash(txId, apiKey);
       txHash = result.txHash;

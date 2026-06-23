@@ -20,6 +20,34 @@ const AGENT_ADDRESS = process.env.CIRCLE_AGENT_ADDRESS || "0xc83e6b9a6aa46a09b1f
 const ARC_RPC       = "https://rpc.testnet.arc.network";
 const CIRCLE_BASE   = "https://api.circle.com/v1/w3s";
 const SCAN_URL      = "https://testnet.arcscan.app/tx/";
+const MEMO_ADDRESS  = "0x5294E9927c3306DcBaDb03fe70b92e01cCede505";
+
+// ── ABI / Hex Encoding Helpers for Memos ──────────────────────────────────────
+function padAddress(addr) {
+  return addr.toLowerCase().replace("0x", "").padStart(64, "0");
+}
+
+function padUint256(val) {
+  return BigInt(val).toString(16).padStart(64, "0");
+}
+
+function encodeTransferFrom(from, to, amountRaw) {
+  return "0x23b872dd" + padAddress(from) + padAddress(to) + padUint256(amountRaw);
+}
+
+function encodeMemoId(uuid) {
+  const clean = uuid.replace(/-/g, "").toLowerCase();
+  return "0x" + clean.padEnd(64, "0");
+}
+
+function encodeMemoData(text) {
+  let hex = "";
+  for (let i = 0; i < text.length; i++) {
+    hex += text.charCodeAt(i).toString(16);
+  }
+  return "0x" + hex;
+}
+
 
 // ── On-chain helpers ──────────────────────────────────────────────────────────
 
@@ -61,7 +89,7 @@ function encryptEntitySecret(hexSecret, publicKeyPem) {
   return encrypted.toString("base64");
 }
 
-async function executeTransferFrom(userWallet, amount) {
+async function executeTransferFrom(userWallet, amount, orderId) {
   const apiKey       = process.env.CIRCLE_API_KEY;
   const entitySecret = process.env.CIRCLE_ENTITY_SECRET;
   const walletId     = process.env.CIRCLE_WALLET_ID;
@@ -70,6 +98,10 @@ async function executeTransferFrom(userWallet, amount) {
   const ciphertext = encryptEntitySecret(entitySecret, publicKey);
   const amountRaw  = Math.round(amount * 1e6).toString();
 
+  const innerData = encodeTransferFrom(userWallet, MERCHANT_ADDR, amountRaw);
+  const memoId = encodeMemoId(orderId);
+  const memoData = encodeMemoData("ArcWear Order");
+
   const res = await fetch(`${CIRCLE_BASE}/developer/transactions/contractExecution`, {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
@@ -77,9 +109,9 @@ async function executeTransferFrom(userWallet, amount) {
       idempotencyKey:        crypto.randomUUID(),
       entitySecretCiphertext: ciphertext,
       walletId,
-      contractAddress:       USDC_ADDRESS,
-      abiFunctionSignature:  "transferFrom(address,address,uint256)",
-      abiParameters:         [userWallet, MERCHANT_ADDR, amountRaw],
+      contractAddress:       MEMO_ADDRESS,
+      abiFunctionSignature:  "memo(address,bytes,bytes32,bytes)",
+      abiParameters:         [USDC_ADDRESS, innerData, memoId, memoData],
       feeLevel:              "MEDIUM",
     }),
   });
@@ -282,7 +314,8 @@ export default async function handler(req, res) {
         }
 
         // 3. Execute transferFrom
-        const txHash = await executeTransferFrom(trigger.userWallet, trigger.price);
+        const orderId = crypto.randomUUID();
+        const txHash = await executeTransferFrom(trigger.userWallet, trigger.price, orderId);
         console.log(`[agent-cron] ✅ Executed! Tx: ${txHash}`);
 
         // 4. Update trigger
