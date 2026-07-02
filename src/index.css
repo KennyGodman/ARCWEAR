@@ -50,6 +50,78 @@
   --transition-spring: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/* ── Dark Mode Tokens ── */
+[data-theme="dark"] {
+  --color-bg:        #0f0e0d;
+  --color-surface:   #1c1917;
+  --color-border:    #292524;
+  --color-border-lt: #1f1e1c;
+
+  --color-ink:       #f5f3f0;
+  --color-ink-mid:   #d6d0ca;
+  --color-ink-muted: #a8a29e;
+  --color-ink-faint: #78716c;
+  --color-ink-stone: #e7e4e0;
+
+  --color-brand:     #e8a849;
+  --color-brand-lt:  #c47d2a;
+  --color-accent:    #f97316;
+  --color-accent-dk: #ea6c0a;
+
+  --shadow-sm:  0 1px 4px rgba(0, 0, 0, 0.30);
+  --shadow-md:  0 4px 20px rgba(0, 0, 0, 0.40);
+  --shadow-lg:  0 8px 40px rgba(0, 0, 0, 0.50);
+  --shadow-xl:  0 20px 60px rgba(0, 0, 0, 0.60);
+}
+
+/* Dark mode base overrides */
+[data-theme="dark"] body {
+  color: var(--color-ink);
+  background: var(--color-bg);
+}
+
+[data-theme="dark"] .search-bar-wrap {
+  background: #1c1917;
+  border-color: #3a3632;
+}
+
+[data-theme="dark"] .search-input {
+  color: var(--color-ink);
+}
+
+[data-theme="dark"] .order-drawer,
+[data-theme="dark"] .wishlist-drawer {
+  background: #161412 !important;
+  color: var(--color-ink);
+}
+
+[data-theme="dark"] .nav-action-btn {
+  background: #1c1917 !important;
+  color: #e7e4e0 !important;
+  border-color: #292524 !important;
+}
+
+[data-theme="dark"] .cart-btn-accent {
+  background: #f97316 !important;
+  color: #fff !important;
+  border-color: #f97316 !important;
+}
+
+[data-theme="dark"] .product-card {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .product-grid > * {
+  background: var(--color-surface);
+}
+
+[data-theme="dark"] .product-grid {
+  background: var(--color-border);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #3d3834; }
+
 /* ── Base Reset ── */
 *,
 *::before,
@@ -71,12 +143,85 @@ body {
   line-height: 1.5;
   color: var(--color-ink);
   background: var(--color-bg);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ── Smooth Theme Transition ── */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-duration: 0.25s;
+  transition-timing-function: ease;
+}
+
+/* Exempt animation-heavy elements from the global transition */
+.cart-btn-bounce,
+.topbar-text,
+[style*="animation"] {
+  transition: none !important;
 }
 
 /* ── Custom Scrollbar ── */
 ::-webkit-scrollbar        { width: 4px; }
 ::-webkit-scrollbar-track  { background: var(--color-surface); }
 ::-webkit-scrollbar-thumb  { background: #d4cfc8; border-radius: 4px; }
+
+/* ── Theme Toggle Button ── */
+.theme-toggle-btn {
+  position: relative;
+  width: 52px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  flex-shrink: 0;
+  overflow: hidden;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: border-color 0.25s, background 0.25s;
+}
+
+.theme-toggle-btn:hover {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px rgba(196, 125, 42, 0.12);
+}
+
+.theme-toggle-btn__track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5px;
+  font-size: 11px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.theme-toggle-btn__knob {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #c47d2a, #f97316);
+  box-shadow: 0 2px 6px rgba(196, 125, 42, 0.4);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s;
+  top: 2px;
+  left: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.theme-toggle-btn.dark .theme-toggle-btn__knob {
+  transform: translateX(24px);
+  background: linear-gradient(135deg, #1c1917, #292524);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
 
 /* =========================================================
    Global Animations
@@ -552,5 +697,101 @@ body {
 .social-icon-banner:hover {
   color: #fff;
   transform: translateY(-2px);
+}
+
+/* =========================================================
+   Responsive Header Navigation & Action Buttons
+   ========================================================= */
+.nav-tab-btn {
+  border: none;
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+@media (max-width: 1250px) {
+  .nav-tab-btn {
+    padding: 5px 8px !important;
+    font-size: 10.5px !important;
+    gap: 3px !important;
+  }
+}
+@media (max-width: 1100px) {
+  .nav-tab-btn {
+    padding: 4px 6px !important;
+    font-size: 10px !important;
+    gap: 2px !important;
+  }
+}
+
+.nav-action-btn {
+  background: #fff;
+  color: #1c1917;
+  border: 1px solid #e7e4e0;
+  border-radius: 4px;
+  padding: 5px 12px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all .2s;
+}
+
+@media (max-width: 1250px) {
+  .nav-action-btn {
+    padding: 4px 8px !important;
+    font-size: 9.5px !important;
+    gap: 4px !important;
+  }
+  .nav-wrap {
+    padding: 0 1.5% !important;
+    gap: 8px !important;
+  }
+  .search-bar-wrap {
+    max-width: 200px !important;
+    margin: 0 8px !important;
+  }
+}
+
+@media (max-width: 1100px) {
+  .nav-action-btn {
+    padding: 3px 6px !important;
+    font-size: 9px !important;
+    gap: 3px !important;
+  }
+  .search-bar-wrap {
+    display: none !important;
+  }
+}
+
+.cart-btn-accent {
+  background: #f97316 !important;
+  color: #fff !important;
+  border: 1px solid #f97316 !important;
+}
+
+.wallet-chip {
+  font-size: 10px;
+  font-weight: 700;
+}
+@media (max-width: 1250px) {
+  .wallet-chip {
+    padding: 4px 6px !important;
+    font-size: 9px !important;
+  }
+}
+@media (max-width: 1100px) {
+  .wallet-chip {
+    padding: 3px 4px !important;
+    font-size: 8.5px !important;
+  }
 }
 

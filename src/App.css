@@ -489,4 +489,41 @@
   animation: tooltipScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* ── Dark Mode Overrides for Component Styles ── */
+[data-theme="dark"] .option-btn {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  color: var(--color-ink-mid);
+}
 
+[data-theme="dark"] .option-btn.active {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-bg);
+}
+
+[data-theme="dark"] .btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .help-dropdown {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+[data-theme="dark"] .wishlist-btn {
+  background: rgba(28, 25, 23, 0.9);
+}
+
+[data-theme="dark"] .agent-panel {
+  background: var(--color-surface) !important;
+}
+
+[data-theme="dark"] .chat-bubble--assistant {
+  background: #292524;
+  border-color: #3a3632;
+}
+
+[data-theme="dark"] .toast--success { background: var(--color-brand); }

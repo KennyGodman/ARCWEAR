@@ -60,7 +60,7 @@ CURRENT USER STATUS:
 - User's Wishlist: ${wishlistStr}
 
 CORE TOOLS:
-- search_products: Search the catalogue by section (men/women/children), category, price, keywords
+- search_products: Search the catalogue by section (fashion/appliances/gaming/electronics/phones_gadgets/health_beauty/home_office), category, price, keywords
 - add_to_cart: Add a product to the user's cart by ID
 - view_cart: See current cart contents and total
 - remove_from_cart: Remove a product from the cart

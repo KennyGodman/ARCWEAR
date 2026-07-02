@@ -17,6 +17,42 @@ function fakeReviews(id) {
 
 // Fake material/detail bullets per category
 const CATEGORY_DETAILS = {
+  // Fashion (Men, Women, Kids)
+  men:      ["Machine wash cold", "100% premium fabric", "Regular fit", "Imported"],
+  women:    ["Dry clean or hand wash", "Soft touch fabric", "Flattering drape", "Premium quality"],
+  children: ["Machine wash gentle", "Ultra-soft cotton", "Durable stitching", "Kid-safe dyes"],
+  
+  // Appliances
+  kitchen:          ["Energy Star certified", "Stainless steel components", "1-year warranty", "Easy to clean"],
+  laundry_cleaning: ["Compact & portable design", "Efficient power usage", "User-friendly interface"],
+  comfort:          ["Whisper-quiet operation", "Smart home integration", "HEPA filter equipped"],
+
+  // Gaming
+  consoles:    ["4K Ultra HD support", "High-speed SSD storage", "Includes wireless controller"],
+  accessories: ["RGB customizable lighting", "Ultra-low latency response", "Ergonomic tactile feel"],
+  gear:        ["Premium comfort materials", "Durable metal frame", "Designed for long sessions"],
+
+  // Electronics
+  computers:  ["High-resolution display", "All-day battery life", "Premium aluminum chassis"],
+  audio:      ["Hi-Res Audio certified", "Active Noise Cancellation", "Long battery life with case"],
+  smart_home: ["Wi-Fi & Bluetooth enabled", "Voice control compatible", "Easy mobile setup"],
+
+  // Phones & Gadgets
+  smartphones:       ["Super Retina OLED display", "Advanced camera system", "Water & dust resistant"],
+  wearables:         ["Heart rate & sleep tracking", "Water-resistant up to 50m", "Multi-day battery life"],
+  power:             ["GaN fast charging tech", "Multi-device protection", "Durable braided nylon"],
+
+  // Health & Beauty
+  skincare: ["Dermatologist tested", "Paraben & cruelty-free", "Suitable for all skin types"],
+  makeup:   ["Long-lasting formula", "Highly pigmented shades", "Hypoallergenic ingredients"],
+  wellness: ["100% organic ingredients", "Lab-tested for purity", "Non-GMO & gluten-free"],
+
+  // Home & Office
+  furniture:    ["Ergonomic design support", "Sturdy premium construction", "Easy assembly required"],
+  organization: ["High-capacity storage", "Durable eco-friendly materials", "Sleek clutter-free design"],
+  stationery:   ["Acid-free premium paper", "Smooth writing experience", "Elegant gift box included"],
+  
+  // Fallbacks
   shirts:   ["Machine wash cold", "100% premium fabric", "Regular fit", "Imported"],
   trousers: ["Machine wash cold", "Stretch waistband", "Side & back pockets", "Imported"],
   belts:    ["Genuine leather / canvas", "Metal buckle hardware", "Adjustable length", "Handcrafted"],
@@ -315,36 +351,38 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
             </p>
 
             {/* Size Selector */}
-            <div style={{ marginBottom: 18 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: "#78716c", letterSpacing: 1.2, textTransform: "uppercase" }}>
-                  Size
-                </span>
-                <span style={{ fontSize: 13, color: "#f97316", cursor: "pointer", fontWeight: 600 }}>
-                  Size guide ↗
-                </span>
+            {(item.section === "fashion" || item.sectionLabel === "Fashion") && (
+              <div style={{ marginBottom: 18 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#78716c", letterSpacing: 1.2, textTransform: "uppercase" }}>
+                    Size
+                  </span>
+                  <span style={{ fontSize: 13, color: "#f97316", cursor: "pointer", fontWeight: 600 }}>
+                    Size guide ↗
+                  </span>
+                </div>
+                <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
+                  {SIZES.map(s => (
+                    <button
+                      key={s}
+                      onClick={() => setSelectedSize(s)}
+                      style={{
+                        width: 44, height: 44,
+                        border: selectedSize === s ? "2px solid #1c1917" : "1.5px solid #e7e4e0",
+                        borderRadius: 8,
+                        background: selectedSize === s ? "#1c1917" : "#fff",
+                        color: selectedSize === s ? "#fff" : "#44403c",
+                        fontSize: 14, fontWeight: 600,
+                        cursor: "pointer",
+                        transition: "all 0.15s",
+                      }}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
-                {SIZES.map(s => (
-                  <button
-                    key={s}
-                    onClick={() => setSelectedSize(s)}
-                    style={{
-                      width: 44, height: 44,
-                      border: selectedSize === s ? "2px solid #1c1917" : "1.5px solid #e7e4e0",
-                      borderRadius: 8,
-                      background: selectedSize === s ? "#1c1917" : "#fff",
-                      color: selectedSize === s ? "#fff" : "#44403c",
-                      fontSize: 14, fontWeight: 600,
-                      cursor: "pointer",
-                      transition: "all 0.15s",
-                    }}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
+            )}
 
             {/* Color Selector */}
             <div style={{ marginBottom: 20 }}>

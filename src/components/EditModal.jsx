@@ -45,20 +45,22 @@ export default function EditModal({ item, onClose, onSave }) {
         {/* Body */}
         <div style={{ padding: "18px 20px" }}>
           {/* Size */}
-          <div style={{ marginBottom: 16 }}>
-            <span className="label">Size</span>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {["XS", "S", "M", "L", "XL", "XXL"].map(s => (
-                <button
-                  key={s}
-                  className={`option-btn${size === s ? " active" : ""}`}
-                  onClick={() => setSize(s)}
-                >
-                  {s}
-                </button>
-              ))}
+          {(item.section === "fashion" || item.sectionLabel === "Fashion") && (
+            <div style={{ marginBottom: 16 }}>
+              <span className="label">Size</span>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {["XS", "S", "M", "L", "XL", "XXL"].map(s => (
+                  <button
+                    key={s}
+                    className={`option-btn${size === s ? " active" : ""}`}
+                    onClick={() => setSize(s)}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Colour */}
           <div style={{ marginBottom: 16 }}>

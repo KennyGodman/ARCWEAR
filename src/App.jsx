@@ -3,6 +3,7 @@ import useAllowance from "./hooks/useAllowance";
 import ApprovalModal from "./components/ApprovalModal";
 import ProductDetailPage from "./components/ProductDetailPage";
 import { encodeMemoUSDC } from "./utils";
+import { CATALOGUE, ALL_PRODUCTS } from "./catalogue";
 
 /* =========================================================
    ARCWEAR — Main Application
@@ -30,192 +31,9 @@ const disc = (p, op) => Math.round(((op - p) / op) * 100);
 /* =========================================================
    Product Catalogue
    ========================================================= */
-const CATALOGUE = {
-  men: {
-    label: "Men", icon: "👔", categories: {
-      shirts: {
-        label: "Shirts & Tops", emoji: "👕", items: [
-          { id: "m-s1", name: "Oxford Button-Down", price: 42, oldPrice: 58, desc: "Egyptian cotton, spread collar", img: "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=400&q=80" },
-          { id: "m-s2", name: "Linen Crew Tee", price: 28, oldPrice: 38, desc: "Stonewashed linen, relaxed fit", img: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80" },
-          { id: "m-s3", name: "Flannel Overshirt", price: 65, oldPrice: 80, desc: "Brushed flannel, double chest pocket", img: "https://images.unsplash.com/photo-1588359348347-9bc6cbbb689e?w=400&q=80" },
-          { id: "m-s4", name: "Knit Polo Shirt", price: 48, oldPrice: 65, desc: "Fine knit cotton, ribbed collar & cuffs", img: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=400&q=80" },
-          { id: "m-s5", name: "Denim Utility Shirt", price: 55, oldPrice: 75, desc: "Lightweight denim, double chest pockets", img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&q=80" },
-          { id: "m-s6", name: "Flannel Overshirt", price: 65, oldPrice: 80, desc: "Brushed flannel, double chest pocket", img: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&q=80" },
-          { id: "m-s7", name: "Knit Polo Shirt", price: 48, oldPrice: 65, desc: "Fine knit cotton, ribbed collar & cuffs", img: "https://images.unsplash.com/photo-1618886614638-80e3c103d31a?w=400&q=80" },
-        ],
-      },
-      trousers: {
-        label: "Trousers", emoji: "👖", items: [
-          { id: "m-t1", name: "Slim Chino", price: 58, oldPrice: 75, desc: "Stretch cotton, tapered leg", img: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&q=80" },
-          { id: "m-t2", name: "Cargo Pants", price: 72, oldPrice: 90, desc: "Ripstop canvas, utility pockets", img: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&q=80" },
-          { id: "m-t3", name: "Dress Trouser", price: 85, oldPrice: 105, desc: "Wool-blend, flat-front cut", img: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&q=80" },
-          { id: "m-t4", name: "Tailored Corduroy", price: 78, oldPrice: 98, desc: "Fine-wale corduroy, comfortable stretch", img: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&q=80" },
-          { id: "m-t5", name: "Relaxed Linen Pants", price: 65, oldPrice: 85, desc: "Drawstring waist, breathable fabric", img: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?q=80&w=397&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D=80" },
-          { id: "m-t6", name: "Dress Trouser", price: 85, oldPrice: 105, desc: "Wool-blend, flat-front cut", img: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&q=80" },
-          { id: "m-t7", name: "Tailored Corduroy", price: 78, oldPrice: 98, desc: "Fine-wale corduroy, comfortable stretch", img: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400&q=80" },
-        ],
-      },
-      belts: {
-        label: "Belts", emoji: "🪢", items: [
-          { id: "m-b1", name: "Leather Classic", price: 35, oldPrice: 45, desc: "Full-grain Italian leather", img: "https://images.unsplash.com/photo-1752386268324-0533ffbfbc0e?fm=jpg&q=80&w=400" },
-          { id: "m-b2", name: "Woven Canvas Belt", price: 22, oldPrice: 30, desc: "Military-style, brass buckle", img: "https://images.unsplash.com/photo-1666723043169-22e29545675c?q=80&w=400" },
-          { id: "m-b3", name: "Suede Dress Belt", price: 38, oldPrice: 52, desc: "Genuine brushed suede, brushed steel buckle", img: "https://images.unsplash.com/photo-1664286074240-d7059e004dff?q=80&w=400" },
-          { id: "m-b4", name: "Braided Leather Belt", price: 42, oldPrice: 55, desc: "Intricately hand-woven leather cords", img: "https://images.unsplash.com/photo-1705493655920-20c572928501?q=80&w=400" },
-          { id: "m-b5", name: "Reversible Smooth Belt", price: 45, oldPrice: 60, desc: "Dual-sided black/brown sleek leather", img: "https://images.unsplash.com/photo-1549654929-e63d34779e41?q=80&w=400" },
-          { id: "m-b6", name: "Suede Dress Belt", price: 38, oldPrice: 52, desc: "Genuine brushed suede, brushed steel buckle", img: "https://images.unsplash.com/photo-1664286022075-8e997e95bd17?q=80&w=400" },
-          { id: "m-b7", name: "Braided Leather Belt", price: 42, oldPrice: 55, desc: "Intricately hand-woven leather cords", img: "https://images.unsplash.com/photo-1752386268324-0533ffbfbc0e?q=80&w=400" },
-        ],
-      },
-      caps: {
-        label: "Headwear", emoji: "🧢", items: [
-          { id: "m-c1", name: "Snapback Cap", price: 25, oldPrice: 32, desc: "6-panel, structured brim", img: "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=400&q=80" },
-          { id: "m-c2", name: "Bucket Hat", price: 20, oldPrice: 28, desc: "Waxed cotton, packable", img: "https://images.unsplash.com/photo-1556306535-0f09a537f0a3?w=400&q=80" },
-          { id: "m-c3", name: "Beanie Knit", price: 18, oldPrice: 25, desc: "Merino wool, ribbed cuff", img: "https://plus.unsplash.com/premium_photo-1671810380670-1cca53667f00?q=80&w=400" },
-          { id: "m-c4", name: "Merino Wool Beanie", price: 24, oldPrice: 32, desc: "Ultra-soft merino, dynamic thermal weave", img: "https://plus.unsplash.com/premium_photo-1725914369015-e031be89c5cf?q=80&w=400" },
-          { id: "m-c5", name: "Classic Cap", price: 45, oldPrice: 60, desc: "Stiff wool felt, leather band accent", img: "https://images.unsplash.com/photo-1466992133056-ae8de8e22809?q=80&w=400" },
-          { id: "m-c6", name: " Turban", price: 18, oldPrice: 25, desc: "Indian Turban", img: "https://images.unsplash.com/photo-1762331236115-6b4165187de4?q=80&w=400" },
-          { id: "m-c7", name: "Cowboy Hat", price: 24, oldPrice: 32, desc: "Black Cowboy Hat", img: "https://images.unsplash.com/photo-1768594362994-c95c01a34650?q=80&w=400" },
-        ],
-      },
-      shoes: {
-        label: "Footwear", emoji: "👟", items: [
-          { id: "m-sh1", name: "White Leather Sneaker", price: 110, oldPrice: 140, desc: "Tumbled leather, cupsole", img: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400&q=80" },
-          { id: "m-sh2", name: "Chelsea Boot", price: 145, oldPrice: 180, desc: "Suede upper, elastic gusset", img: "https://plus.unsplash.com/premium_photo-1729788891863-0d9b6f2b453b?q=80&w=400" },
-          { id: "m-sh3", name: "Loafer ", price: 98, oldPrice: 120, desc: "Horsebit detail, leather lining", img: "https://images.unsplash.com/photo-1777987601447-266e128de448?q=80&w=400" },
-          { id: "m-sh4", name: "Suede Desert Boot", price: 125, oldPrice: 160, desc: "Crepe sole, water-repellent suede upper", img: "https://images.unsplash.com/photo-1616688577198-0462bcecbdf9?q=80&w=400" },
-          { id: "m-sh5", name: "Double Monk Strap", price: 135, oldPrice: 170, desc: "Burnished calfskin, silver buckle details", img: "https://images.unsplash.com/photo-1533867617858-e7b97e060509?w=400&q=80" },
-          { id: "m-sh6", name: "Sneakers", price: 98, oldPrice: 120, desc: "Horsebit detail, leather lining", img: "https://images.unsplash.com/photo-1622760807800-66cf1466fc08?q=80&w=400" },
-          { id: "m-sh7", name: "Running Boot", price: 125, oldPrice: 160, desc: "Crepe sole, water-repellent suede upper", img: "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?q=80&w=400" },
-        ],
-      },
-    },
-  },
-  women: {
-    label: "Women", icon: "👗", categories: {
-      shirts: {
-        label: "Tops & Blouses", emoji: "👚", items: [
-          { id: "w-s1", name: "Silk Blouse", price: 68, oldPrice: 85, desc: "Mulberry silk, relaxed drape", img: "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=400&q=80" },
-          { id: "w-s2", name: "Crop Cami", price: 32, oldPrice: 42, desc: "Ribbed modal, adjustable straps", img: "https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?w=400&q=80" },
-          { id: "w-s3", name: "Wrap Cardigan", price: 55, oldPrice: 70, desc: "Cashmere blend, tie-waist", img: "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&q=80" },
-          { id: "w-s4", name: "Linen V-Neck Blouse", price: 48, oldPrice: 65, desc: "Relaxed linen, shell button front", img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80" },
-          { id: "w-s5", name: "Off-Shoulder Ribbed Knit", price: 45, oldPrice: 60, desc: "Soft cotton-rib blend, long sleeves", img: "https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=400&q=80" },
-          { id: "w-s6", name: "Wrap Cardigan", price: 55, oldPrice: 70, desc: "Cashmere blend, tie-waist", img: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&q=80" },
-          { id: "w-s7", name: "Linen V-Neck Blouse", price: 48, oldPrice: 65, desc: "Relaxed linen, shell button front", img: "https://images.unsplash.com/photo-1509319117193-57bab727e09d?w=400&q=80" },
-        ],
-      },
-      trousers: {
-        label: "Bottoms", emoji: "👗", items: [
-          { id: "w-t1", name: "High-Rise Flare", price: 75, oldPrice: 95, desc: "Stretch denim, wide flare hem", img: "https://images.unsplash.com/photo-1582533561751-ef6f6ab93a2e?w=400&q=80" },
-          { id: "w-t2", name: "Midi Skirt", price: 60, oldPrice: 78, desc: "Satin lining, A-line silhouette", img: "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=400&q=80" },
-          { id: "w-t3", name: "Tailored Wide-Leg", price: 88, oldPrice: 110, desc: "Crepe fabric, pleat front", img: "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400&q=80" },
-          { id: "w-t4", name: "Paperbag Linen Shorts", price: 42, oldPrice: 58, desc: "Tie-waist belt, breezy linen fabric", img: "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&q=80" },
-          { id: "w-t5", name: "Pleated Tapered Trouser", price: 78, oldPrice: 98, desc: "High-waist front pleats, ankle crop", img: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&q=80" },
-          { id: "w-t6", name: "Tailored Wide-Leg", price: 88, oldPrice: 110, desc: "Crepe fabric, pleat front", img: "https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&q=80" },
-          { id: "w-t7", name: "Paperbag Linen Shorts", price: 42, oldPrice: 58, desc: "Tie-waist belt, breezy linen fabric", img: "https://images.unsplash.com/photo-1604176354204-9268737828e4?w=400&q=80" },
-        ],
-      },
-      belts: {
-        label: "Belts", emoji: "🪢", items: [
-          { id: "w-b1", name: "Gold Chain Belt", price: 38, oldPrice: 50, desc: "Brass links, adjustable fit", img: "https://plus.unsplash.com/premium_photo-1737659254929-44685a35717b?q=80&w=400" },
-          { id: "w-b2", name: "Louis Vuitton", price: 30, oldPrice: 40, desc: "Patent leather, pin buckle", img: "https://images.unsplash.com/photo-1585856331452-87ea5a04c21c?w=500&q=60" },
-          { id: "w-b3", name: "Studded Suede Belt", price: 35, oldPrice: 48, desc: "Gold-tone studs, rich suede strap", img: "https://plus.unsplash.com/premium_photo-1724075829638-7a4d3f2eb235?q=80&w=400" },
-          { id: "w-b4", name: "Wide Leather Waist Cinch", price: 48, oldPrice: 65, desc: "Premium smooth leather, statement buckle", img: "https://images.unsplash.com/photo-1574288443562-5ccb5bdb46d8?q=80&w=400" },
-          { id: "w-b5", name: "Woven Raffia Belt", price: 26, oldPrice: 38, desc: "Natural straw weave, round wooden buckle", img: "https://images.unsplash.com/photo-1763673375520-c5562a39a2c5?q=80&w=400" },
-          { id: "w-b6", name: "Studded Suede Belt", price: 35, oldPrice: 48, desc: "Gold-tone studs, rich suede strap", img: "https://images.unsplash.com/photo-1760040803892-913d1471a121?q=80&w=400" },
-          { id: "w-b7", name: "Wide Leather Waist Cinch", price: 48, oldPrice: 65, desc: "Premium smooth leather, statement buckle", img: "https://images.unsplash.com/photo-1758505805266-3bd5f8fbd867?w=400" },
-        ],
-      },
-      caps: {
-        label: "Headwear", emoji: "🎩", items: [
-          { id: "w-c1", name: "Wide Brim Sun Hat", price: 40, oldPrice: 52, desc: "Raffia weave, ribbon band", img: "https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400&q=80" },
-          { id: "w-c2", name: "Classic Beret", price: 28, oldPrice: 36, desc: "Felted wool, French-style", img: "https://images.unsplash.com/photo-1693748160059-adf1a64c0873?q=80&w=400" },
-          { id: "w-c3", name: "Beach Hat", price: 22, oldPrice: 30, desc: "Chunky knit, removable pom", img: "https://plus.unsplash.com/premium_photo-1693221161784-e6a735e8e4b4?q=80&w=400" },
-          { id: "w-c4", name: "Fedora Hat", price: 32, oldPrice: 45, desc: "Warm angora blend, delicate cable knit", img: "https://images.unsplash.com/photo-1642170637760-f59a0b6d922d?q=80&w=400" },
-          { id: "w-c5", name: "Polo cap", price: 52, oldPrice: 70, desc: "Sleek teardrop crown, raw-edge brim", img: "https://images.unsplash.com/photo-1777455163870-a846a5ca98af?w=400" },
-          { id: "w-c6", name: "Knit Pom Beanie", price: 22, oldPrice: 30, desc: "Chunky knit, removable pom", img: "https://images.unsplash.com/photo-1745274811550-64b2289deea4?q=80&w=400" },
-          { id: "w-c7", name: "", price: 32, oldPrice: 45, desc: "Warm angora blend, delicate cable knit", img: "https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?q=80&w=400" },
-        ],
-      },
-      shoes: {
-        label: "Footwear", emoji: "👠", items: [
-          { id: "w-sh1", name: "Block Heel Mule", price: 120, oldPrice: 150, desc: "Suede upper, 7cm block heel", img: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=400&q=80" },
-          { id: "w-sh2", name: "Platform Sneaker", price: 95, oldPrice: 120, desc: "Leather & canvas, 4cm platform", img: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=400&q=80" },
-          { id: "w-sh3", name: "Kitten Heel Pump", price: 138, oldPrice: 170, desc: "Satin finish, pointed toe", img: "https://images.unsplash.com/photo-1515347619252-60a4bf4fff4f?w=400&q=80" },
-          { id: "w-sh4", name: "Pointed Toe Flat", price: 88, oldPrice: 110, desc: "Soft glove leather, cushioned insole", img: "https://images.unsplash.com/photo-1535043934128-cf0b28d52f95?w=400&q=80" },
-          { id: "w-sh5", name: "Ankle Strap Sandal", price: 115, oldPrice: 145, desc: "Block heel, gold buckle closure", img: "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&q=80" },
-          { id: "w-sh6", name: "Kitten Heel Pump", price: 138, oldPrice: 170, desc: "Satin finish, pointed toe", img: "https://plus.unsplash.com/premium_photo-1676234844384-82e1830af724?w=400&q=80" },
-          { id: "w-sh7", name: "Pointed Toe Flat", price: 88, oldPrice: 110, desc: "Soft glove leather, cushioned insole", img: "https://images.unsplash.com/photo-1618274158638-41d9f8d9279d?w=400&q=80" },
-        ],
-      },
-    },
-  },
-  children: {
-    label: "Children", icon: "🧒", categories: {
-      shirts: {
-        label: "Tops & Tees", emoji: "👕", items: [
-          { id: "k-s1", name: "Dino Print Tee", price: 18, oldPrice: 25, desc: "100% organic cotton, crew neck", img: "https://images.unsplash.com/photo-1622290291165-d341f1938b8a?q=80&w=400" },
-          { id: "k-s2", name: "Rainbow Hoodie", price: 32, oldPrice: 42, desc: "Brushed fleece, kangaroo pocket", img: "https://images.unsplash.com/photo-1503944168849-8bf86875bbd8?w=400&q=80" },
-          { id: "k-s3", name: "Striped Long Sleeve", price: 22, oldPrice: 30, desc: "Soft jersey, ribbed cuffs", img: "https://images.unsplash.com/photo-1471286174890-9c112ffca5b4?w=400&q=80" },
-          { id: "k-s4", name: "Flannel Plaid Shirt", price: 25, oldPrice: 35, desc: "Soft organic flannel, button-up front", img: "https://plus.unsplash.com/premium_photo-1675183689613-f28f2d39cb9b?q=80&w=400" },
-          { id: "k-s5", name: "Embroidered Knit Top", price: 28, oldPrice: 38, desc: "Cute floral accents, scalloped collar", img: "https://plus.unsplash.com/premium_photo-1691367782367-2bd37f646abc?q=80&w=400" },
-          { id: "k-s6", name: "Striped Long Sleeve", price: 22, oldPrice: 30, desc: "Soft jersey, ribbed cuffs", img: "https://plus.unsplash.com/premium_photo-1701984401543-4b635f3a03b5?q=80&w=400" },
-          { id: "k-s7", name: "Flannel Plaid Shirt", price: 25, oldPrice: 35, desc: "Soft organic flannel, button-up front", img: "https://images.unsplash.com/photo-1764417846375-da86bd2603f8?q=80&w=400" },
-        ],
-      },
-      trousers: {
-        label: "Bottoms", emoji: "👖", items: [
-          { id: "k-t1", name: "Elastic Joggers", price: 25, oldPrice: 32, desc: "French terry, elastic waist", img: "https://images.unsplash.com/photo-1616692994673-2feb09ac5770?q=80&w=400" },
-          { id: "k-t2", name: "Denim Shortalls", price: 40, oldPrice: 52, desc: "Stretch denim, adjustable straps", img: "https://plus.unsplash.com/premium_photo-1673835711880-e672de68193b?w=400" },
-          { id: "k-t3", name: "Cargo Shorts", price: 28, oldPrice: 36, desc: "Ripstop, velcro side pockets", img: "https://images.unsplash.com/photo-1607454317233-28962e07083a?w=400" },
-          { id: "k-t4", name: "Corduroy Overall Dress", price: 35, oldPrice: 48, desc: "Adjustable straps, front pouch pocket", img: "https://images.unsplash.com/photo-1615962024321-f029aefe1f25?w=400" },
-          { id: "k-t5", name: "Chino Work Shorts", price: 22, oldPrice: 30, desc: "Durable twill, elastic button adjusters", img: "https://images.unsplash.com/photo-1632232962967-0740a757380d?w=400" },
-          { id: "k-t6", name: "Jump Suit", price: 28, oldPrice: 36, desc: "Ripstop, velcro side pockets", img: "https://plus.unsplash.com/premium_photo-1671736768698-67783d4200d6?w=400" },
-          { id: "k-t7", name: "Corduroy Overall Dress", price: 35, oldPrice: 48, desc: "Adjustable straps, front pouch pocket", img: "https://images.unsplash.com/photo-1604482858862-1db908a653e4?w=400" },
-        ],
-      },
-      belts: {
-        label: "Belts", emoji: "🪢", items: [
-          { id: "k-b1", name: "Cartoon Buckle Belt", price: 12, oldPrice: 18, desc: "Woven, fun character buckle", img: "https://images.unsplash.com/photo-1752386341161-de2b02ea1f50?w=400&q=80" },
-          { id: "k-b2", name: "Glitter Elastic Belt", price: 14, oldPrice: 20, desc: "Sparkly elastic webbing, heart-shape clasp", img: "https://images.unsplash.com/photo-1711443982852-b3df5c563448?w=400&q=80" },
-          { id: "k-b3", name: "Braided Cotton Belt", price: 15, oldPrice: 22, desc: "Colorful cotton cord, brass hardware", img: "https://images.unsplash.com/photo-1664286074176-5206ee5dc878?w=400&q=80" },
-          { id: "k-b4", name: "Reversible Casual Belt", price: 16, oldPrice: 24, desc: "Two-tone webbed strap, steel buckle", img: "https://plus.unsplash.com/premium_photo-1723575737806-ecd7f74bf3a1?w=400&q=80" },
-          { id: "k-b5", name: "Classic Toddler Suspenders", price: 18, oldPrice: 26, desc: "Y-back elastic strap, heavy-duty clips", img: "https://images.unsplash.com/photo-1717241424404-5331845a1107?w=400&q=80" },
-          { id: "k-b6", name: "Black leather Suspenders", price: 15, oldPrice: 22, desc: "Colorful cotton cord, brass hardware", img: "https://images.unsplash.com/photo-1503327151497-be3b97ef0d42?w=400&q=80" },
-          { id: "k-b7", name: "KungFu Belt", price: 16, oldPrice: 24, desc: "Two-tone webbed strap, steel buckle", img: "https://plus.unsplash.com/premium_photo-1667941272664-9146446e1b7b?w=400&q=80" },
-        ],
-      },
-      caps: {
-        label: "Headwear", emoji: "🧢", items: [
-          { id: "k-c1", name: "Dino Baseball Cap", price: 15, oldPrice: 22, desc: "Cotton twill, embroidered dino", img: "https://images.unsplash.com/flagged/photo-1552840207-7b12058bfee4?w=400&q=80" },
-          { id: "k-c2", name: "Sun Protection Hat", price: 20, oldPrice: 28, desc: "UPF 50+, wide brim", img: "https://images.unsplash.com/photo-1732041101188-eff6bfc65692?w=400&q=80" },
-          { id: "k-c3", name: "Cozy Knit Ear Hat", price: 18, oldPrice: 25, desc: "Soft fleece lining, cute bear ear details", img: "https://plus.unsplash.com/premium_photo-1697183202193-a5037862b539?w=400&q=80" },
-          { id: "k-c4", name: "Head Warmer", price: 16, oldPrice: 24, desc: "Open-top weave, velcro strap back", img: "https://images.unsplash.com/photo-1768399408789-3a5e1fac6166?q=80&w=400" },
-          { id: "k-c5", name: "Waterproof Rain Hat", price: 22, oldPrice: 30, desc: "Wide brim, toggle drawstring chin strap", img: "https://images.unsplash.com/photo-1773176862337-17602cd46015?q=80&w=400" },
-          { id: "k-c6", name: "Face cap", price: 18, oldPrice: 25, desc: "Soft fleece lining, cute bear ear details", img: "https://images.unsplash.com/photo-1616788474390-5c5d9db71a19?q=80&w=400" },
-          { id: "k-c7", name: "Bucket Hat", price: 16, oldPrice: 24, desc: "Open-top weave, velcro strap back", img: "https://images.unsplash.com/photo-1775324588624-6bbe1092734d?q=80&w=400" },
-        ],
-      },
-      shoes: {
-        label: "Footwear", emoji: "👟", items: [
-          { id: "k-sh1", name: "Light-Up Sneakers", price: 55, oldPrice: 70, desc: "LED outsole, velcro close", img: "https://images.unsplash.com/photo-1742390671647-bc9c5399fdf3?q=80&w=400" },
-          { id: "k-sh2", name: "Velcro Sandals", price: 38, oldPrice: 50, desc: "Quick-dry, adjustable strap", img: "https://images.unsplash.com/photo-1625563206627-7e713d1ac0a8?q=80&w=400" },
-          { id: "k-sh3", name: "Rain Boots", price: 42, oldPrice: 55, desc: "Natural rubber, easy-pull tab", img: "https://images.unsplash.com/photo-1571180202803-407624f64578?q=80&w=400" },
-          { id: "k-sh4", name: "Canvas Slip-On Loafer", price: 35, oldPrice: 46, desc: "Breathable canvas upper, flexible outsole", img: "https://images.unsplash.com/photo-1764155161021-bab07b550c01?q=80&w=400" },
-          { id: "k-sh5", name: "Classic High-Top Sneaker", price: 48, oldPrice: 62, desc: "Lace closure with side zipper for easy on/off", img: "https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=400&q=80" },
-          { id: "k-sh6", name: "Soft Sneakers", price: 42, oldPrice: 55, desc: "Natural rubber, easy-pull tab", img: "https://images.unsplash.com/photo-1631542245680-3bc3aeb813be?w=400&q=80" },
-          { id: "k-sh7", name: "Rubber Sandals", price: 35, oldPrice: 46, desc: "Breathable canvas upper, flexible outsole", img: "https://plus.unsplash.com/premium_photo-1749544314937-e95c0200a250?q=80&w=400" },
-        ],
-      },
-    },
-  },
-};
-
-// Flatten catalogue into a searchable array
-const ALL_PRODUCTS = [];
-for (const [sk, sec] of Object.entries(CATALOGUE))
-  for (const [ck, cat] of Object.entries(sec.categories))
-    for (const item of cat.items)
-      ALL_PRODUCTS.push({ ...item, section: sk, sectionLabel: sec.label, category: ck, categoryLabel: cat.label, emoji: cat.emoji });
+/* =========================================================
+   Product Catalogue (Imported from src/catalogue.js)
+   ========================================================= */
 
 /* =========================================================
    AI Agent Tool Definitions
@@ -227,7 +45,7 @@ const AGENT_TOOLS = [
     input_schema: {
       type: "object",
       properties: {
-        section: { type: "string", enum: ["men", "women", "children", "all"] },
+        section: { type: "string", enum: ["fashion", "appliances", "gaming", "electronics", "phones_gadgets", "health_beauty", "home_office", "all"] },
         category: { anyOf: [{ type: "string" }, { type: "null" }] },
         maxPrice: { anyOf: [{ type: "number" }, { type: "null" }] },
         minPrice: { anyOf: [{ type: "number" }, { type: "null" }] },
@@ -2647,7 +2465,7 @@ function CombinedFooter({ addToast }) {
    ArcWear — Root Page Component
    ========================================================= */
 export default function ArcWear() {
-  const [section, setSection] = useState("men");
+  const [section, setSection] = useState("fashion");
   const [activeCat, setActiveCat] = useState(null);
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
@@ -2657,6 +2475,23 @@ export default function ArcWear() {
   const [walletDropdownOpen, setWalletDropdownOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
   const [scrolled, setScrolled] = useState(false);
+
+  // ── Dark / Light Mode ──
+  const [darkMode, setDarkMode] = useState(() => {
+    try {
+      return localStorage.getItem("arcwear_theme") === "dark";
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleTheme = () => {
+    setDarkMode(prev => {
+      const next = !prev;
+      try { localStorage.setItem("arcwear_theme", next ? "dark" : "light"); } catch {}
+      return next;
+    });
+  };
   const [editItem, setEditItem] = useState(null);
   const [approvalOpen, setApprovalOpen] = useState(false);
   const [approvalAmount, setApprovalAmount] = useState(500);
@@ -3178,7 +3013,7 @@ export default function ArcWear() {
   const displayCats = activeCat ? filteredCats.filter(([k]) => k === activeCat) : filteredCats;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#fff", fontFamily: "var(--font-sans)" }}>
+    <div data-theme={darkMode ? "dark" : "light"} style={{ minHeight: "100vh", background: "var(--color-bg)", fontFamily: "var(--font-sans)", colorScheme: darkMode ? "dark" : "light" }}>
 
       {/* ── TOP BAR ── */}
       <div style={{ background: "#1c1917", padding: "6px 0", textAlign: "center", overflow: "hidden", whiteSpace: "nowrap" }}>
@@ -3192,16 +3027,18 @@ export default function ArcWear() {
         aria-label="Main navigation"
         style={{
           position: "sticky", top: 0, zIndex: 900,
-          background: scrolled ? "rgba(255,255,255,0.97)" : "#fff",
+          background: scrolled
+            ? (darkMode ? "rgba(15,14,13,0.97)" : "rgba(255,255,255,0.97)")
+            : "var(--color-bg)",
           backdropFilter: scrolled ? "blur(12px)" : "none",
-          borderBottom: "1px solid #e7e4e0",
+          borderBottom: "1px solid var(--color-border)",
           boxShadow: scrolled ? "0 2px 16px rgba(0,0,0,0.06)" : "none",
           transition: "all .3s",
         }}
       >
         <div
           className="nav-wrap"
-          style={{ maxWidth: "100%", padding: "0 3%", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}
+          style={{ maxWidth: "100%", padding: "0 2%", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}
         >
           {/* Logo */}
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
@@ -3220,23 +3057,19 @@ export default function ArcWear() {
             aria-label="Shop by gender"
             style={{ gap: 0, background: "#f5f3f0", borderRadius: 6, padding: 3, border: "1px solid #e7e4e0" }}
           >
-            {["men", "women", "children"].map(k => {
+            {Object.keys(CATALOGUE).map(k => {
               const s = CATALOGUE[k];
               const isActive = section === k;
               return (
                 <button
                   key={k}
                   role="tab"
+                  className="nav-tab-btn"
                   aria-selected={isActive}
                   onClick={() => { setSection(k); setActiveCat(null); }}
                   style={{
                     background: isActive ? "#1c1917" : "transparent",
                     color: isActive ? "#fff" : "#78716c",
-                    border: "none", cursor: "pointer",
-                    padding: "7px 18px", borderRadius: 4,
-                    fontSize: 12, fontWeight: 600,
-                    transition: "all .2s",
-                    display: "flex", alignItems: "center", gap: 5,
                   }}
                   onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = "#e7e4e0"; e.currentTarget.style.color = "#1c1917"; } }}
                   onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#78716c"; } }}
@@ -3248,28 +3081,27 @@ export default function ArcWear() {
           </div>
 
           {/* Desktop search bar */}
-          <div className="desktop-only search-bar-wrap" style={{ flex: 1, maxWidth: 320, margin: "0 16px" }}>
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Search products, categories.."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                style={{ background: "none", border: "none", cursor: "pointer", padding: "0 10px 0 0", fontSize: 13, color: "#a8a29e" }}
-                aria-label="Clear search"
-              >
-                ✕
-              </button>
-            )}
-          </div>
+          {/* Search bar removed from navbar */}
 
           {/* Actions */}
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
 
+            {/* Dark / Light mode toggle */}
+            <button
+              onClick={toggleTheme}
+              className={`theme-toggle-btn${darkMode ? " dark" : ""}`}
+              aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+              aria-pressed={darkMode}
+              title={darkMode ? "Light mode" : "Dark mode"}
+            >
+              <span className="theme-toggle-btn__track">
+                <span aria-hidden="true">☀️</span>
+                <span aria-hidden="true">🌙</span>
+              </span>
+              <span className="theme-toggle-btn__knob" aria-hidden="true">
+                {darkMode ? "🌙" : "☀️"}
+              </span>
+            </button>
 
 
             {/* Wallet chip / connect button */}
@@ -3384,14 +3216,7 @@ export default function ArcWear() {
             ) : (
               <button
                 onClick={connectWallet}
-                className="desktop-only"
-                style={{
-                  background: "#fff", color: "#1c1917",
-                  border: "1px solid #e7e4e0", borderRadius: 4,
-                  padding: "5px 11px", fontSize: 10, fontWeight: 600,
-                  cursor: "pointer", display: "flex", alignItems: "center", gap: 4,
-                  transition: "all .2s",
-                }}
+                className="desktop-only nav-action-btn"
                 onMouseEnter={e => { e.currentTarget.style.background = "#7c4a1a"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#7c4a1a"; }}
                 onMouseLeave={e => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.color = "#1c1917"; e.currentTarget.style.borderColor = "#e7e4e0"; }}
               >
@@ -3402,15 +3227,8 @@ export default function ArcWear() {
             {/* Wishlist button */}
             <button
               onClick={() => setWishlistOpen(true)}
-              className="desktop-only"
+              className="desktop-only nav-action-btn"
               aria-label={`Open wishlist — ${wishlist.length} items`}
-              style={{
-                background: "#fff", color: "#1c1917",
-                border: "1px solid #e7e4e0", borderRadius: 4,
-                padding: "5px 12px", fontSize: 10, fontWeight: 700,
-                cursor: "pointer", display: "flex", alignItems: "center", gap: 5,
-                transition: "all .2s",
-              }}
               onMouseEnter={e => { e.currentTarget.style.background = "#f5f3f0"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "#fff"; }}
             >
@@ -3425,15 +3243,8 @@ export default function ArcWear() {
             {/* Order History button */}
             <button
               onClick={() => setOrdersOpen(true)}
-              className="desktop-only"
+              className="desktop-only nav-action-btn"
               aria-label={`Open order history — ${orders.length} orders`}
-              style={{
-                background: "#fff", color: "#1c1917",
-                border: "1px solid #e7e4e0", borderRadius: 4,
-                padding: "5px 12px", fontSize: 10, fontWeight: 700,
-                cursor: "pointer", display: "flex", alignItems: "center", gap: 5,
-                transition: "all .2s",
-              }}
               onMouseEnter={e => { e.currentTarget.style.background = "#f5f3f0"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "#fff"; }}
             >
@@ -3449,14 +3260,8 @@ export default function ArcWear() {
             <button
               id="desktop-cart-btn"
               onClick={() => setCartOpen(true)}
+              className="nav-action-btn cart-btn-accent"
               aria-label={`Open cart — ${cartCount} item${cartCount !== 1 ? "s" : ""}`}
-              style={{
-                background: "#f97316", color: "#fff",
-                border: "1px solid #f97316", borderRadius: 4,
-                padding: "5px 12px", fontSize: 10, fontWeight: 700,
-                cursor: "pointer", display: "flex", alignItems: "center", gap: 5,
-                transition: "all .2s",
-              }}
               onMouseEnter={e => { e.currentTarget.style.background = "#7c4a1a"; e.currentTarget.style.borderColor = "#7c4a1a"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "#f97316"; e.currentTarget.style.borderColor = "#f97316"; }}
             >
@@ -3477,7 +3282,7 @@ export default function ArcWear() {
           aria-label="Shop by gender"
           style={{ display: "none", gap: 6, overflowX: "auto", padding: "8px 12px 10px", borderTop: "1px solid #f0ede8" }}
         >
-          {["men", "women", "children"].map(k => {
+          {Object.keys(CATALOGUE).map(k => {
             const s = CATALOGUE[k];
             const isActive = section === k;
             return (
@@ -3541,6 +3346,63 @@ export default function ArcWear() {
                   Browse ↓
                 </button>
               </div>
+
+              {/* Prominent Search Bar */}
+              <div style={{
+                display: "flex",
+                width: "100%",
+                maxWidth: 480,
+                marginTop: 24,
+                background: darkMode ? "#1c1917" : "#fff",
+                borderRadius: 10,
+                overflow: "hidden",
+                border: `1px solid ${darkMode ? "#292524" : "#e7e4e0"}`,
+                boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
+              }}>
+                <input
+                  type="text"
+                  placeholder="Search products, brands, specs..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  style={{
+                    flex: 1,
+                    border: "none",
+                    outline: "none",
+                    padding: "12px 16px",
+                    fontSize: 13,
+                    color: "var(--color-ink)",
+                    background: "transparent",
+                  }}
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: "0 12px", fontSize: 14, color: "#a8a29e" }}
+                    aria-label="Clear search"
+                  >
+                    ✕
+                  </button>
+                )}
+                <button
+                  onClick={() => document.getElementById("products")?.scrollIntoView({ behavior: "smooth" })}
+                  style={{
+                    background: "#f97316",
+                    color: "#fff",
+                    border: "none",
+                    padding: "0 24px",
+                    cursor: "pointer",
+                    fontSize: 12,
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                    transition: "background 0.2s"
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = "#7c4a1a"}
+                  onMouseLeave={e => e.currentTarget.style.background = "#f97316"}
+                >
+                  Search
+                </button>
+              </div>
             </div>
 
             {/* Stats */}
@@ -3560,14 +3422,14 @@ export default function ArcWear() {
       <div
         role="navigation"
         aria-label="Category filter"
-        style={{ background: "#fff", borderBottom: "1px solid #e7e4e0", position: "sticky", top: 60, zIndex: 800 }}
+        style={{ background: "var(--color-bg)", borderBottom: "1px solid var(--color-border)", position: "sticky", top: 60, zIndex: 800 }}
       >
         <div
           className="filter-wrap"
           style={{ maxWidth: "100%", padding: "0 4%", height: 48, display: "flex", alignItems: "center", justifyContent: "space-between" }}
         >
           <div style={{ display: "flex", gap: 6, overflowX: "auto", padding: "4px 0" }} role="group" aria-label="Filter by category">
-            {[["all", "All"], ["shirts", "Shirts"], ["trousers", "Trousers"], ["belts", "Belts"], ["caps", "Headwear"], ["shoes", "Footwear"]].map(([k, label]) => {
+            {[["all", "All"], ...cats.map(([k, c]) => [k, c.label])].map(([k, label]) => {
               const isActive = (k === "all" && !activeCat) || activeCat === k;
               return (
                 <button
@@ -3591,10 +3453,10 @@ export default function ArcWear() {
                 value={minPrice}
                 onChange={e => setMinPrice(e.target.value)}
                 style={{
-                  width: 56, height: 28, background: "#faf9f7",
-                  border: "1px solid #e7e4e0", borderRadius: 4,
+                  width: 56, height: 28, background: "var(--color-surface)",
+                  border: "1px solid var(--color-border)", borderRadius: 4,
                   padding: "0 6px", outline: "none", fontSize: 11,
-                  fontFamily: "var(--font-mono)",
+                  fontFamily: "var(--font-mono)", color: "var(--color-ink)",
                 }}
               />
               <span>–</span>
@@ -3604,10 +3466,10 @@ export default function ArcWear() {
                 value={maxPrice}
                 onChange={e => setMaxPrice(e.target.value)}
                 style={{
-                  width: 56, height: 28, background: "#faf9f7",
-                  border: "1px solid #e7e4e0", borderRadius: 4,
+                  width: 56, height: 28, background: "var(--color-surface)",
+                  border: "1px solid var(--color-border)", borderRadius: 4,
                   padding: "0 6px", outline: "none", fontSize: 11,
-                  fontFamily: "var(--font-mono)",
+                  fontFamily: "var(--font-mono)", color: "var(--color-ink)",
                 }}
               />
             </div>
@@ -3617,10 +3479,10 @@ export default function ArcWear() {
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
               style={{
-                height: 28, background: "#faf9f7",
-                border: "1px solid #e7e4e0", borderRadius: 4,
+                height: 28, background: "var(--color-surface)",
+                border: "1px solid var(--color-border)", borderRadius: 4,
                 padding: "0 8px", outline: "none", fontSize: 11,
-                color: "#44403c", fontWeight: 600, cursor: "pointer"
+                color: "var(--color-ink-mid)", fontWeight: 600, cursor: "pointer"
               }}
             >
               <option value="default">Default Sort</option>
@@ -3640,12 +3502,12 @@ export default function ArcWear() {
         {displayCats.length === 0 ? (
           <div style={{ textAlign: "center", padding: "80px 20px" }}>
             <p style={{ fontSize: 48, marginBottom: 12 }}>🔍</p>
-            <h3 style={{ fontSize: 19, fontWeight: 700, color: "#1c1917", marginBottom: 6 }}>No products found</h3>
+            <h3 style={{ fontSize: 19, fontWeight: 700, color: "var(--color-ink)", marginBottom: 6 }}>No products found</h3>
             <p style={{ fontSize: 14, color: "#78716c" }}>Try checking your spelling or clearing filters.</p>
             <button
               onClick={() => { setSearchQuery(""); setMinPrice(""); setMaxPrice(""); setActiveCat(null); }}
               style={{
-                marginTop: 16, background: "#1c1917", color: "#fff",
+                marginTop: 16, background: "var(--color-ink)", color: "var(--color-bg)",
                 border: "none", borderRadius: 8, padding: "8px 20px",
                 fontSize: 12, fontWeight: 700, cursor: "pointer",
                 letterSpacing: 1, textTransform: "uppercase"
@@ -3654,30 +3516,99 @@ export default function ArcWear() {
               Reset Filters
             </button>
           </div>
-        ) : displayCats.map(([catKey, cat]) => (
-          <section key={catKey} style={{ marginBottom: 36 }}>
-            <div className="section-header section-header">
-              <span style={{ fontSize: 22 }} aria-hidden="true">{cat.emoji}</span>
-              <h2 className="section-header__title">{cat.label}</h2>
-              <div className="section-header__divider" aria-hidden="true" />
-              <span className="section-header__count">{cat.items.length} products</span>
-            </div>
-            <div className="product-grid" key={`${section}-${activeCat}-${catKey}`}>
-              {cat.items.map(item => (
-                <ProductCard
-                  key={item.id}
-                  item={{ ...item, categoryLabel: cat.label, sectionLabel: sec.label }}
-                  onAdd={addToCart}
-                  onEdit={setEditItem}
-                  onViewDetail={(i) => setDetailItem({ ...i, categoryLabel: cat.label, sectionLabel: sec.label })}
-                  agentPick={false}
-                  wishlist={wishlist}
-                  onToggleWishlist={toggleWishlist}
-                />
-              ))}
-            </div>
-          </section>
-        ))}
+        ) : displayCats.map(([catKey, cat]) => {
+          if (section === "fashion") {
+            const groups = [
+              {
+                id: "men",
+                label: "Men's Collection",
+                emoji: "🤵",
+                items: cat.items.filter(item => item.id.startsWith("m-")),
+              },
+              {
+                id: "women",
+                label: "Women's Collection",
+                emoji: "💃",
+                items: cat.items.filter(item => item.id.startsWith("w-")),
+              },
+              {
+                id: "kids",
+                label: "Kids' & Children's",
+                emoji: "🧸",
+                items: cat.items.filter(item => item.id.startsWith("k-")),
+              },
+            ].filter(g => g.items.length > 0);
+
+            return (
+              <section key={catKey} style={{ marginBottom: 44 }}>
+                <div className="section-header" style={{ marginBottom: 20 }}>
+                  <span style={{ fontSize: 22 }} aria-hidden="true">{cat.emoji}</span>
+                  <h2 className="section-header__title">{cat.label}</h2>
+                  <div className="section-header__divider" aria-hidden="true" />
+                  <span className="section-header__count">{cat.items.length} products</span>
+                </div>
+
+                {groups.map(group => (
+                  <div key={group.id} style={{ marginBottom: 28 }}>
+                    <h3 style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      letterSpacing: "1.5px",
+                      textTransform: "uppercase",
+                      color: "var(--color-ink-muted)",
+                      marginTop: 16,
+                      marginBottom: 12,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6
+                    }}>
+                      <span style={{ fontSize: 16 }}>{group.emoji}</span> {group.label}
+                    </h3>
+                    <div className="product-grid" key={`${section}-${activeCat}-${catKey}-${group.id}`}>
+                      {group.items.map(item => (
+                        <ProductCard
+                          key={item.id}
+                          item={{ ...item, categoryLabel: cat.label, sectionLabel: sec.label }}
+                          onAdd={addToCart}
+                          onEdit={setEditItem}
+                          onViewDetail={(i) => setDetailItem({ ...i, categoryLabel: cat.label, sectionLabel: sec.label })}
+                          agentPick={false}
+                          wishlist={wishlist}
+                          onToggleWishlist={toggleWishlist}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </section>
+            );
+          }
+
+          return (
+            <section key={catKey} style={{ marginBottom: 36 }}>
+              <div className="section-header section-header">
+                <span style={{ fontSize: 22 }} aria-hidden="true">{cat.emoji}</span>
+                <h2 className="section-header__title">{cat.label}</h2>
+                <div className="section-header__divider" aria-hidden="true" />
+                <span className="section-header__count">{cat.items.length} products</span>
+              </div>
+              <div className="product-grid" key={`${section}-${activeCat}-${catKey}`}>
+                {cat.items.map(item => (
+                  <ProductCard
+                    key={item.id}
+                    item={{ ...item, categoryLabel: cat.label, sectionLabel: sec.label }}
+                    onAdd={addToCart}
+                    onEdit={setEditItem}
+                    onViewDetail={(i) => setDetailItem({ ...i, categoryLabel: cat.label, sectionLabel: sec.label })}
+                    agentPick={false}
+                    wishlist={wishlist}
+                    onToggleWishlist={toggleWishlist}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })}
 
         {/* Combined Footer & Blockchain Banner */}
         <CombinedFooter addToast={addToast} />
