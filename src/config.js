@@ -7,7 +7,7 @@ export const ARC_CHAIN_CONFIG = {
   blockExplorerUrls: ["https://testnet.arcscan.app"],
 };
 export const USDC_ADDRESS   = "0x3600000000000000000000000000000000000000";
-export const MERCHANT_ADDR  = "0x627148dF4DE3b44Aa624e7592d3A47485777A6Bb";
+export const MERCHANT_ADDR  = "0xd515765a6c9b1c3f9a4df52f5326eea43ee42469";
 
 // Circle Agent Wallet — receives ERC-20 approve() from users (legacy flow),
 // then calls transferFrom() server-side to execute autonomous purchases.

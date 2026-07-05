@@ -15,7 +15,7 @@
 import crypto from "crypto";
 
 const USDC_ADDRESS  = "0x3600000000000000000000000000000000000000";
-const MERCHANT_ADDR = "0x627148dF4DE3b44Aa624e7592d3A47485777A6Bb";
+const MERCHANT_ADDR = "0xd515765a6c9b1c3f9a4df52f5326eea43ee42469";
 const AGENT_ADDRESS = process.env.CIRCLE_AGENT_ADDRESS || "0xc83e6b9a6aa46a09b1fb28c5bce7e8e74bacd488";
 const ARC_RPC       = "https://rpc.testnet.arc.network";
 const CIRCLE_BASE   = "https://api.circle.com/v1/w3s";
