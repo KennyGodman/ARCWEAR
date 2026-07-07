@@ -53,8 +53,9 @@ ArcWear runs on a custom **Arc L1 Testnet** architecture using the following spe
 | Asset / Contract | Contract Address |
 | :--- | :--- |
 | **USDC Stablecoin** | `0x3600000000000000000000000000000000000000` |
-| **Merchant Vault** | `0xd515765a6c9b1c3f9a4df52f5326eea43ee42469` |
-| **Memo Escrow Address** | `0x5294E9927c3306DcBaDb03fe70b92e01cCede505` |
+| **Merchant Vault** | `0xA5071Cc8d99777CbbcB2574E78B7659E3CF7316E` |
+| **AgenticCommerce Escrow** | `0x642Ae8983e31050387Ad5c0A45A7fdD53EB11ac7` |
+| **Memo Contract Address** | `0x5294E9927c3306DcBaDb03fe70b92e01cCede505` |
 
 ---
 

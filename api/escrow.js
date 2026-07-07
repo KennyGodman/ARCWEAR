@@ -22,11 +22,11 @@
 import crypto from "crypto";
 
 // ── Constants ──────────────────────────────────────────────────────────────────
-const USDC_ADDRESS    = "0x3600000000000000000000000000000000000000";
-const MERCHANT_ADDR   = process.env.MERCHANT_ADDRESS || "0xd515765a6c9b1c3f9a4df52f5326eea43ee42469";
-const ARC_RPC         = "https://rpc.testnet.arc.network";
-const CIRCLE_BASE     = "https://api.circle.com/v1/w3s";
-const MEMO_ADDRESS    = "0x5294E9927c3306DcBaDb03fe70b92e01cCede505";
+const USDC_ADDRESS = "0x3600000000000000000000000000000000000000";
+const MERCHANT_ADDR = process.env.MERCHANT_ADDRESS || "0xd515765a6c9b1c3f9a4df52f5326eea43ee42469";
+const ARC_RPC = "https://rpc.testnet.arc.network";
+const CIRCLE_BASE = "https://api.circle.com/v1/w3s";
+const MEMO_ADDRESS = "0x5294E9927c3306DcBaDb03fe70b92e01cCede505";
 
 // ── ABI / Hex Encoding Helpers for Memos ──────────────────────────────────────
 function padAddress(addr) {
@@ -57,7 +57,7 @@ function encodeMemoData(text) {
 
 // Loaded from env at runtime (set after contract deployment)
 const ESCROW_CONTRACT = () => process.env.ESCROW_CONTRACT_ADDRESS;
-const EVALUATOR_ADDR  = () => process.env.EVALUATOR_ADDRESS || process.env.CIRCLE_AGENT_ADDRESS;
+const EVALUATOR_ADDR = () => process.env.EVALUATOR_ADDRESS || process.env.CIRCLE_AGENT_ADDRESS;
 
 // 14-day expiry for all ArcWear escrow jobs
 const EXPIRY_SECONDS = 14 * 24 * 60 * 60;
@@ -105,13 +105,13 @@ async function callEscrowContract(fnSignature, params, apiKey, entitySecret, wal
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      idempotencyKey:         crypto.randomUUID(),
+      idempotencyKey: crypto.randomUUID(),
       entitySecretCiphertext: ciphertext,
       walletId,
-      contractAddress:        escrowAddr,
-      abiFunctionSignature:   fnSignature,
-      abiParameters:          params,
-      feeLevel:               "MEDIUM",
+      contractAddress: escrowAddr,
+      abiFunctionSignature: fnSignature,
+      abiParameters: params,
+      feeLevel: "MEDIUM",
     }),
   });
 
@@ -147,13 +147,13 @@ async function callFundOnBehalfWithMemo(jobId, client, expectedBudget, orderId, 
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      idempotencyKey:         crypto.randomUUID(),
+      idempotencyKey: crypto.randomUUID(),
       entitySecretCiphertext: ciphertext,
       walletId,
-      contractAddress:        MEMO_ADDRESS,
-      abiFunctionSignature:   "memo(address,bytes,bytes32,bytes)",
-      abiParameters:          [escrowAddr, innerData, memoId, memoData],
-      feeLevel:               "MEDIUM",
+      contractAddress: MEMO_ADDRESS,
+      abiFunctionSignature: "memo(address,bytes,bytes32,bytes)",
+      abiParameters: [escrowAddr, innerData, memoId, memoData],
+      feeLevel: "MEDIUM",
     }),
   });
 
@@ -175,11 +175,11 @@ async function callFundOnBehalfWithMemo(jobId, client, expectedBudget, orderId, 
 async function pollForHash(txId, apiKey, maxAttempts = 30, intervalMs = 2000) {
   for (let i = 0; i < maxAttempts; i++) {
     await new Promise((r) => setTimeout(r, intervalMs));
-    const res  = await fetch(`${CIRCLE_BASE}/transactions/${txId}`, {
+    const res = await fetch(`${CIRCLE_BASE}/transactions/${txId}`, {
       headers: { Authorization: `Bearer ${apiKey}` },
     });
     const body = await res.json();
-    const tx   = body.data?.transaction;
+    const tx = body.data?.transaction;
     if (!tx) continue;
     if (tx.txHash) return { txHash: tx.txHash, state: tx.state };
     if (tx.state === "FAILED" || tx.state === "CANCELLED") {
@@ -213,9 +213,9 @@ async function getOnChainJobStatus(jobId) {
   if (!escrowAddr) return null;
 
   // getJob(uint256) selector = keccak256("getJob(uint256)")[0..4]
-  const selector  = "bf22c457";
-  const jobIdHex  = BigInt(jobId).toString(16).padStart(64, "0");
-  const data      = "0x" + selector + jobIdHex;
+  const selector = "bf22c457";
+  const jobIdHex = BigInt(jobId).toString(16).padStart(64, "0");
+  const data = "0x" + selector + jobIdHex;
 
   try {
     const raw = await ethCall(escrowAddr, data);
@@ -224,8 +224,8 @@ async function getOnChainJobStatus(jobId) {
     // Decode the Job struct (simplified — read the status field at offset 6*32)
     // Job layout (packed 32-byte slots): client, provider, evaluator, token, budget, expiredAt, status, deliverable, completionReason
     const statusOffset = 6 * 64; // 7th field (0-indexed: 6), each 32 bytes = 64 hex chars
-    const statusHex    = raw.slice(2 + statusOffset, 2 + statusOffset + 64);
-    const statusNum    = parseInt(statusHex, 16);
+    const statusHex = raw.slice(2 + statusOffset, 2 + statusOffset + 64);
+    const statusNum = parseInt(statusHex, 16);
     const STATUS_NAMES = ["Open", "Funded", "Submitted", "Completed", "Rejected", "Expired"];
     return STATUS_NAMES[statusNum] ?? "Unknown";
   } catch {
@@ -335,10 +335,10 @@ async function parseJobIdFromReceipt(txHash) {
  * @returns {{ txHashes, jobId }} Transaction hashes and the job ID
  */
 async function executeEscrowFlow(userWallet, total, orderId, apiKey, entitySecret, walletId) {
-  const escrowAddr  = ESCROW_CONTRACT();
-  const evaluator   = EVALUATOR_ADDR();
-  const expiredAt   = Math.floor(Date.now() / 1000) + EXPIRY_SECONDS;
-  const budgetRaw   = Math.round(total * 1e6).toString(); // USDC 6 decimals
+  const escrowAddr = ESCROW_CONTRACT();
+  const evaluator = EVALUATOR_ADDR();
+  const expiredAt = Math.floor(Date.now() / 1000) + EXPIRY_SECONDS;
+  const budgetRaw = Math.round(total * 1e6).toString(); // USDC 6 decimals
   const description = `ArcWear Order ${orderId.slice(0, 8)}`;
 
   console.log(`[escrow] Starting ERC-8183 flow for ${userWallet}, ${total} USDC`);
@@ -390,9 +390,9 @@ async function executeEscrowFlow(userWallet, total, orderId, apiKey, entitySecre
   return {
     jobId,
     txHashes: {
-      create:   createTxHash,
-      fund:     fundTxHash,
-      submit:   submitTxHash,
+      create: createTxHash,
+      fund: fundTxHash,
+      submit: submitTxHash,
     },
     // The "primary" txHash for order records — the fund tx (when USDC moved)
     txHash: fundTxHash,
@@ -407,17 +407,17 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  const apiKey       = process.env.CIRCLE_API_KEY;
+  const apiKey = process.env.CIRCLE_API_KEY;
   const entitySecret = process.env.CIRCLE_ENTITY_SECRET;
-  const walletId     = process.env.CIRCLE_WALLET_ID;
+  const walletId = process.env.CIRCLE_WALLET_ID;
 
   if (!apiKey || !entitySecret || !walletId) {
     return res.status(500).json({
       error: "Circle credentials not configured",
       missing: [
-        !apiKey       && "CIRCLE_API_KEY",
+        !apiKey && "CIRCLE_API_KEY",
         !entitySecret && "CIRCLE_ENTITY_SECRET",
-        !walletId     && "CIRCLE_WALLET_ID",
+        !walletId && "CIRCLE_WALLET_ID",
       ].filter(Boolean),
     });
   }
