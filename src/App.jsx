@@ -1227,19 +1227,49 @@ function AgentChat({
         setMsgs(p => [...p, { role: "user", text: autoText }]);
 
         const c = cartRef.current;
+        const itemsTotal = c.reduce((s, i) => s + i.price * i.qty, 0);
+        const activeFulfillmentMethod = localStorage.getItem("arcwear_fulfillment_method") || fulfillmentMethod;
+        const activeDeliveryState = localStorage.getItem("arcwear_delivery_state") || deliveryState;
+        const activeDeliveryFee = activeFulfillmentMethod === "delivery" ? getDeliveryFee(activeDeliveryState) : 0;
+        const total = itemsTotal + activeDeliveryFee;
+
         try {
           addToast("🤖 Agent executing purchase...", "agent");
+          const activeFullName = localStorage.getItem("arcwear_delivery_fullname") || deliveryFullName;
+          const activePhone = localStorage.getItem("arcwear_delivery_phone") || deliveryPhone;
+          const activeAddressLine = localStorage.getItem("arcwear_delivery_address_line") || deliveryAddressLine;
+          const activeCity = localStorage.getItem("arcwear_delivery_city") || deliveryCity;
+          const activeNotes = localStorage.getItem("arcwear_delivery_notes") || deliveryNotes;
+          
+          const activeDeliveryAddress = activeFulfillmentMethod === "delivery" ? [
+            activeFullName && `Name: ${activeFullName}`,
+            activePhone && `Phone: ${activePhone}`,
+            activeAddressLine,
+            activeCity,
+            activeDeliveryState,
+            activeNotes && `Notes: ${activeNotes}`
+          ].filter(Boolean).join(", ") : null;
+
+          const activePickupLocation = activeFulfillmentMethod === "pickup" ? (localStorage.getItem("arcwear_pickup_location") || pickupLocation) : null;
+
           const res = await fetch("/api/agent-pay", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               userWallet: wallet,
-              items: c.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price })),
-              total: totalAmount,
+              items: c.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price, size: i.size, color: i.color })),
+              total,
               customerEmail,
-              fulfillmentMethod,
-              deliveryAddress: fulfillmentMethod === "delivery" ? deliveryAddress : null,
-              pickupLocation: fulfillmentMethod === "pickup" ? pickupLocation : null,
+              fulfillmentMethod: activeFulfillmentMethod,
+              deliveryAddress: activeDeliveryAddress,
+              pickupLocation: activePickupLocation,
+              deliveryFullName: activeFullName || null,
+              deliveryPhone: activePhone || null,
+              deliveryAddressLine: activeAddressLine || null,
+              deliveryCity: activeCity || null,
+              deliveryState: activeDeliveryState || null,
+              deliveryNotes: activeNotes || null,
+              deliveryFee: activeDeliveryFee
             }),
           });
           const data = await res.json();
@@ -1252,13 +1282,20 @@ function AgentChat({
             addToast(`❌ Agent purchase failed: ${errMsg}`, "error");
           } else {
             if (onSaveOrder) {
-              onSaveOrder(data.txHash, totalAmount, c, {
+              onSaveOrder(data.txHash, total, c, {
                 jobId: data.jobId,
                 escrowStatus: data.escrowStatus || "completed",
                 escrow: data.escrow,
-                fulfillmentMethod,
-                deliveryAddress: fulfillmentMethod === "delivery" ? deliveryAddress : null,
-                pickupLocation: fulfillmentMethod === "pickup" ? pickupLocation : null
+                fulfillmentMethod: activeFulfillmentMethod,
+                deliveryAddress: activeDeliveryAddress,
+                pickupLocation: activePickupLocation,
+                deliveryFullName: activeFullName || null,
+                deliveryPhone: activePhone || null,
+                deliveryAddressLine: activeAddressLine || null,
+                deliveryCity: activeCity || null,
+                deliveryState: activeDeliveryState || null,
+                deliveryNotes: activeNotes || null,
+                deliveryFee: activeDeliveryFee
               });
             }
             setCart([]);
@@ -1267,14 +1304,14 @@ function AgentChat({
             const successMsg = `✓ Purchase confirmed! I've autonomously executed the transaction via the escrow contract.
 
 Ordered: ${c.map(i => `${i.name} (x${i.qty})`).join(", ")}
-Total: ${totalAmount.toFixed(2)} USDC
+Total: ${total.toFixed(2)} USDC
 Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : ""}`;
             
             setMsgs(p => [...p, {
               role: "assistant",
               text: successMsg
             }]);
-            addToast(`✓ Agent purchased ${c.length} items for ${totalAmount.toFixed(2)} USDC!`, "success");
+            addToast(`✓ Agent purchased ${c.length} items for ${total.toFixed(2)} USDC!`, "success");
           }
         } catch (err) {
           const errMsg = err.message || "Unknown network error";
