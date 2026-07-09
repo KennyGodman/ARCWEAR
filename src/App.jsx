@@ -1009,6 +1009,14 @@ function AgentChat({
   const bottomRef = useRef(null);
   const waitingForApproval = useRef(false);
 
+  const getDeliveryFee = (st) => {
+    const s = (st || "").toLowerCase().trim();
+    if (s === "lagos") return 5.0;
+    if (s === "abuja") return 8.0;
+    if (s === "rivers") return 10.0;
+    return 6.0;
+  };
+
   const [voiceEnabled, setVoiceEnabled] = useState(() => {
     return localStorage.getItem("arcwear_agent_voice_enabled") === "true";
   });
