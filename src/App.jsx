@@ -1393,7 +1393,11 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
     if (name === "agent_checkout") {
       const c = cartRef.current;
       const itemsTotal = c.reduce((s, i) => s + i.price * i.qty, 0);
-      const total = itemsTotal + (fulfillmentMethod === "delivery" ? deliveryFee : 0);
+      const activeFulfillmentMethod = localStorage.getItem("arcwear_fulfillment_method") || fulfillmentMethod;
+      const activeDeliveryState = localStorage.getItem("arcwear_delivery_state") || deliveryState;
+      const activeDeliveryFee = activeFulfillmentMethod === "delivery" ? getDeliveryFee(activeDeliveryState) : 0;
+      const total = itemsTotal + activeDeliveryFee;
+
       if (c.length === 0) return { error: "Cart is empty" };
       if (!wallet) return { error: "No wallet connected. Ask user to connect wallet first." };
       if ((allowance || 0) < total) {
@@ -1405,6 +1409,23 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
       // Call the agent-pay backend
       try {
         addToast("🤖 Agent executing purchase...", "agent");
+        const activeFullName = localStorage.getItem("arcwear_delivery_fullname") || deliveryFullName;
+        const activePhone = localStorage.getItem("arcwear_delivery_phone") || deliveryPhone;
+        const activeAddressLine = localStorage.getItem("arcwear_delivery_address_line") || deliveryAddressLine;
+        const activeCity = localStorage.getItem("arcwear_delivery_city") || deliveryCity;
+        const activeNotes = localStorage.getItem("arcwear_delivery_notes") || deliveryNotes;
+        
+        const activeDeliveryAddress = activeFulfillmentMethod === "delivery" ? [
+          activeFullName && `Name: ${activeFullName}`,
+          activePhone && `Phone: ${activePhone}`,
+          activeAddressLine,
+          activeCity,
+          activeDeliveryState,
+          activeNotes && `Notes: ${activeNotes}`
+        ].filter(Boolean).join(", ") : null;
+
+        const activePickupLocation = activeFulfillmentMethod === "pickup" ? (localStorage.getItem("arcwear_pickup_location") || pickupLocation) : null;
+
         const res = await fetch("/api/agent-pay", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -1413,16 +1434,16 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
             items: c.map(i => ({ id: i.id, name: i.name, qty: i.qty, price: i.price, size: i.size, color: i.color })),
             total,
             customerEmail,
-            fulfillmentMethod,
-            deliveryAddress,
-            pickupLocation,
-            deliveryFullName,
-            deliveryPhone,
-            deliveryAddressLine,
-            deliveryCity,
-            deliveryState,
-            deliveryNotes,
-            deliveryFee
+            fulfillmentMethod: activeFulfillmentMethod,
+            deliveryAddress: activeDeliveryAddress,
+            pickupLocation: activePickupLocation,
+            deliveryFullName: activeFullName || null,
+            deliveryPhone: activePhone || null,
+            deliveryAddressLine: activeAddressLine || null,
+            deliveryCity: activeCity || null,
+            deliveryState: activeDeliveryState || null,
+            deliveryNotes: activeNotes || null,
+            deliveryFee: activeDeliveryFee
           }),
         });
         const data = await res.json();
@@ -1435,9 +1456,16 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
             jobId: data.jobId,
             escrowStatus: data.escrowStatus || "completed",
             escrow: data.escrow,
-            fulfillmentMethod,
-            deliveryAddress: fulfillmentMethod === "delivery" ? deliveryAddress : null,
-            pickupLocation: fulfillmentMethod === "pickup" ? pickupLocation : null
+            fulfillmentMethod: activeFulfillmentMethod,
+            deliveryAddress: activeDeliveryAddress,
+            pickupLocation: activePickupLocation,
+            deliveryFullName: activeFullName || null,
+            deliveryPhone: activePhone || null,
+            deliveryAddressLine: activeAddressLine || null,
+            deliveryCity: activeCity || null,
+            deliveryState: activeDeliveryState || null,
+            deliveryNotes: activeNotes || null,
+            deliveryFee: activeDeliveryFee
           });
         }
         setCart([]);
@@ -1550,7 +1578,16 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
         wallet,
         cart: cartRef.current,
         wishlist: ALL_PRODUCTS.filter(p => wishlistRef.current.includes(p.id)),
-        customerEmail
+        customerEmail,
+        fulfillmentMethod: localStorage.getItem("arcwear_fulfillment_method") || fulfillmentMethod,
+        pickupLocation: localStorage.getItem("arcwear_pickup_location") || pickupLocation,
+        deliveryFullName: localStorage.getItem("arcwear_delivery_fullname") || deliveryFullName,
+        deliveryPhone: localStorage.getItem("arcwear_delivery_phone") || deliveryPhone,
+        deliveryAddressLine: localStorage.getItem("arcwear_delivery_address_line") || deliveryAddressLine,
+        deliveryCity: localStorage.getItem("arcwear_delivery_city") || deliveryCity,
+        deliveryState: localStorage.getItem("arcwear_delivery_state") || deliveryState,
+        deliveryNotes: localStorage.getItem("arcwear_delivery_notes") || deliveryNotes,
+        deliveryFee: (localStorage.getItem("arcwear_fulfillment_method") || fulfillmentMethod) === "delivery" ? getDeliveryFee(localStorage.getItem("arcwear_delivery_state") || deliveryState) : 0
       }),
     });
     const data = await res.json();
