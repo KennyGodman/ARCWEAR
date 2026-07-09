@@ -3973,7 +3973,7 @@ export default function ArcWear() {
 
             {/* Stats */}
             <div className="hero-stats" style={{ gap: 20, flexWrap: "wrap" }}>
-              {[["5", "Categories"], ["25+", "Products"], ["USDC", "Payment"], ["Arc", "Blockchain"]].map(([v, l]) => (
+              {[["7", "Categories"], ["100+", "Products"], ["USDC", "Payment"], ["Arc", "Blockchain"]].map(([v, l]) => (
                 <div key={l} className="stat-item">
                   <p className="stat-item__value">{v}</p>
                   <p className="stat-item__label">{l}</p>
