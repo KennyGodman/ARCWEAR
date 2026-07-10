@@ -54,6 +54,33 @@ function encodeMemoData(text) {
   return "0x" + hex;
 }
 
+// Manually ABI-encode createJob so we can wrap it in the Memo contract
+function encodeCreateJob(client, provider, evaluator, token, budget, expiredAt, description) {
+  // selector: keccak256("createJob(address,address,address,address,uint256,uint256,string)")[0..4]
+  const selector = "c14c4e8f";
+  const descBytes = Buffer.from(description, "utf8");
+  const descHex   = descBytes.toString("hex");
+  const slot0     = padAddress(client);
+  const slot1     = padAddress(provider);
+  const slot2     = padAddress(evaluator);
+  const slot3     = padAddress(token);
+  const slot4     = padUint256(BigInt(budget));
+  const slot5     = padUint256(BigInt(expiredAt));
+  // offset to string data: 7 static slots × 32 bytes each = 224 bytes
+  const strOffset = padUint256(7 * 32);
+  const strLen    = padUint256(descBytes.length);
+  const strData   = descHex.padEnd(Math.ceil(descBytes.length / 32) * 64, "0");
+  return "0x" + selector + slot0 + slot1 + slot2 + slot3 + slot4 + slot5 + strOffset + strLen + strData;
+}
+
+// Manually ABI-encode submit(uint256,bytes32) for Memo wrapping
+function encodeSubmit(jobId, deliverableHex) {
+  // selector: keccak256("submit(uint256,bytes32)")[0..4]
+  const selector = "dac1f55b";
+  const clean = deliverableHex.replace("0x", "").padStart(64, "0");
+  return "0x" + selector + padUint256(BigInt(jobId)) + clean;
+}
+
 
 // Loaded from env at runtime (set after contract deployment)
 const ESCROW_CONTRACT = () => process.env.ESCROW_CONTRACT_ADDRESS;
@@ -154,6 +181,80 @@ async function callFundOnBehalfWithMemo(jobId, client, expectedBudget, orderId, 
       abiFunctionSignature: "memo(address,bytes,bytes32,bytes)",
       abiParameters: [escrowAddr, innerData, memoId, memoData],
       feeLevel: "MEDIUM",
+    }),
+  });
+
+  const body = await res.json();
+  if (!res.ok) {
+    const msg = body.message || body.errors?.[0]?.message || `Circle API ${res.status}`;
+    throw new Error(msg);
+  }
+
+  const txId = body.data?.id;
+  if (!txId) throw new Error("Circle returned no transaction ID");
+  return txId;
+}
+
+/**
+ * Call createJob on the escrow contract wrapped in the Memo contract.
+ */
+async function callCreateJobWithMemo(client, provider, evaluator, token, budget, expiredAt, description, orderId, apiKey, entitySecret, walletId) {
+  const escrowAddr = ESCROW_CONTRACT();
+  if (!escrowAddr) throw new Error("ESCROW_CONTRACT_ADDRESS not set in env");
+
+  const ciphertext = await buildCiphertext(apiKey, entitySecret);
+  const innerData  = encodeCreateJob(client, provider, evaluator, token, budget, expiredAt, description);
+  const memoId     = encodeMemoId(orderId);
+  const memoData   = encodeMemoData("ArcWear Order");
+
+  const res = await fetch(`${CIRCLE_BASE}/developer/transactions/contractExecution`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      idempotencyKey:         crypto.randomUUID(),
+      entitySecretCiphertext: ciphertext,
+      walletId,
+      contractAddress:        MEMO_ADDRESS,
+      abiFunctionSignature:   "memo(address,bytes,bytes32,bytes)",
+      abiParameters:          [escrowAddr, innerData, memoId, memoData],
+      feeLevel:               "MEDIUM",
+    }),
+  });
+
+  const body = await res.json();
+  if (!res.ok) {
+    const msg = body.message || body.errors?.[0]?.message || `Circle API ${res.status}`;
+    throw new Error(msg);
+  }
+
+  const txId = body.data?.id;
+  if (!txId) throw new Error("Circle returned no transaction ID");
+  return txId;
+}
+
+/**
+ * Call submit on the escrow contract wrapped in the Memo contract.
+ */
+async function callSubmitWithMemo(jobId, deliverableHex, orderId, apiKey, entitySecret, walletId) {
+  const escrowAddr = ESCROW_CONTRACT();
+  if (!escrowAddr) throw new Error("ESCROW_CONTRACT_ADDRESS not set in env");
+
+  const ciphertext = await buildCiphertext(apiKey, entitySecret);
+  const innerData  = encodeSubmit(jobId, deliverableHex);
+  const memoId     = encodeMemoId(orderId);
+  const memoData   = encodeMemoData("ArcWear Order");
+
+  const res = await fetch(`${CIRCLE_BASE}/developer/transactions/contractExecution`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      idempotencyKey:         crypto.randomUUID(),
+      entitySecretCiphertext: ciphertext,
+      walletId,
+      contractAddress:        MEMO_ADDRESS,
+      abiFunctionSignature:   "memo(address,bytes,bytes32,bytes)",
+      abiParameters:          [escrowAddr, innerData, memoId, memoData],
+      feeLevel:               "MEDIUM",
     }),
   });
 
@@ -345,10 +446,9 @@ async function executeEscrowFlow(userWallet, total, orderId, apiKey, entitySecre
   console.log(`[escrow] Contract: ${escrowAddr}, Evaluator: ${evaluator}`);
 
   // ── Step 1: createJob ─────────────────────────────────────────────────────
-  console.log("[escrow] Step 1: createJob()");
-  const createTxId = await callEscrowContract(
-    "createJob(address,address,address,address,uint256,uint256,string)",
-    [userWallet, MERCHANT_ADDR, evaluator, USDC_ADDRESS, budgetRaw, expiredAt.toString(), description],
+  console.log("[escrow] Step 1: createJob() with memo");
+  const createTxId = await callCreateJobWithMemo(
+    userWallet, MERCHANT_ADDR, evaluator, USDC_ADDRESS, budgetRaw, expiredAt.toString(), description, orderId,
     apiKey, entitySecret, walletId
   );
   const { txHash: createTxHash } = await pollForHash(createTxId, apiKey);
@@ -378,10 +478,9 @@ async function executeEscrowFlow(userWallet, total, orderId, apiKey, entitySecre
     .update(orderId)
     .digest("hex");
 
-  console.log(`[escrow] Step 3: submit(jobId=${jobId}, deliverable=${deliverableHex.slice(0, 10)}...)`);
-  const submitTxId = await callEscrowContract(
-    "submit(uint256,bytes32)",
-    [jobId.toString(), deliverableHex],
+  console.log(`[escrow] Step 3: submit(jobId=${jobId}, deliverable=${deliverableHex.slice(0, 10)}...) with memo`);
+  const submitTxId = await callSubmitWithMemo(
+    jobId, deliverableHex, orderId,
     apiKey, entitySecret, walletId
   );
   const { txHash: submitTxHash } = await pollForHash(submitTxId, apiKey);
