@@ -57,7 +57,7 @@ function encodeMemoData(text) {
 // Manually ABI-encode createJob so we can wrap it in the Memo contract
 function encodeCreateJob(client, provider, evaluator, token, budget, expiredAt, description) {
   // selector: keccak256("createJob(address,address,address,address,uint256,uint256,string)")[0..4]
-  const selector = "c14c4e8f";
+  const selector = "35dda8f6";
   const descBytes = Buffer.from(description, "utf8");
   const descHex   = descBytes.toString("hex");
   const slot0     = padAddress(client);
@@ -76,7 +76,7 @@ function encodeCreateJob(client, provider, evaluator, token, budget, expiredAt, 
 // Manually ABI-encode submit(uint256,bytes32) for Memo wrapping
 function encodeSubmit(jobId, deliverableHex) {
   // selector: keccak256("submit(uint256,bytes32)")[0..4]
-  const selector = "dac1f55b";
+  const selector = "2ecea788";
   const clean = deliverableHex.replace("0x", "").padStart(64, "0");
   return "0x" + selector + padUint256(BigInt(jobId)) + clean;
 }
