@@ -10,7 +10,7 @@ Write-Host "Logo base64 length: $($b64.Length) chars"
 # ── 1. Update send-confirmation.js ──────────────────────────
 $apiFile = "c:\Users\HP\Documents\ARCWEAR\api\send-confirmation.js"
 $apiContent = Get-Content $apiFile -Raw
-$oldSrc = 'src="https://swift-cart.vercel.app/swiftcart.jpg"'
+$oldSrc = 'src="https://swiftcart-shop.vercel.app/swiftcart.jpg"'
 $newSrc = 'src="' + $dataUri + '"'
 $apiContent = $apiContent -replace [regex]::Escape($oldSrc), $newSrc
 Set-Content $apiFile -Value $apiContent -NoNewline
