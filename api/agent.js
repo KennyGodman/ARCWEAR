@@ -181,9 +181,8 @@ TOOL CALLS:
     // Call Groq API with fallback and retry logic
     const candidateModels = [
       "llama-3.3-70b-versatile",
-      "qwen/qwen3.6-27b",
       "llama-3.1-8b-instant",
-      "mixtral-8x7b-32768"
+      "qwen/qwen3.6-27b"
     ];
 
     let lastError = null;
@@ -220,12 +219,17 @@ TOOL CALLS:
             const errorMsg = data.error?.message || `Model ${model} rate limited (429)`;
             console.warn(`[agent] Model ${model} rate limited (429). Details: ${errorMsg}. Falling back to next model.`);
             lastError = new Error(errorMsg);
-            await new Promise(r => setTimeout(r, 500));
+            await new Promise(r => setTimeout(r, 600));
             break; // Break retry loop to try next model immediately
           }
 
           if (!response.ok) {
-            throw new Error(data.error?.message || `API error (${response.status})`);
+            const errMsg = data.error?.message || `API error (${response.status})`;
+            if (errMsg.toLowerCase().includes("decommissioned")) {
+              console.warn(`[agent] Model ${model} is decommissioned. Skipping.`);
+              break;
+            }
+            throw new Error(errMsg);
           }
 
           modelSucceeded = true;
