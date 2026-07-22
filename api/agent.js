@@ -74,16 +74,16 @@ CURRENT USER STATUS:
   - Notes: ${deliveryNotes || "None"}
   - Delivery Fee: ${deliveryFee ? `${deliveryFee} USDC` : "0.00 USDC"}
 
-CHECKOUT FLOW (AGENT-ONLY, NO MANUAL CHECKOUT):
-All purchases must go through the autonomous agent path. Never call 'initiate_checkout'.
-1. Check pre-approved USDC Allowance.
-   - If allowance >= cart total: immediately call 'agent_checkout' to execute purchase. No wallet popup.
-   - If allowance < cart total: immediately call 'request_approval' with cart total or 500 USDC. Call the tool directly so the modal appears.
-2. NEVER call 'initiate_checkout' or 'check_allowance'.
+CHECKOUT FLOW:
+When the user asks to checkout, buy, or pay:
+1. If Connected Wallet is "Not Connected": call 'request_approval' or 'initiate_checkout' to open the approval modal and ask the user to connect their wallet.
+2. If Connected Wallet is connected:
+   - If pre-approved USDC Allowance >= cart total: immediately call 'agent_checkout' to execute purchase autonomously. No manual steps needed.
+   - If pre-approved USDC Allowance < cart total: immediately call 'request_approval' (amount: cart total or 500 USDC) or 'initiate_checkout' so the approval modal pops up immediately.
 3. When 'agent_checkout' completes successfully, you MUST confirm the purchase in your response text in this exact format:
 ✓ Purchase confirmed! I've autonomously executed the transaction via the escrow contract.
 
-Ordered: [List of items ordered with quantities, e.g. Dino Print Tee (x1)]
+Ordered: [List of items ordered with quantities]
 Total: [Total amount including delivery fee] USDC
 Transaction Hash: [txHash returned by the tool]
 

@@ -81,7 +81,7 @@ const AGENT_TOOLS = [
   },
   {
     name: "initiate_checkout",
-    description: "DISABLED — do not use. All checkouts must go through agent_checkout.",
+    description: "Open the interactive checkout modal or trigger checkout for the user. Call this or request_approval when user says 'checkout', 'buy', or 'pay'.",
     input_schema: { type: "object", properties: {} },
   },
   // ── Autonomous Agent Tools ──
@@ -1629,10 +1629,8 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
       setTools([]);
       return "I reached the maximum number of steps. Please try again or break your request into smaller steps.";
     }
-    // Only send tools that the agent can use given current state (initiate_checkout excluded — agent path only)
-    const availableTools = wallet
-      ? AGENT_TOOLS.filter(t => t.name !== "initiate_checkout")
-      : AGENT_TOOLS.filter(t => !["initiate_checkout", "check_allowance", "request_approval", "agent_checkout"].includes(t.name));
+    // Send all tools so the agent can execute any checkout, approval, or search action
+    const availableTools = AGENT_TOOLS;
     const res = await fetch("/api/agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -1695,7 +1693,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
         }
         if (b.name === "initiate_checkout") {
           isBlocking = true;
-          blockingMsg = text || "I have opened the checkout flow for you. Please review your details and confirm the transaction in your wallet.";
+          blockingMsg = text || "I have opened the checkout modal for you. Please approve the spending limit or confirm your order!";
         }
       }
 
@@ -1707,21 +1705,33 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
       return runAgent([...apiMsgs, { role: "assistant", content: data.content }, { role: "user", content: results }], depth + 1);
     }
 
-    // Fail-safe: if the agent explains it's going to request approval but forgot the tool call
+    // Fail-safe: if the user asked for checkout/buy/pay or agent mentioned allowance/approval
     const lowerText = text.toLowerCase();
+    const lastUserMsg = (apiMsgs[apiMsgs.length - 1]?.content || "").toLowerCase();
     if (
-      (lowerText.includes("allowance") || lowerText.includes("spending limit") || lowerText.includes("approve")) &&
-      (lowerText.includes("request") || lowerText.includes("popup") || lowerText.includes("pop up") || lowerText.includes("modal"))
+      lastUserMsg.includes("checkout") || lastUserMsg.includes("buy") || lastUserMsg.includes("pay") ||
+      ((lowerText.includes("allowance") || lowerText.includes("spending limit") || lowerText.includes("approve")) &&
+       (lowerText.includes("request") || lowerText.includes("popup") || lowerText.includes("pop up") || lowerText.includes("modal")))
     ) {
       const totalAmount = cartRef.current.reduce((s, i) => s + i.price * i.qty, 0);
-      if (totalAmount > 0 && allowance < totalAmount) {
-        console.log("[runAgent] Fail-safe: Triggering request_approval from text response");
+      if (totalAmount > 0) {
+        if (allowance >= totalAmount && wallet) {
+          console.log("[runAgent] Fail-safe: Triggering agent_checkout directly");
+          const execRes = await exec("agent_checkout", {});
+          if (execRes.success && execRes.txHash) {
+            setTools([]);
+            return `✓ Purchase confirmed! I've autonomously executed the transaction via the escrow contract.\n\nOrdered: ${cartRef.current.map(i => `${i.name} (x${i.qty})`).join(", ")}\nTotal: ${execRes.total} USDC\nTransaction Hash: ${execRes.txHash}`;
+          }
+        }
+        console.log("[runAgent] Fail-safe: Triggering request_approval / checkout modal");
         waitingForApproval.current = true;
         if (onRequestApproval) {
           onRequestApproval(totalAmount || 500);
+        } else {
+          setTimeout(() => setCheckoutOpen(true), 400);
         }
         setTools([]);
-        return text || `I have popped up the Agent Approval modal for ${totalAmount} USDC. Please approve the spending limit in your wallet to enable instant agent checkout!`;
+        return text || `I have popped up the Agent Approval modal for ${totalAmount.toFixed(2)} USDC. Please approve the spending limit in your wallet to complete checkout!`;
       }
     }
 
