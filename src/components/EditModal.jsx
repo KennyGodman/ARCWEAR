@@ -32,8 +32,8 @@ export default function EditModal({ item, onClose, onSave }) {
             />
           </div>
           <div style={{ flex: 1 }}>
-            <p style={{ fontSize: 17, fontWeight: 600, color: "#1c1917", margin: 0, lineHeight: 1.3 }}>{item.name}</p>
-            <p style={{ fontFamily: "var(--font-mono)", fontSize: 15, color: "#c47d2a", margin: "4px 0 0" }}>{fmt(item.price)}</p>
+            <p style={{ fontSize: 17, fontWeight: 600, color: "#0f172a", margin: 0, lineHeight: 1.3 }}>{item.name}</p>
+            <p style={{ fontFamily: "var(--font-mono)", fontSize: 15, color: "#2563eb", margin: "4px 0 0" }}>{fmt(item.price)}</p>
           </div>
           <button className="btn-icon" onClick={onClose} aria-label="Close">✕</button>
         </div>
@@ -88,10 +88,11 @@ export default function EditModal({ item, onClose, onSave }) {
             onClick={handleSave}
             style={{
               width: "100%",
-              background: added ? "hsl(158, 65%, 38%)" : "#1c1917",
+              background: added ? "#10b981" : "#2563eb",
               color: "#fff", border: "none", borderRadius: 10,
               padding: "13px", fontSize: 14, fontWeight: 700,
               cursor: "pointer", letterSpacing: 1.5, textTransform: "uppercase",
+              boxShadow: "0 4px 14px rgba(37, 99, 235, 0.3)",
               transition: "all .25s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
               transform: added ? "scale(0.96)" : "scale(1)",
             }}

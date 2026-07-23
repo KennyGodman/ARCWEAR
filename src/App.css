@@ -27,28 +27,28 @@
   padding: 11px 22px;
 }
 .btn-primary:hover {
-  background: #7c4a1a;
-  border-color: #7c4a1a;
+  background: #1d4ed8;
+  border-color: #1d4ed8;
 }
 
 .btn-secondary {
   background: #fff;
-  color: var(--color-ink);
-  border: 1px solid var(--color-border);
+  color: #2563eb;
+  border: 1.5px solid #2563eb;
   padding: 11px 22px;
 }
 .btn-secondary:hover {
-  background: var(--color-surface);
+  background: #eff6ff;
 }
 
 .btn-ghost {
   background: transparent;
-  color: #d4cfc8;
-  border: 1px solid #44403c;
+  color: #94a3b8;
+  border: 1px solid #334155;
   padding: 11px 22px;
 }
 .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(37, 99, 235, 0.08);
 }
 
 .btn-icon {
@@ -90,12 +90,12 @@
 }
 
 .badge-tool {
-  background: #fef3c7;
-  border: 1px solid #fde68a;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
   border-radius: var(--radius-full);
   padding: 2px 9px;
   font-size: 10px;
-  color: #92400e;
+  color: #1d4ed8;
 }
 
 /* ── Cards ── */
@@ -108,7 +108,7 @@
 
 .card-dark {
   background: var(--color-ink);
-  border: 1px solid #292524;
+  border: 1px solid #1e293b;
   border-radius: var(--radius-lg);
 }
 
@@ -153,8 +153,8 @@
   transition: var(--transition-fast);
 }
 .option-btn.active {
-  border-color: var(--color-ink);
-  background: var(--color-ink);
+  border-color: var(--color-brand);
+  background: var(--color-brand);
   color: #fff;
 }
 
@@ -296,7 +296,7 @@
   border: 1px solid var(--color-border-lt);
 }
 .chat-bubble--user {
-  background: var(--color-ink);
+  background: #2563eb;
   color: #fff;
   border-radius: 16px 16px 4px 16px;
 }
@@ -305,7 +305,7 @@
 .agent-avatar {
   width: 26px;
   height: 26px;
-  background: linear-gradient(135deg, #c47d2a, #e8a849);
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -351,11 +351,15 @@
   background: var(--color-surface);
   color: var(--color-ink-muted);
 }
-.filter-pill.active,
-.filter-pill:hover {
-  background: var(--color-ink);
+.filter-pill.active {
+  background: #2563eb;
   color: #fff;
-  border-color: var(--color-ink);
+  border-color: #2563eb;
+}
+.filter-pill:hover:not(.active) {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
 }
 
 /* ── Section Header ── */

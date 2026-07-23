@@ -273,16 +273,16 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
             {/* Brand strip */}
             <div style={{
               position: "absolute", bottom: 0, left: 0, right: 0,
-              background: "linear-gradient(to top, rgba(28,25,23,0.7), transparent)",
+              background: "linear-gradient(to top, rgba(15,23,42,0.7), transparent)",
               padding: "32px 20px 20px",
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <div style={{
-                  background: "#c47d2a", color: "#fff",
+                  background: "#2563eb", color: "#fff",
                   borderRadius: 6, padding: "3px 8px",
                   fontSize: 11, fontWeight: 700, letterSpacing: 1.5,
                 }}>◎ ARC</div>
-                <span style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", letterSpacing: 1 }}>
+                <span style={{ fontSize: 12, color: "rgba(255,255,255,0.8)", letterSpacing: 1 }}>
                   {item.sectionLabel?.toUpperCase()} · {item.categoryLabel?.toUpperCase()}
                 </span>
               </div>
@@ -296,10 +296,10 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
             <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 14 }}>
               {[item.sectionLabel, item.categoryLabel].filter(Boolean).map((crumb, i, arr) => (
                 <span key={crumb} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                  <span style={{ fontSize: 13, color: i === arr.length - 1 ? "#c47d2a" : "#a8a29e", fontWeight: i === arr.length - 1 ? 600 : 400 }}>
+                  <span style={{ fontSize: 13, color: i === arr.length - 1 ? "#2563eb" : "#94a3b8", fontWeight: i === arr.length - 1 ? 600 : 400 }}>
                     {crumb}
                   </span>
-                  {i < arr.length - 1 && <span style={{ color: "#d4cfc8", fontSize: 12 }}>›</span>}
+                  {i < arr.length - 1 && <span style={{ color: "#cbd5e1", fontSize: 12 }}>›</span>}
                 </span>
               ))}
             </div>
@@ -308,7 +308,7 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
             <h1 style={{
               fontFamily: "var(--font-serif)",
               fontSize: 28, fontWeight: 700,
-              color: "#1c1917", lineHeight: 1.25,
+              color: "#0f172a", lineHeight: 1.25,
               marginBottom: 10,
             }}>
               {item.name}
@@ -323,13 +323,13 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 6 }}>
               <span style={{
                 fontFamily: "var(--font-mono)",
-                fontSize: 30, fontWeight: 700, color: "#f97316",
+                fontSize: 30, fontWeight: 700, color: "#2563eb",
               }}>
                 {fmt(item.price)}
               </span>
               <span style={{
                 fontFamily: "var(--font-mono)",
-                fontSize: 17, color: "#a8a29e",
+                fontSize: 17, color: "#94a3b8",
                 textDecoration: "line-through",
               }}>
                 {fmt(item.oldPrice)}
@@ -337,7 +337,7 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
             </div>
             <div style={{ marginBottom: 20 }}>
               <span style={{
-                background: "rgba(196,30,58,0.08)", color: "#c41e3a",
+                background: "rgba(220,38,38,0.08)", color: "#dc2626",
                 borderRadius: 4, padding: "3px 10px",
                 fontSize: 13, fontWeight: 700,
               }}>
@@ -346,7 +346,7 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
             </div>
 
             {/* Description */}
-            <p style={{ fontSize: 15, color: "#57534e", lineHeight: 1.7, marginBottom: 22 }}>
+            <p style={{ fontSize: 15, color: "#475569", lineHeight: 1.7, marginBottom: 22 }}>
               {item.desc} — crafted for everyday elegance and lasting comfort. Part of our curated {item.sectionLabel} collection.
             </p>
 
@@ -354,10 +354,10 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
             {(item.section === "fashion" || item.sectionLabel === "Fashion") && (
               <div style={{ marginBottom: 18 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: "#78716c", letterSpacing: 1.2, textTransform: "uppercase" }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#64748b", letterSpacing: 1.2, textTransform: "uppercase" }}>
                     Size
                   </span>
-                  <span style={{ fontSize: 13, color: "#f97316", cursor: "pointer", fontWeight: 600 }}>
+                  <span style={{ fontSize: 13, color: "#2563eb", cursor: "pointer", fontWeight: 600 }}>
                     Size guide ↗
                   </span>
                 </div>
@@ -368,10 +368,10 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
                       onClick={() => setSelectedSize(s)}
                       style={{
                         width: 44, height: 44,
-                        border: selectedSize === s ? "2px solid #1c1917" : "1.5px solid #e7e4e0",
+                        border: selectedSize === s ? "2px solid #2563eb" : "1.5px solid #e2e8f0",
                         borderRadius: 8,
-                        background: selectedSize === s ? "#1c1917" : "#fff",
-                        color: selectedSize === s ? "#fff" : "#44403c",
+                        background: selectedSize === s ? "#2563eb" : "#fff",
+                        color: selectedSize === s ? "#fff" : "#334155",
                         fontSize: 14, fontWeight: 600,
                         cursor: "pointer",
                         transition: "all 0.15s",
@@ -386,8 +386,8 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
 
             {/* Color Selector */}
             <div style={{ marginBottom: 20 }}>
-              <span style={{ fontSize: 13, fontWeight: 700, color: "#78716c", letterSpacing: 1.2, textTransform: "uppercase", display: "block", marginBottom: 8 }}>
-                Colour — <span style={{ color: "#1c1917", fontWeight: 700, textTransform: "none" }}>{selectedColor}</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#64748b", letterSpacing: 1.2, textTransform: "uppercase", display: "block", marginBottom: 8 }}>
+                Colour — <span style={{ color: "#0f172a", fontWeight: 700, textTransform: "none" }}>{selectedColor}</span>
               </span>
               <div style={{ display: "flex", gap: 8 }}>
                 {COLORS.map(c => (
@@ -401,8 +401,8 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
                       borderRadius: "50%",
                       background: c.hex,
                       border: selectedColor === c.name
-                        ? "3px solid #1c1917"
-                        : "2px solid #e7e4e0",
+                        ? "3px solid #2563eb"
+                        : "2px solid #e2e8f0",
                       cursor: "pointer",
                       transition: "transform 0.15s, border 0.15s",
                       outline: selectedColor === c.name ? "2px solid #fff" : "none",
@@ -420,21 +420,21 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
               {/* Quantity */}
               <div style={{
                 display: "flex", alignItems: "center",
-                border: "1.5px solid #e7e4e0", borderRadius: 10,
+                border: "1.5px solid #e2e8f0", borderRadius: 10,
                 overflow: "hidden", flexShrink: 0,
               }}>
                 <button
                   onClick={() => setQty(q => Math.max(1, q - 1))}
                   aria-label="Decrease"
-                  style={{ width: 40, height: 48, border: "none", background: "#f9f7f5", fontSize: 18, cursor: "pointer", color: "#44403c" }}
+                  style={{ width: 40, height: 48, border: "none", background: "#f8fafc", fontSize: 18, cursor: "pointer", color: "#334155" }}
                 >−</button>
-                <span style={{ width: 40, textAlign: "center", fontFamily: "var(--font-mono)", fontSize: 16, fontWeight: 700, color: "#1c1917" }}>
+                <span style={{ width: 40, textAlign: "center", fontFamily: "var(--font-mono)", fontSize: 16, fontWeight: 700, color: "#0f172a" }}>
                   {qty}
                 </span>
                 <button
                   onClick={() => setQty(q => q + 1)}
                   aria-label="Increase"
-                  style={{ width: 40, height: 48, border: "none", background: "#f9f7f5", fontSize: 18, cursor: "pointer", color: "#44403c" }}
+                  style={{ width: 40, height: 48, border: "none", background: "#f8fafc", fontSize: 18, cursor: "pointer", color: "#334155" }}
                 >+</button>
               </div>
 
@@ -443,7 +443,7 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
                 onClick={handleAdd}
                 style={{
                   flex: 1, height: 48,
-                  background: added ? "hsl(158,65%,38%)" : "#f97316",
+                  background: added ? "hsl(158,65%,38%)" : "#2563eb",
                   color: "#fff", border: "none", borderRadius: 10,
                   fontSize: 14, fontWeight: 700, cursor: "pointer",
                   letterSpacing: 1.4, textTransform: "uppercase",
@@ -486,17 +486,17 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
             </div>
 
             {/* Tab switcher */}
-            <div style={{ borderBottom: "1px solid #f0ede8", marginBottom: 14 }}>
+            <div style={{ borderBottom: "1px solid #e2e8f0", marginBottom: 14 }}>
               {[["details", "Details"], ["shipping", "Shipping"], ["reviews", "Reviews"]].map(([key, label]) => (
                 <button
                   key={key}
                   onClick={() => setActiveTab(key)}
                   style={{
                     background: "none", border: "none",
-                    borderBottom: activeTab === key ? "2px solid #c47d2a" : "2px solid transparent",
+                    borderBottom: activeTab === key ? "2px solid #2563eb" : "2px solid transparent",
                     marginBottom: -1, padding: "8px 14px",
                     fontSize: 13, fontWeight: 700,
-                    color: activeTab === key ? "#c47d2a" : "#a8a29e",
+                    color: activeTab === key ? "#2563eb" : "#64748b",
                     cursor: "pointer", letterSpacing: 0.8, textTransform: "uppercase",
                     transition: "all 0.15s",
                   }}
@@ -510,12 +510,12 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
             {activeTab === "details" && (
               <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: 6 }}>
                 {details.map(d => (
-                  <li key={d} style={{ fontSize: 14, color: "#57534e", display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ color: "#c47d2a", fontSize: 12 }}>✦</span> {d}
+                  <li key={d} style={{ fontSize: 14, color: "#475569", display: "flex", alignItems: "center", gap: 8 }}>
+                    <span style={{ color: "#2563eb", fontSize: 12 }}>✦</span> {d}
                   </li>
                 ))}
-                <li style={{ fontSize: 14, color: "#57534e", display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ color: "#c47d2a", fontSize: 12 }}>✦</span> SKU: {item.id.toUpperCase()}
+                <li style={{ fontSize: 14, color: "#475569", display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ color: "#2563eb", fontSize: 12 }}>✦</span> SKU: {item.id.toUpperCase()}
                 </li>
               </ul>
             )}
@@ -527,12 +527,12 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
                   ["Express Shipping",  "2–3 business days", "12 USDC"],
                   ["Same-Day (Arc)",    "Instant on Arc chain", "2 USDC"],
                 ].map(([method, time, cost]) => (
-                  <div key={method} style={{ display: "flex", justifyContent: "space-between", padding: "8px 12px", background: "#faf9f7", borderRadius: 8, border: "1px solid #f0ede8", fontSize: 14 }}>
+                  <div key={method} style={{ display: "flex", justifyContent: "space-between", padding: "8px 12px", background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0", fontSize: 14 }}>
                     <div>
-                      <div style={{ fontWeight: 600, color: "#1c1917", marginBottom: 2 }}>{method}</div>
-                      <div style={{ color: "#a8a29e", fontSize: 13 }}>{time}</div>
+                      <div style={{ fontWeight: 600, color: "#0f172a", marginBottom: 2 }}>{method}</div>
+                      <div style={{ color: "#64748b", fontSize: 13 }}>{time}</div>
                     </div>
-                    <div style={{ fontFamily: "var(--font-mono)", color: "#c47d2a", fontWeight: 700, fontSize: 13, alignSelf: "center" }}>{cost}</div>
+                    <div style={{ fontFamily: "var(--font-mono)", color: "#2563eb", fontWeight: 700, fontSize: 13, alignSelf: "center" }}>{cost}</div>
                   </div>
                 ))}
               </div>
@@ -542,7 +542,7 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 14 }}>
                   <div style={{ textAlign: "center" }}>
-                    <div style={{ fontFamily: "var(--font-serif)", fontSize: 44, fontWeight: 700, color: "#1c1917", lineHeight: 1 }}>{rating}</div>
+                    <div style={{ fontFamily: "var(--font-serif)", fontSize: 44, fontWeight: 700, color: "#0f172a", lineHeight: 1 }}>{rating}</div>
                     <StarRating rating={rating} count={reviewCount} />
                   </div>
                   <div style={{ flex: 1 }}>
@@ -551,18 +551,18 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
                       const pct = star === 5 ? 45 + (seed % 30) : star === 4 ? 25 + (seed % 20) : star === 3 ? 10 + (seed % 10) : star === 2 ? 5 : 3;
                       return (
                         <div key={star} style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
-                          <span style={{ fontSize: 12, color: "#a8a29e", width: 8 }}>{star}</span>
-                          <span style={{ color: "#f59e0b", fontSize: 12 }}>★</span>
-                          <div style={{ flex: 1, height: 5, background: "#f0ede8", borderRadius: 3, overflow: "hidden" }}>
-                            <div style={{ width: `${pct}%`, height: "100%", background: "#f59e0b", borderRadius: 3 }} />
+                          <span style={{ fontSize: 12, color: "#64748b", width: 8 }}>{star}</span>
+                          <span style={{ color: "#3b82f6", fontSize: 12 }}>★</span>
+                          <div style={{ flex: 1, height: 5, background: "#e2e8f0", borderRadius: 3, overflow: "hidden" }}>
+                            <div style={{ width: `${pct}%`, height: "100%", background: "#2563eb", borderRadius: 3 }} />
                           </div>
-                          <span style={{ fontSize: 12, color: "#a8a29e", width: 26, textAlign: "right" }}>{pct}%</span>
+                          <span style={{ fontSize: 12, color: "#64748b", width: 26, textAlign: "right" }}>{pct}%</span>
                         </div>
                       );
                     })}
                   </div>
                 </div>
-                <p style={{ fontSize: 13, color: "#a8a29e", fontStyle: "italic" }}>
+                <p style={{ fontSize: 13, color: "#64748b", fontStyle: "italic" }}>
                   Based on {reviewCount} verified purchases · Ratings are aggregated.
                 </p>
               </div>
@@ -572,11 +572,11 @@ export default function ProductDetailPage({ item, allProducts, onClose, onAdd, o
 
         {/* ── Related Products ── */}
         {related.length > 0 && (
-          <div className="pdp-related-section" style={{ borderTop: "1px solid #f0ede8", padding: "28px 32px 32px" }}>
+          <div className="pdp-related-section" style={{ borderTop: "1px solid #e2e8f0", padding: "28px 32px 32px" }}>
             <h3 style={{
               fontFamily: "var(--font-serif)",
               fontSize: 20, fontWeight: 700,
-              color: "#1c1917", marginBottom: 16,
+              color: "#0f172a", marginBottom: 16,
             }}>
               You may also like
             </h3>
@@ -607,15 +607,15 @@ function RelatedCard({ item, onAdd }) {
   return (
     <div
       style={{
-        border: "1px solid #f0ede8", borderRadius: 10, overflow: "hidden",
+        border: "1px solid #e2e8f0", borderRadius: 10, overflow: "hidden",
         background: "#fff", transition: "box-shadow 0.2s",
       }}
-      onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.1)"}
+      onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 20px rgba(37,99,235,0.12)"}
       onMouseLeave={e => e.currentTarget.style.boxShadow = "none"}
     >
       {/* Image */}
-      <div style={{ height: 140, background: "#faf9f7", overflow: "hidden", position: "relative" }}>
-        <span style={{ position: "absolute", top: 6, left: 6, background: "#c41e3a", color: "#fff", borderRadius: 3, padding: "2px 6px", fontSize: 11, fontWeight: 700 }}>
+      <div style={{ height: 140, background: "#f8fafc", overflow: "hidden", position: "relative" }}>
+        <span style={{ position: "absolute", top: 6, left: 6, background: "#dc2626", color: "#fff", borderRadius: 3, padding: "2px 6px", fontSize: 11, fontWeight: 700 }}>
           -{pct}%
         </span>
         {!imgError ? (
@@ -634,11 +634,11 @@ function RelatedCard({ item, onAdd }) {
       </div>
       {/* Info */}
       <div style={{ padding: "10px 10px 12px" }}>
-        <p style={{ fontSize: 13, fontWeight: 600, color: "#1c1917", margin: "0 0 4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: "#0f172a", margin: "0 0 4px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {item.name}
         </p>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontFamily: "var(--font-mono)", fontSize: 14, fontWeight: 700, color: "#f97316" }}>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 14, fontWeight: 700, color: "#2563eb" }}>
             {fmt(item.price)}
           </span>
           <button

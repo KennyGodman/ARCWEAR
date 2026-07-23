@@ -4,26 +4,27 @@
 
 /* ── Design Tokens ── */
 :root {
-  /* Brand Palette */
+  /* Brand Palette — Blue & White */
   --color-bg:        #ffffff;
-  --color-surface:   #faf9f7;
-  --color-border:    #e7e4e0;
-  --color-border-lt: #f0ede8;
+  --color-surface:   #f8fafc;
+  --color-border:    #e2e8f0;
+  --color-border-lt: #f1f5f9;
 
-  --color-ink:       #1c1917;   /* primary text / dark backgrounds */
-  --color-ink-mid:   #44403c;   /* secondary text */
-  --color-ink-muted: #78716c;   /* placeholder / tertiary */
-  --color-ink-faint: #a8a29e;   /* disabled / captions */
-  --color-ink-stone: #57534e;   /* dark surface text */
+  --color-ink:       #0f172a;   /* primary slate text */
+  --color-ink-mid:   #334155;   /* secondary text */
+  --color-ink-muted: #64748b;   /* placeholder / tertiary */
+  --color-ink-faint: #94a3b8;   /* disabled / captions */
+  --color-ink-stone: #475569;   /* dark surface text */
 
-  --color-brand:     #c47d2a;   /* SwiftCart gold */
-  --color-brand-lt:  #e8a849;   /* lighter gold */
-  --color-accent:    #f97316;   /* orange CTA */
-  --color-accent-dk: #ea6c0a;   /* orange hover */
+  --color-brand:     #2563eb;   /* SwiftCart vibrant blue */
+  --color-brand-lt:  #3b82f6;   /* lighter blue */
+  --color-brand-dk:  #1d4ed8;   /* royal deep blue */
+  --color-accent:    #2563eb;   /* primary blue CTA */
+  --color-accent-dk: #1d4ed8;   /* blue hover */
 
-  --color-success:   #22c55e;
-  --color-error:     #b91c1c;
-  --color-sale:      #c41e3a;
+  --color-success:   #10b981;
+  --color-error:     #ef4444;
+  --color-sale:      #dc2626;
 
   /* Typography */
   --font-sans:  'Jost', system-ui, sans-serif;
@@ -31,10 +32,10 @@
   --font-mono:  'DM Mono', ui-monospace, Consolas, monospace;
 
   /* Shadows */
-  --shadow-sm:  0 1px 4px rgba(0, 0, 0, 0.08);
-  --shadow-md:  0 4px 20px rgba(0, 0, 0, 0.10);
-  --shadow-lg:  0 8px 40px rgba(0, 0, 0, 0.14);
-  --shadow-xl:  0 20px 60px rgba(0, 0, 0, 0.20);
+  --shadow-sm:  0 1px 4px rgba(37, 99, 235, 0.08);
+  --shadow-md:  0 4px 20px rgba(37, 99, 235, 0.12);
+  --shadow-lg:  0 8px 40px rgba(15, 23, 42, 0.14);
+  --shadow-xl:  0 20px 60px rgba(15, 23, 42, 0.20);
 
   /* Radii */
   --radius-sm:  4px;
@@ -47,26 +48,61 @@
   /* Transitions */
   --transition-fast:   all 0.15s ease;
   --transition-base:   all 0.25s ease;
-  --transition-spring: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --transition-spring: all 0.25 cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ── Custom Toastify Styling ── */
+.Toastify__toast-container {
+  z-index: 9999 !important;
+  width: 360px !important;
+  max-width: 90vw !important;
+}
+.Toastify__toast {
+  border-radius: 12px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15) !important;
+  border: 1px solid var(--color-border) !important;
+  padding: 12px 16px !important;
+}
+.Toastify__toast-theme--light {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+.Toastify__toast-theme--dark {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+.Toastify__progress-bar--success {
+  background: #10b981 !important;
+}
+.Toastify__progress-bar--info {
+  background: #2563eb !important;
+}
+.Toastify__progress-bar--error {
+  background: #ef4444 !important;
 }
 
 /* ── Dark Mode Tokens ── */
 [data-theme="dark"] {
-  --color-bg:        #0f0e0d;
-  --color-surface:   #1c1917;
-  --color-border:    #292524;
-  --color-border-lt: #1f1e1c;
+  --color-bg:        #0f172a;
+  --color-surface:   #1e293b;
+  --color-border:    #334155;
+  --color-border-lt: #1e293b;
 
-  --color-ink:       #f5f3f0;
-  --color-ink-mid:   #d6d0ca;
-  --color-ink-muted: #a8a29e;
-  --color-ink-faint: #78716c;
-  --color-ink-stone: #e7e4e0;
+  --color-ink:       #f8fafc;
+  --color-ink-mid:   #cbd5e1;
+  --color-ink-muted: #94a3b8;
+  --color-ink-faint: #64748b;
+  --color-ink-stone: #cbd5e1;
 
-  --color-brand:     #e8a849;
-  --color-brand-lt:  #c47d2a;
-  --color-accent:    #f97316;
-  --color-accent-dk: #ea6c0a;
+  --color-brand:     #3b82f6;
+  --color-brand-lt:  #60a5fa;
+  --color-brand-dk:  #2563eb;
+  --color-accent:    #2563eb;
+  --color-accent-dk: #1d4ed8;
 
   --shadow-sm:  0 1px 4px rgba(0, 0, 0, 0.30);
   --shadow-md:  0 4px 20px rgba(0, 0, 0, 0.40);
@@ -102,9 +138,9 @@
 }
 
 [data-theme="dark"] .cart-btn-accent {
-  background: #f97316 !important;
+  background: #2563eb !important;
   color: #fff !important;
-  border-color: #f97316 !important;
+  border-color: #2563eb !important;
 }
 
 [data-theme="dark"] .product-card {
@@ -204,8 +240,8 @@ body {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #c47d2a, #f97316);
-  box-shadow: 0 2px 6px rgba(196, 125, 42, 0.4);
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s;
   top: 2px;
   left: 2px;
@@ -219,7 +255,7 @@ body {
 
 .theme-toggle-btn.dark .theme-toggle-btn__knob {
   transform: translateX(24px);
-  background: linear-gradient(135deg, #1c1917, #292524);
+  background: linear-gradient(135deg, #0f172a, #1e293b);
   box-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
 
@@ -261,8 +297,8 @@ body {
 }
 
 @keyframes glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.45); }
-  60%       { box-shadow: 0 0 0 12px rgba(249, 115, 22, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.45); }
+  60%       { box-shadow: 0 0 0 12px rgba(37, 99, 235, 0); }
 }
 
 @keyframes slideDown {
@@ -314,7 +350,7 @@ body {
 
 .product-img {
   height: 200px;
-  background: #f9f7f5;
+  background: #f8fafc;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -342,15 +378,16 @@ body {
 .agent-panel {
   position: fixed;
   background: var(--color-bg);
-  box-shadow: 0 24px 72px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 24px 72px rgba(15, 23, 42, 0.25);
   z-index: 1400;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  bottom: 24px;
-  right: 24px;
-  width: 360px;
-  height: 530px;
+  bottom: 20px;
+  right: 20px;
+  width: 350px;
+  height: 460px;
+  max-height: calc(100vh - 90px);
   border-radius: var(--radius-2xl);
   animation: agentIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -424,7 +461,8 @@ body {
     bottom: 0 !important;
     right: 0 !important;
     width: 100% !important;
-    height: 80vh !important;
+    height: 65vh !important;
+    max-height: calc(100vh - 80px) !important;
     border-radius: var(--radius-2xl) var(--radius-2xl) 0 0 !important;
   }
 
@@ -514,7 +552,7 @@ body {
 .view-detail-btn {
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  background: rgba(28, 25, 23, 0.85);
+  background: rgba(15, 23, 42, 0.85);
   color: #fff;
   border: none;
   padding: 8px;
@@ -542,7 +580,7 @@ body {
   display: flex;
   align-items: center;
   width: 340px;
-  border: 1.5px solid #b0a9a0;
+  border: 1.5px solid #cbd5e1;
   border-radius: 50px;
   overflow: hidden;
   background: #fff;
@@ -550,7 +588,7 @@ body {
 }
 .search-bar-wrap:focus-within {
   border-color: var(--color-brand);
-  box-shadow: 0 0 0 3px rgba(196, 125, 42, 0.1);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
 .search-input {
@@ -567,7 +605,7 @@ body {
 .search-input::placeholder { color: var(--color-ink-faint); }
 
 .search-submit-btn {
-  background: #f97316;
+  background: #2563eb;
   color: #fff;
   border: none;
   padding: 9px 20px;
@@ -580,8 +618,8 @@ body {
   transition: background 0.2s;
   letter-spacing: 0.4px;
 }
-.search-submit-btn:hover  { background: #ea6c0a; }
-.search-submit-btn:active { background: #c95e08; }
+.search-submit-btn:hover  { background: #1d4ed8; }
+.search-submit-btn:active { background: #1e40af; }
 
 /* =========================================================
    Order History Drawer
@@ -779,9 +817,9 @@ body {
 }
 
 .cart-btn-accent {
-  background: #f97316 !important;
+  background: #2563eb !important;
   color: #fff !important;
-  border: 1px solid #f97316 !important;
+  border: 1px solid #2563eb !important;
 }
 
 .wallet-chip {

@@ -87,15 +87,15 @@ export default function CartDrawer({ cart, onRemove, onCheckout, onClose, wallet
             <div className="arc-block" style={{ marginBottom: 12 }}>
               <div className="arc-block__icon">◎</div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, color: "#c47d2a", letterSpacing: 1.5, textTransform: "uppercase", margin: 0 }}>Arc Blockchain · USDC</p>
-                <p style={{ fontSize: 11, color: "#57534e", margin: "2px 0 0" }}>Sub-second finality · Circle L1</p>
+                <p style={{ fontSize: 11, fontWeight: 700, color: "#2563eb", letterSpacing: 1.5, textTransform: "uppercase", margin: 0 }}>Arc Blockchain · USDC</p>
+                <p style={{ fontSize: 11, color: "#475569", margin: "2px 0 0" }}>Sub-second finality · Circle L1</p>
               </div>
             </div>
 
             <button
               onClick={onCheckout}
               style={{
-                width: "100%", background: "#f97316", color: "#fff",
+                width: "100%", background: "#2563eb", color: "#fff",
                 border: "none", borderRadius: 10, padding: "13px",
                 fontSize: 14, fontWeight: 700, cursor: "pointer",
                 letterSpacing: 1.5, textTransform: "uppercase",

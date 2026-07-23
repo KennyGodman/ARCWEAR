@@ -429,7 +429,7 @@ export default function CheckoutModal({
                 {/* Row 5: Delivery fee */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #292524", paddingTop: "10px", marginTop: "4px" }}>
                   <span style={{ fontSize: "11px", color: "#a8a29e" }}>Delivery fee</span>
-                  <span style={{ fontSize: "13px", fontWeight: "700", color: "#fb923c" }}>{deliveryFee.toFixed(2)} USDC</span>
+                  <span style={{ fontSize: "13px", fontWeight: "700", color: "#60a5fa" }}>{deliveryFee.toFixed(2)} USDC</span>
                 </div>
               </div>
             ) : (
@@ -450,46 +450,46 @@ export default function CheckoutModal({
             )}
 
             {/* Item list */}
-            <div style={{ background: "#faf9f7", borderRadius: 10, border: "1px solid #f0ede8", marginBottom: 16, maxHeight: 140, overflowY: "auto" }}>
+            <div style={{ background: "#f8fafc", borderRadius: 10, border: "1px solid #e2e8f0", marginBottom: 16, maxHeight: 140, overflowY: "auto" }}>
               {cart.map(i => (
-                <div key={i.id} style={{ display: "flex", justifyContent: "space-between", padding: "6px 14px", borderBottom: "1px solid #f0ede8", fontSize: 15, color: "#1c1917" }}>
-                  <span>{i.name} <span style={{ color: "#a8a29e" }}>×{i.qty}</span></span>
+                <div key={i.id} style={{ display: "flex", justifyContent: "space-between", padding: "6px 14px", borderBottom: "1px solid #e2e8f0", fontSize: 15, color: "#0f172a" }}>
+                  <span>{i.name} <span style={{ color: "#64748b" }}>×{i.qty}</span></span>
                   <span style={{ fontFamily: "var(--font-mono)", fontSize: 13 }}>{fmt(i.price * i.qty)}</span>
                 </div>
               ))}
             </div>
 
             {/* Payment details */}
-            <div style={{ background: "#1c1917", borderRadius: 12, padding: "14px 16px", marginBottom: 18 }}>
+            <div style={{ background: "#0f172a", borderRadius: 12, padding: "14px 16px", marginBottom: 18 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                <div style={{ width: 30, height: 30, background: "#c47d2a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: "#fff", fontWeight: 800, flexShrink: 0 }}>◎</div>
+                <div style={{ width: 30, height: 30, background: "#2563eb", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: "#fff", fontWeight: 800, flexShrink: 0 }}>◎</div>
                 <div>
                   <p style={{ fontSize: 16, fontWeight: 700, color: "#fff", margin: 0 }}>Arc Blockchain · USDC</p>
-                  <p style={{ fontSize: 11, color: "#57534e", letterSpacing: 1.2, textTransform: "uppercase", margin: "2px 0 0" }}>Circle L1 · Rabby &amp; MetaMask</p>
+                  <p style={{ fontSize: 11, color: "#94a3b8", letterSpacing: 1.2, textTransform: "uppercase", margin: "2px 0 0" }}>Circle L1 · Rabby &amp; MetaMask</p>
                 </div>
               </div>
               {[["Wallet", trunc(wallet) || "Not connected"], ["Network", "Arc Testnet (5042002)"], ["Gas", "~0.001 USDC"]].map(([k, v]) => (
                 <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 3 }}>
-                  <span style={{ color: "#57534e" }}>{k}</span>
-                  <span style={{ fontFamily: "var(--font-mono)", color: "#a8a29e" }}>{v}</span>
+                  <span style={{ color: "#64748b" }}>{k}</span>
+                  <span style={{ fontFamily: "var(--font-mono)", color: "#cbd5e1" }}>{v}</span>
                 </div>
               ))}
-              <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, fontSize: 18, color: "#fff", borderTop: "1px solid #292524", paddingTop: 8, marginTop: 6 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, fontSize: 18, color: "#fff", borderTop: "1px solid #1e293b", paddingTop: 8, marginTop: 6 }}>
                 <span>Total</span>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 15, color: "#c47d2a" }}>{fmt(total)}</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 15, color: "#60a5fa" }}>{fmt(total)}</span>
               </div>
             </div>
 
             <div style={{ display: "flex", gap: 10 }}>
               <button
                 onClick={onClose}
-                style={{ flex: 1, background: "#f5f3f0", border: "1px solid #e7e4e0", borderRadius: 10, padding: "11px", fontSize: 13, cursor: "pointer", color: "#78716c", letterSpacing: 1.5, textTransform: "uppercase" }}
+                style={{ flex: 1, background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 10, padding: "11px", fontSize: 13, cursor: "pointer", color: "#64748b", letterSpacing: 1.5, textTransform: "uppercase" }}
               >
                 Cancel
               </button>
               <button
                 onClick={pay}
-                style={{ flex: 2, background: "#f97316", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1.5, textTransform: "uppercase" }}
+                style={{ flex: 2, background: "#2563eb", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1.5, textTransform: "uppercase" }}
               >
                 Pay {fmt(total)}
               </button>
@@ -511,12 +511,12 @@ export default function CheckoutModal({
                 animation: "spin 1.5s linear infinite",
                 display: "inline-block",
                 boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                border: "2px solid #e7e4e0",
+                border: "2px solid #e2e8f0",
               }}
             />
-            <h3 style={{ fontSize: 24, fontWeight: 700, color: "#1c1917", marginBottom: 6 }}>Signing Transaction</h3>
-            <p style={{ fontSize: 14, color: "#a8a29e" }}>Approve in your wallet</p>
-            <p style={{ fontSize: 12, color: "#c47d2a", letterSpacing: 1.5, textTransform: "uppercase", marginTop: 6 }}>Arc finality &lt;1 second</p>
+            <h3 style={{ fontSize: 24, fontWeight: 700, color: "#0f172a", marginBottom: 6 }}>Signing Transaction</h3>
+            <p style={{ fontSize: 14, color: "#64748b" }}>Approve in your wallet</p>
+            <p style={{ fontSize: 12, color: "#2563eb", letterSpacing: 1.5, textTransform: "uppercase", marginTop: 6 }}>Arc finality &lt;1 second</p>
           </div>
         )}
 
@@ -534,18 +534,18 @@ export default function CheckoutModal({
                 animation: "spin 1.5s linear infinite",
                 display: "inline-block",
                 boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                border: "2px solid #e7e4e0",
+                border: "2px solid #e2e8f0",
               }}
             />
-            <h3 style={{ fontSize: 24, fontWeight: 700, color: "#1c1917", marginBottom: 6 }}>Confirming Payment</h3>
-            <p style={{ fontSize: 14, color: "#a8a29e" }}>Waiting for block finalization on Arc...</p>
+            <h3 style={{ fontSize: 24, fontWeight: 700, color: "#0f172a", marginBottom: 6 }}>Confirming Payment</h3>
+            <p style={{ fontSize: 14, color: "#64748b" }}>Waiting for block finalization on Arc...</p>
             {txHash && (
               <div style={{ marginTop: 12 }}>
                 <a
                   href={`${ARC_CHAIN_CONFIG.blockExplorerUrls[0]}/tx/${txHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ fontSize: 13, color: "#f97316", textDecoration: "underline" }}
+                  style={{ fontSize: 13, color: "#2563eb", textDecoration: "underline" }}
                 >
                   View on ArcScan ↗
                 </a>
@@ -557,12 +557,12 @@ export default function CheckoutModal({
         {/* ── Success step ── */}
         {step === "success" && (
           <div style={{ textAlign: "center", padding: "34px 0" }}>
-            <div style={{ width: 56, height: 56, background: "#1c1917", borderRadius: "50%", margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#c47d2a" }}>✓</div>
-            <h3 style={{ fontSize: 26, fontWeight: 700, color: "#1c1917", marginBottom: 5 }}>Payment Confirmed</h3>
-            <p style={{ fontSize: 14, color: "#a8a29e", marginBottom: 16 }}>Settled on Arc Blockchain</p>
+            <div style={{ width: 56, height: 56, background: "#2563eb", borderRadius: "50%", margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#fff" }}>✓</div>
+            <h3 style={{ fontSize: 26, fontWeight: 700, color: "#0f172a", marginBottom: 5 }}>Payment Confirmed</h3>
+            <p style={{ fontSize: 14, color: "#64748b", marginBottom: 16 }}>Settled on Arc Blockchain</p>
             {txHash && (
               <div style={{ marginBottom: 16 }}>
-                <p style={{ fontSize: 12, color: "#78716c", margin: "0 0 6px" }}>Transaction Hash:</p>
+                <p style={{ fontSize: 12, color: "#64748b", margin: "0 0 6px" }}>Transaction Hash:</p>
                 <a
                   href={`${ARC_CHAIN_CONFIG.blockExplorerUrls[0]}/tx/${txHash}`}
                   target="_blank"
@@ -570,13 +570,13 @@ export default function CheckoutModal({
                   style={{
                     fontSize: 12,
                     fontFamily: "var(--font-mono)",
-                    color: "#f97316",
-                    background: "#faf9f7",
+                    color: "#2563eb",
+                    background: "#f8fafc",
                     borderRadius: 8,
                     padding: "8px 12px",
                     display: "block",
                     wordBreak: "break-all",
-                    border: "1px solid #f0ede8",
+                    border: "1px solid #e2e8f0",
                     textDecoration: "none",
                     transition: "all 0.2s",
                   }}
@@ -587,7 +587,7 @@ export default function CheckoutModal({
             )}
             <button
               onClick={onClose}
-              style={{ background: "#1c1917", color: "#fff", border: "none", borderRadius: 10, padding: "11px 28px", fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1.5, textTransform: "uppercase" }}
+              style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: 10, padding: "11px 28px", fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1.5, textTransform: "uppercase" }}
             >
               Continue Shopping
             </button>

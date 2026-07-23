@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import useAllowance from "./hooks/useAllowance";
 import ApprovalModal from "./components/ApprovalModal";
 import ProductDetailPage from "./components/ProductDetailPage";
@@ -176,14 +178,14 @@ function LogoImage() {
     return (
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         <div style={{
-          width: 28, height: 28,
-          background: "#1c1917", borderRadius: 6,
+          width: 32, height: 32,
+          background: "#2563eb", borderRadius: 6,
           display: "flex", alignItems: "center", justifyContent: "center",
           flexShrink: 0,
         }}>
-          <span style={{ fontSize: 11, fontWeight: 800, color: "#c47d2a", letterSpacing: 1 }}>SC</span>
+          <span style={{ fontSize: 12, fontWeight: 800, color: "#fff", letterSpacing: 1 }}>SC</span>
         </div>
-        <span className="logo-text" style={{ fontFamily: "var(--font-serif)", fontSize: 14, fontWeight: 700, color: "var(--color-ink)", letterSpacing: 0.5 }}>
+        <span className="logo-text" style={{ fontFamily: "var(--font-serif)", fontSize: 16, fontWeight: 700, color: "#ffffff", letterSpacing: 0.5 }}>
           SwiftCart
         </span>
       </div>
@@ -192,9 +194,9 @@ function LogoImage() {
 
   return (
     <img
-      src="/swiftcart.jpg"
+      src="/swiftcart-logo.png"
       alt="SwiftCart"
-      style={{ height: "28px", width: "auto", objectFit: "contain", maxWidth: 110, borderRadius: "6px" }}
+      style={{ height: "42px", width: "auto", objectFit: "contain", maxWidth: 160, display: "block" }}
       onError={() => setErr(true)}
     />
   );
@@ -261,7 +263,7 @@ function EditModal({ item, onClose, onSave }) {
           </div>
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: 17, fontWeight: 600, color: "#1c1917", margin: 0, lineHeight: 1.3 }}>{item.name}</p>
-            <p style={{ fontFamily: "var(--font-mono)", fontSize: 15, color: "#c47d2a", margin: "4px 0 0" }}>{fmt(item.price)}</p>
+            <p style={{ fontFamily: "var(--font-mono)", fontSize: 15, color: "#2563eb", margin: "4px 0 0" }}>{fmt(item.price)}</p>
           </div>
           <button className="btn-icon" onClick={onClose} aria-label="Close">✕</button>
         </div>
@@ -314,10 +316,11 @@ function EditModal({ item, onClose, onSave }) {
             onClick={handleSave}
             style={{
               width: "100%",
-              background: added ? "hsl(158, 65%, 38%)" : "#1c1917",
+              background: added ? "#10b981" : "#2563eb",
               color: "#fff", border: "none", borderRadius: 10,
               padding: "13px", fontSize: 14, fontWeight: 700,
               cursor: "pointer", letterSpacing: 1.5, textTransform: "uppercase",
+              boxShadow: "0 4px 14px rgba(37, 99, 235, 0.3)",
               transition: "all .25s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
               transform: added ? "scale(0.96)" : "scale(1)",
             }}
@@ -398,7 +401,7 @@ function ProductCard({ item, onAdd, onEdit, onViewDetail, agentPick, wishlist = 
           aria-label={`View details for ${item.name}`}
           tabIndex={-1}
         >
-          🔍 View Details
+          View Details
         </button>
       </div>
 
@@ -431,7 +434,7 @@ function ProductCard({ item, onAdd, onEdit, onViewDetail, agentPick, wishlist = 
             className="add-btn"
             style={{
               flex: 1,
-              background: added ? "hsl(158, 65%, 38%)" : "#f97316",
+              background: added ? "hsl(158, 65%, 38%)" : "#2563eb",
               color: "#fff", border: "none", borderRadius: 4,
               padding: "8px 0", fontSize: 13, fontWeight: 700,
               cursor: "pointer", textTransform: "uppercase",
@@ -446,12 +449,16 @@ function ProductCard({ item, onAdd, onEdit, onViewDetail, agentPick, wishlist = 
             aria-label="Edit options"
             title="Edit options"
             style={{
-              width: 36, background: "#f5f3f0",
-              border: "1px solid #e7e4e0", borderRadius: 4,
+              width: 34, background: "#f8fafc",
+              border: "1px solid #e2e8f0", borderRadius: 4,
               cursor: "pointer", display: "flex",
               alignItems: "center", justifyContent: "center",
-              fontSize: 16, flexShrink: 0,
+              fontSize: 13, flexShrink: 0,
+              opacity: 0.5,
+              transition: "opacity 0.2s ease, background 0.2s ease",
             }}
+            onMouseEnter={e => e.currentTarget.style.opacity = "1"}
+            onMouseLeave={e => e.currentTarget.style.opacity = "0.5"}
           >
             ✏️
           </button>
@@ -551,7 +558,7 @@ function CartDrawer({ cart, onRemove, onCheckout, onClose, wallet }) {
             <div className="arc-block" style={{ marginBottom: 12 }}>
               <div className="arc-block__icon">◎</div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 700, color: "#c47d2a", letterSpacing: 1.5, textTransform: "uppercase", margin: 0 }}>Arc Blockchain · USDC</p>
+                <p style={{ fontSize: 11, fontWeight: 700, color: "#2563eb", letterSpacing: 1.5, textTransform: "uppercase", margin: 0 }}>Arc Blockchain · USDC</p>
                 <p style={{ fontSize: 11, color: "#57534e", margin: "2px 0 0" }}>Sub-second finality · Circle L1</p>
               </div>
             </div>
@@ -559,7 +566,7 @@ function CartDrawer({ cart, onRemove, onCheckout, onClose, wallet }) {
             <button
               onClick={onCheckout}
               style={{
-                width: "100%", background: "#f97316", color: "#fff",
+                width: "100%", background: "#2563eb", color: "#fff",
                 border: "none", borderRadius: 10, padding: "13px",
                 fontSize: 14, fontWeight: 700, cursor: "pointer",
                 letterSpacing: 1.5, textTransform: "uppercase",
@@ -773,9 +780,9 @@ function CheckoutModal({
                   onClick={() => setFulfillmentMethod("delivery")}
                   style={{
                     flex: 1, padding: "8px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer",
-                    border: fulfillmentMethod === "delivery" ? "1px solid #f97316" : "1px solid #e7e4e0",
-                    background: fulfillmentMethod === "delivery" ? "#fff7ed" : "#fff",
-                    color: fulfillmentMethod === "delivery" ? "#f97316" : "#78716c",
+                    border: fulfillmentMethod === "delivery" ? "1px solid #2563eb" : "1px solid #e2e8f0",
+                    background: fulfillmentMethod === "delivery" ? "#eff6ff" : "#fff",
+                    color: fulfillmentMethod === "delivery" ? "#2563eb" : "#64748b",
                     transition: "all 0.2s"
                   }}
                 >
@@ -786,9 +793,9 @@ function CheckoutModal({
                   onClick={() => setFulfillmentMethod("pickup")}
                   style={{
                     flex: 1, padding: "8px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer",
-                    border: fulfillmentMethod === "pickup" ? "1px solid #f97316" : "1px solid #e7e4e0",
-                    background: fulfillmentMethod === "pickup" ? "#fff7ed" : "#fff",
-                    color: fulfillmentMethod === "pickup" ? "#f97316" : "#78716c",
+                    border: fulfillmentMethod === "pickup" ? "1px solid #2563eb" : "1px solid #e2e8f0",
+                    background: fulfillmentMethod === "pickup" ? "#eff6ff" : "#fff",
+                    color: fulfillmentMethod === "pickup" ? "#2563eb" : "#64748b",
                     transition: "all 0.2s"
                   }}
                 >
@@ -829,46 +836,46 @@ function CheckoutModal({
             )}
 
             {/* Item list */}
-            <div style={{ background: "#faf9f7", borderRadius: 10, border: "1px solid #f0ede8", marginBottom: 16, maxHeight: 140, overflowY: "auto" }}>
+            <div style={{ background: "#f8fafc", borderRadius: 10, border: "1px solid #e2e8f0", marginBottom: 16, maxHeight: 140, overflowY: "auto" }}>
               {cart.map(i => (
-                <div key={i.id} style={{ display: "flex", justifyContent: "space-between", padding: "6px 14px", borderBottom: "1px solid #f0ede8", fontSize: 15, color: "#1c1917" }}>
-                  <span>{i.name} <span style={{ color: "#a8a29e" }}>×{i.qty}</span></span>
+                <div key={i.id} style={{ display: "flex", justifyContent: "space-between", padding: "6px 14px", borderBottom: "1px solid #e2e8f0", fontSize: 15, color: "#0f172a" }}>
+                  <span>{i.name} <span style={{ color: "#64748b" }}>×{i.qty}</span></span>
                   <span style={{ fontFamily: "var(--font-mono)", fontSize: 13 }}>{fmt(i.price * i.qty)}</span>
                 </div>
               ))}
             </div>
 
             {/* Payment details */}
-            <div style={{ background: "#1c1917", borderRadius: 12, padding: "14px 16px", marginBottom: 18 }}>
+            <div style={{ background: "#0f172a", borderRadius: 12, padding: "14px 16px", marginBottom: 18 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-                <div style={{ width: 30, height: 30, background: "#c47d2a", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: "#fff", fontWeight: 800, flexShrink: 0 }}>◎</div>
+                <div style={{ width: 30, height: 30, background: "#2563eb", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, color: "#fff", fontWeight: 800, flexShrink: 0 }}>◎</div>
                 <div>
                   <p style={{ fontSize: 16, fontWeight: 700, color: "#fff", margin: 0 }}>Arc Blockchain · USDC</p>
-                  <p style={{ fontSize: 11, color: "#57534e", letterSpacing: 1.2, textTransform: "uppercase", margin: "2px 0 0" }}>Circle L1 · Rabby & MetaMask</p>
+                  <p style={{ fontSize: 11, color: "#94a3b8", letterSpacing: 1.2, textTransform: "uppercase", margin: "2px 0 0" }}>Circle L1 · Rabby &amp; MetaMask</p>
                 </div>
               </div>
               {[["Wallet", trunc(wallet) || "Not connected"], ["Network", "Arc Testnet (5042002)"], ["Gas", "~0.001 USDC"]].map(([k, v]) => (
                 <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, marginBottom: 3 }}>
-                  <span style={{ color: "#57534e" }}>{k}</span>
-                  <span style={{ fontFamily: "var(--font-mono)", color: "#a8a29e" }}>{v}</span>
+                  <span style={{ color: "#64748b" }}>{k}</span>
+                  <span style={{ fontFamily: "var(--font-mono)", color: "#cbd5e1" }}>{v}</span>
                 </div>
               ))}
-              <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, fontSize: 18, color: "#fff", borderTop: "1px solid #292524", paddingTop: 8, marginTop: 6 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, fontSize: 18, color: "#fff", borderTop: "1px solid #1e293b", paddingTop: 8, marginTop: 6 }}>
                 <span>Total</span>
-                <span style={{ fontFamily: "var(--font-mono)", fontSize: 15, color: "#c47d2a" }}>{fmt(total)}</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 15, color: "#60a5fa" }}>{fmt(total)}</span>
               </div>
             </div>
 
             <div style={{ display: "flex", gap: 10 }}>
               <button
                 onClick={onClose}
-                style={{ flex: 1, background: "#f5f3f0", border: "1px solid #e7e4e0", borderRadius: 10, padding: "11px", fontSize: 13, cursor: "pointer", color: "#78716c", letterSpacing: 1.5, textTransform: "uppercase" }}
+                style={{ flex: 1, background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 10, padding: "11px", fontSize: 13, cursor: "pointer", color: "#64748b", letterSpacing: 1.5, textTransform: "uppercase" }}
               >
                 Cancel
               </button>
               <button
                 onClick={pay}
-                style={{ flex: 2, background: "#f97316", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1.5, textTransform: "uppercase" }}
+                style={{ flex: 2, background: "#2563eb", color: "#fff", border: "none", borderRadius: 10, padding: "11px", fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1.5, textTransform: "uppercase" }}
               >
                 Pay {fmt(total)}
               </button>
@@ -890,12 +897,12 @@ function CheckoutModal({
                 animation: "spin 1.5s linear infinite",
                 display: "inline-block",
                 boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                border: "2px solid #e7e4e0",
+                border: "2px solid #e2e8f0",
               }}
             />
-            <h3 style={{ fontSize: 24, fontWeight: 700, color: "#1c1917", marginBottom: 6 }}>Signing Transaction</h3>
-            <p style={{ fontSize: 14, color: "#a8a29e" }}>Approve in your wallet</p>
-            <p style={{ fontSize: 12, color: "#c47d2a", letterSpacing: 1.5, textTransform: "uppercase", marginTop: 6 }}>Arc finality &lt;1 second</p>
+            <h3 style={{ fontSize: 24, fontWeight: 700, color: "#0f172a", marginBottom: 6 }}>Signing Transaction</h3>
+            <p style={{ fontSize: 14, color: "#64748b" }}>Approve in your wallet</p>
+            <p style={{ fontSize: 12, color: "#2563eb", letterSpacing: 1.5, textTransform: "uppercase", marginTop: 6 }}>Arc finality &lt;1 second</p>
           </div>
         )}
 
@@ -913,18 +920,18 @@ function CheckoutModal({
                 animation: "spin 1.5s linear infinite",
                 display: "inline-block",
                 boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                border: "2px solid #e7e4e0",
+                border: "2px solid #e2e8f0",
               }}
             />
-            <h3 style={{ fontSize: 24, fontWeight: 700, color: "#1c1917", marginBottom: 6 }}>Confirming Payment</h3>
-            <p style={{ fontSize: 14, color: "#a8a29e" }}>Waiting for block finalization on Arc...</p>
+            <h3 style={{ fontSize: 24, fontWeight: 700, color: "#0f172a", marginBottom: 6 }}>Confirming Payment</h3>
+            <p style={{ fontSize: 14, color: "#64748b" }}>Waiting for block finalization on Arc...</p>
             {txHash && (
               <div style={{ marginTop: 12 }}>
                 <a
                   href={`${ARC_CHAIN_CONFIG.blockExplorerUrls[0]}/tx/${txHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ fontSize: 13, color: "#f97316", textDecoration: "underline" }}
+                  style={{ fontSize: 13, color: "#2563eb", textDecoration: "underline" }}
                 >
                   View on ArcScan ↗
                 </a>
@@ -936,12 +943,12 @@ function CheckoutModal({
         {/* ── Success step ── */}
         {step === "success" && (
           <div style={{ textAlign: "center", padding: "34px 0" }}>
-            <div style={{ width: 56, height: 56, background: "#1c1917", borderRadius: "50%", margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#c47d2a" }}>✓</div>
-            <h3 style={{ fontSize: 26, fontWeight: 700, color: "#1c1917", marginBottom: 5 }}>Payment Confirmed</h3>
-            <p style={{ fontSize: 14, color: "#a8a29e", marginBottom: 16 }}>Settled on Arc Blockchain</p>
+            <div style={{ width: 56, height: 56, background: "#2563eb", borderRadius: "50%", margin: "0 auto 16px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#fff" }}>✓</div>
+            <h3 style={{ fontSize: 26, fontWeight: 700, color: "#0f172a", marginBottom: 5 }}>Payment Confirmed</h3>
+            <p style={{ fontSize: 14, color: "#64748b", marginBottom: 16 }}>Settled on Arc Blockchain</p>
             {txHash && (
               <div style={{ marginBottom: 16 }}>
-                <p style={{ fontSize: 12, color: "#78716c", margin: "0 0 6px" }}>Transaction Hash:</p>
+                <p style={{ fontSize: 12, color: "#64748b", margin: "0 0 6px" }}>Transaction Hash:</p>
                 <a
                   href={`${ARC_CHAIN_CONFIG.blockExplorerUrls[0]}/tx/${txHash}`}
                   target="_blank"
@@ -949,13 +956,13 @@ function CheckoutModal({
                   style={{
                     fontSize: 12,
                     fontFamily: "var(--font-mono)",
-                    color: "#f97316",
-                    background: "#faf9f7",
+                    color: "#2563eb",
+                    background: "#f8fafc",
                     borderRadius: 8,
                     padding: "8px 12px",
                     display: "block",
                     wordBreak: "break-all",
-                    border: "1px solid #f0ede8",
+                    border: "1px solid #e2e8f0",
                     textDecoration: "none",
                     transition: "all 0.2s",
                   }}
@@ -966,7 +973,7 @@ function CheckoutModal({
             )}
             <button
               onClick={onClose}
-              style={{ background: "#1c1917", color: "#fff", border: "none", borderRadius: 10, padding: "11px 28px", fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1.5, textTransform: "uppercase" }}
+              style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: 10, padding: "11px 28px", fontSize: 13, fontWeight: 700, cursor: "pointer", letterSpacing: 1.5, textTransform: "uppercase" }}
             >
               Continue Shopping
             </button>
@@ -1779,7 +1786,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
     <>
       <div
         onClick={onClose}
-        style={{ position: "fixed", inset: 0, zIndex: 1300, background: "rgba(0,0,0,0.2)" }}
+        style={{ position: "fixed", top: "52px", left: 0, right: 0, bottom: 0, zIndex: 1300, background: "rgba(0,0,0,0.15)" }}
         aria-label="Close agent"
       />
       <div
@@ -1789,15 +1796,15 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
         aria-label="SwiftCart AI shopping agent"
       >
         {/* Header */}
-        <div style={{ background: "#1c1917", padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+        <div style={{ background: "#0f172a", padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div style={{ position: "relative" }}>
-              <div style={{ width: 34, height: 34, background: "linear-gradient(135deg,#c47d2a,#e8a849)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "#fff" }}>◎</div>
-              <div style={{ position: "absolute", bottom: -1, right: -1, width: 10, height: 10, background: "#22c55e", borderRadius: "50%", border: "2px solid #1c1917" }} aria-hidden="true" />
+              <div style={{ width: 34, height: 34, background: "linear-gradient(135deg, #2563eb, #3b82f6)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "#fff" }}>◎</div>
+              <div style={{ position: "absolute", bottom: -1, right: -1, width: 10, height: 10, background: "#10b981", borderRadius: "50%", border: "2px solid #0f172a" }} aria-hidden="true" />
             </div>
             <div>
               <p style={{ fontSize: 16, fontWeight: 700, color: "#fff", margin: 0, lineHeight: 1 }}>SwiftCart Agent</p>
-              <p style={{ fontSize: 10, color: "#c47d2a", letterSpacing: 1.5, textTransform: "uppercase", margin: "2px 0 0" }}>AI · USDC · Arc Blockchain</p>
+              <p style={{ fontSize: 10, color: "#60a5fa", letterSpacing: 1.5, textTransform: "uppercase", margin: "2px 0 0" }}>AI · USDC · Arc Blockchain</p>
             </div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -1847,11 +1854,11 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
               aria-label={voiceEnabled ? "Mute agent voice" : "Enable agent voice"}
               style={{
                 background: voiceEnabled 
-                  ? "linear-gradient(135deg, #c47d2a, #f97316)" 
+                  ? "linear-gradient(135deg, #2563eb, #1d4ed8)" 
                   : "rgba(255,255,255,0.08)",
-                border: voiceEnabled ? "1px solid #f97316" : "1px solid rgba(255,255,255,0.15)",
+                border: voiceEnabled ? "1px solid #2563eb" : "1px solid rgba(255,255,255,0.15)",
                 borderRadius: 10,
-                color: voiceEnabled ? "#fff" : "#a8a29e",
+                color: voiceEnabled ? "#fff" : "#94a3b8",
                 width: 34,
                 height: 34,
                 cursor: "pointer",
@@ -1860,7 +1867,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
                 alignItems: "center",
                 justifyContent: "center",
                 transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-                boxShadow: voiceEnabled ? "0 0 14px rgba(249,115,22,0.45)" : "none",
+                boxShadow: voiceEnabled ? "0 0 14px rgba(37,99,235,0.45)" : "none",
               }}
             >
               {voiceEnabled ? "🔊" : "🔇"}
@@ -1880,8 +1887,8 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
 
         {/* Active tools indicator */}
         {tools.length > 0 && (
-          <div style={{ background: "#faf9f7", borderBottom: "1px solid #f0ede8", padding: "5px 14px", display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
-            <span style={{ fontSize: 10, color: "#c47d2a", fontWeight: 700, animation: "pulse .8s infinite" }} aria-hidden="true">●</span>
+          <div style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", padding: "5px 14px", display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
+            <span style={{ fontSize: 10, color: "#2563eb", fontWeight: 700, animation: "pulse .8s infinite" }} aria-hidden="true">●</span>
             {tools.map((t, i) => (
               <span key={i} className="badge-tool">⚡ {t.replace(/_/g, " ")}</span>
             ))}
@@ -1889,7 +1896,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
         )}
 
         {/* Settings banner (Receipt & Fulfillment) */}
-        <div style={{ background: "#faf9f7", borderBottom: "1px solid #e7e4e0", padding: "12px 16px", display: "flex", flexDirection: "column", gap: 10, flexShrink: 0 }}>
+        <div style={{ background: "#f8fafc", borderBottom: "1px solid #e2e8f0", padding: "12px 16px", display: "flex", flexDirection: "column", gap: 10, flexShrink: 0 }}>
           {/* Email Row */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, width: "100%" }}>
@@ -1897,12 +1904,12 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
                 width: 28,
                 height: 28,
                 borderRadius: "50%",
-                background: "linear-gradient(135deg, #c47d2a, #f97316)",
+                background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 flexShrink: 0,
-                boxShadow: "0 2px 6px rgba(249, 115, 22, 0.2)",
+                boxShadow: "0 2px 6px rgba(37, 99, 235, 0.25)",
                 userSelect: "none"
               }}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: "block" }}>
@@ -1928,12 +1935,12 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
                   boxShadow: "inset 0 1px 2px rgba(0,0,0,0.02)",
                   transition: "border-color 0.2s ease"
                 }}
-                onFocus={e => e.target.style.borderColor = "#f97316"}
-                onBlur={e => e.target.style.borderColor = "#e7e4e0"}
+                onFocus={e => e.target.style.borderColor = "#2563eb"}
+                onBlur={e => e.target.style.borderColor = "#e2e8f0"}
               />
             </div>
             {customerEmail && customerEmail.includes("@") && (
-              <span style={{ fontSize: 10, color: "#16a34a", fontWeight: 700, whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 3 }}>
+              <span style={{ fontSize: 10, color: "#10b981", fontWeight: 700, whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 3 }}>
                 <span>✓</span><span>Active</span>
               </span>
             )}
@@ -1951,22 +1958,22 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
                 fontSize: "12px",
                 fontWeight: 600,
                 cursor: "pointer",
-                border: "1px solid #e7e4e0",
+                border: "1px solid #e2e8f0",
                 background: "#fff",
-                color: "#1c1917",
+                color: "#0f172a",
                 textAlign: "left",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 transition: "all 0.2s"
               }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = "#f97316"}
-              onMouseLeave={e => e.currentTarget.style.borderColor = "#e7e4e0"}
+              onMouseEnter={e => e.currentTarget.style.borderColor = "#2563eb"}
+              onMouseLeave={e => e.currentTarget.style.borderColor = "#e2e8f0"}
             >
               <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 📍 {deliveryFullName ? `${deliveryFullName} (${deliveryState})` : "Add Delivery Details"}
               </span>
-              <span style={{ fontSize: "10px", color: "#f97316", fontWeight: "700" }}>Edit ➔</span>
+              <span style={{ fontSize: "10px", color: "#2563eb", fontWeight: "700" }}>Edit ➔</span>
             </button>
           </div>
         </div>
@@ -1978,7 +1985,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
               {m.role === "assistant" && <div className="agent-avatar" aria-hidden="true">◎</div>}
               <div className={`chat-bubble chat-bubble--${m.role}`}>{m.text || m.content}</div>
               {m.role === "user" && (
-                <div style={{ width: 26, height: 26, background: "#e7e4e0", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#78716c", fontWeight: 700, flexShrink: 0 }} aria-hidden="true">
+                <div style={{ width: 26, height: 26, background: "#e2e8f0", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#64748b", fontWeight: 700, flexShrink: 0 }} aria-hidden="true">
                   U
                 </div>
               )}
@@ -1989,9 +1996,9 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
           {loading && (
             <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
               <div className="agent-avatar" aria-hidden="true">◎</div>
-              <div style={{ background: "#faf9f7", border: "1px solid #f0ede8", borderRadius: "4px 16px 16px 16px", padding: "10px 14px", display: "flex", gap: 5 }}>
+              <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "4px 16px 16px 16px", padding: "10px 14px", display: "flex", gap: 5 }}>
                 {[0, 1, 2].map(i => (
-                  <div key={i} style={{ width: 7, height: 7, background: "#c47d2a", borderRadius: "50%", animation: `bounce 1.1s ${i * 0.18}s infinite` }} />
+                  <div key={i} style={{ width: 7, height: 7, background: "#2563eb", borderRadius: "50%", animation: `bounce 1.1s ${i * 0.18}s infinite` }} />
                 ))}
               </div>
             </div>
@@ -2006,7 +2013,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
               <button
                 key={i}
                 onClick={() => setInput(c)}
-                style={{ background: "#faf9f7", border: "1px solid #e7e4e0", borderRadius: 20, padding: "4px 11px", fontSize: 12, color: "#78716c", cursor: "pointer" }}
+                style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 20, padding: "4px 11px", fontSize: 12, color: "#64748b", cursor: "pointer" }}
               >
                 {c}
               </button>
@@ -2015,7 +2022,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
         )}
 
         {/* Input */}
-        <div style={{ padding: "9px 13px 14px", borderTop: "1px solid #f0ede8", display: "flex", gap: 8, flexShrink: 0, alignItems: "center" }}>
+        <div style={{ padding: "9px 13px 14px", borderTop: "1px solid #e2e8f0", display: "flex", gap: 8, flexShrink: 0, alignItems: "center" }}>
           <div style={{ position: "relative", flex: 1, display: "flex", alignItems: "center" }}>
             <input
               className="input"
@@ -2036,11 +2043,11 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
                 position: "absolute",
                 right: 8,
                 background: isListening 
-                  ? "linear-gradient(135deg, #c47d2a, #f97316)" 
+                  ? "linear-gradient(135deg, #2563eb, #1d4ed8)" 
                   : "rgba(255,255,255,0.08)",
-                border: isListening ? "1px solid #f97316" : "1px solid #e7e4e0",
+                border: isListening ? "1px solid #2563eb" : "1px solid #e2e8f0",
                 borderRadius: "50%",
-                color: isListening ? "#fff" : "#78716c",
+                color: isListening ? "#fff" : "#64748b",
                 width: 28,
                 height: 28,
                 cursor: "pointer",
@@ -2048,7 +2055,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
                 alignItems: "center",
                 justifyContent: "center",
                 fontSize: 14,
-                boxShadow: isListening ? "0 0 10px rgba(249,115,22,0.5)" : "none",
+                boxShadow: isListening ? "0 0 10px rgba(37,99,235,0.5)" : "none",
                 animation: isListening ? "pulse 1.2s infinite" : "none",
                 transition: "all 0.2s ease"
               }}
@@ -2061,7 +2068,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
             disabled={loading || (!input.trim() && !isListening)}
             aria-label="Send message"
             style={{
-              background: loading || (!input.trim() && !isListening) ? "#e7e4e0" : "#1c1917",
+              background: loading || (!input.trim() && !isListening) ? "#cbd5e1" : "#2563eb",
               color: "#fff", border: "none", borderRadius: 10,
               padding: "10px 16px", fontSize: 12, fontWeight: 700,
               cursor: loading || (!input.trim() && !isListening) ? "not-allowed" : "pointer",
@@ -2099,16 +2106,16 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
                 maxWidth: 320,
                 background: "#fff",
                 borderRadius: 16,
-                border: "1px solid #e7e4e0",
-                boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+                border: "1px solid #e2e8f0",
+                boxShadow: "0 10px 25px rgba(15,23,42,0.15)",
                 padding: 20,
                 zIndex: 1001,
                 textAlign: "center"
               }}
             >
               <div style={{ fontSize: 32, marginBottom: 12 }} aria-hidden="true">🗑️</div>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: "#1c1917", margin: "0 0 8px" }}>Clear Chat History?</h3>
-              <p style={{ fontSize: 13, color: "#78716c", margin: "0 0 20px", lineHeight: 1.5 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: "#0f172a", margin: "0 0 8px" }}>Clear Chat History?</h3>
+              <p style={{ fontSize: 13, color: "#64748b", margin: "0 0 20px", lineHeight: 1.5 }}>
                 This will delete your conversation history forever. You cannot undo this action.
               </p>
               <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
@@ -2116,18 +2123,18 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
                   onClick={() => setShowConfirmClear(false)}
                   style={{
                     flex: 1,
-                    background: "#faf9f7",
-                    border: "1px solid #e7e4e0",
+                    background: "#f8fafc",
+                    border: "1px solid #e2e8f0",
                     borderRadius: 10,
                     padding: "9px 16px",
                     fontSize: 12,
                     fontWeight: 700,
-                    color: "#78716c",
+                    color: "#64748b",
                     cursor: "pointer",
                     transition: "all 0.2s"
                   }}
-                  onMouseEnter={e => e.currentTarget.style.background = "#f0ede8"}
-                  onMouseLeave={e => e.currentTarget.style.background = "#faf9f7"}
+                  onMouseEnter={e => e.currentTarget.style.background = "#f1f5f9"}
+                  onMouseLeave={e => e.currentTarget.style.background = "#f8fafc"}
                 >
                   Cancel
                 </button>
@@ -2157,7 +2164,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
                   }}
                   style={{
                     flex: 1,
-                    background: "#f97316",
+                    background: "#2563eb",
                     border: "none",
                     borderRadius: 10,
                     padding: "9px 16px",
@@ -2166,10 +2173,10 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
                     color: "#fff",
                     cursor: "pointer",
                     transition: "all 0.2s",
-                    boxShadow: "0 4px 12px rgba(249, 115, 22, 0.2)"
+                    boxShadow: "0 4px 12px rgba(37, 99, 235, 0.25)"
                   }}
-                  onMouseEnter={e => e.currentTarget.style.background = "#ea6c0a"}
-                  onMouseLeave={e => e.currentTarget.style.background = "#f97316"}
+                  onMouseEnter={e => e.currentTarget.style.background = "#1d4ed8"}
+                  onMouseLeave={e => e.currentTarget.style.background = "#2563eb"}
                 >
                   Clear Chat
                 </button>
@@ -2360,7 +2367,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
               {/* Row 5: Delivery fee */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #292524", paddingTop: "10px", marginTop: "4px" }}>
                 <span style={{ fontSize: "11px", color: "#a8a29e" }}>Delivery fee</span>
-                <span style={{ fontSize: "13px", fontWeight: "700", color: "#fb923c" }}>{deliveryFee.toFixed(2)} USDC</span>
+                <span style={{ fontSize: "13px", fontWeight: "700", color: "#60a5fa" }}>{deliveryFee.toFixed(2)} USDC</span>
               </div>
 
               {/* Save button */}
@@ -2368,7 +2375,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
                 type="button"
                 onClick={() => setIsDeliveryFormOpen(false)}
                 style={{
-                  background: "linear-gradient(135deg, #c47d2a, #f97316)",
+                  background: "linear-gradient(135deg, #2563eb, #1d4ed8)",
                   border: "none",
                   borderRadius: "8px",
                   padding: "10px",
@@ -2377,7 +2384,7 @@ Transaction Hash: ${data.txHash} ${data.jobId ? `(Escrow Job #${data.jobId})` : 
                   fontWeight: "700",
                   cursor: "pointer",
                   textAlign: "center",
-                  boxShadow: "0 4px 12px rgba(249, 115, 22, 0.25)"
+                  boxShadow: "0 4px 12px rgba(37, 99, 235, 0.25)"
                 }}
               >
                 Save Details
@@ -2441,7 +2448,7 @@ function WishlistDrawer({ wishlist, onClose, onRemove, onAddToCart, allProducts 
                 <p style={{ fontSize: 15, fontWeight: 600, color: "#1c1917", margin: 0, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {item.name}
                 </p>
-                <p style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "#c47d2a", margin: "2px 0 0" }}>
+                <p style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: "#2563eb", margin: "2px 0 0" }}>
                   {fmt(item.price)}
                 </p>
               </div>
@@ -2449,7 +2456,7 @@ function WishlistDrawer({ wishlist, onClose, onRemove, onAddToCart, allProducts 
                 <button
                   onClick={() => { onAddToCart(item); onRemove(item); }}
                   style={{
-                    background: "#f97316", color: "#fff",
+                    background: "#2563eb", color: "#fff",
                     border: "none", borderRadius: 4,
                     padding: "6px 10px", fontSize: 11, fontWeight: 700,
                     cursor: "pointer", textTransform: "uppercase"
@@ -2822,13 +2829,13 @@ function CombinedFooter({ addToast }) {
 
   return (
     <footer aria-label="Powered by Arc Blockchain and Footer" style={{
-      background: "#1c1917",
+      background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
       borderRadius: 16,
       padding: "32px 36px 24px",
       marginTop: 36,
-      border: "1px solid #292524",
+      border: "1px solid #334155",
       fontFamily: "var(--font-sans)",
-      color: "#e7e4e0",
+      color: "#cbd5e1",
     }}>
       {/* Top Section: Powered by Arc Blockchain Banner */}
       <div style={{
@@ -2837,13 +2844,13 @@ function CombinedFooter({ addToast }) {
         flexWrap: "wrap",
         gap: 24,
         paddingBottom: 28,
-        borderBottom: "1px solid #292524",
+        borderBottom: "1px solid #334155",
       }}>
         <div style={{ flex: 1, minWidth: 240 }}>
           <h3 style={{ fontFamily: "var(--font-serif)", fontSize: 21, fontWeight: 700, color: "#fff", marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ color: "#c47d2a" }}>◎</span> Powered by Arc Blockchain
+            <span style={{ color: "#3b82f6" }}>◎</span> Powered by Arc Blockchain
           </h3>
-          <p style={{ fontSize: 13, color: "#87827b", lineHeight: 1.6, margin: 0 }}>
+          <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.6, margin: 0 }}>
             AI shopping agent · USDC stablecoin · Circle&apos;s Arc L1 · Sub-second settlement · Non-custodial.
           </p>
         </div>
@@ -2855,9 +2862,9 @@ function CombinedFooter({ addToast }) {
             ["🔒", "Non", "Custodial"]
           ].map(([ic, a, b]) => (
             <div key={b} style={{ textAlign: "center", minWidth: 70 }}>
-              <p style={{ fontSize: 20, marginBottom: 4, color: "#c47d2a", margin: 0 }} aria-hidden="true">{ic}</p>
+              <p style={{ fontSize: 20, marginBottom: 4, color: "#3b82f6", margin: 0 }} aria-hidden="true">{ic}</p>
               <p style={{ fontSize: 12, fontWeight: 700, color: "#fff", margin: 0 }}>{a}</p>
-              <p style={{ fontSize: 9, color: "#57534e", letterSpacing: 1, textTransform: "uppercase", marginTop: 2, margin: 0 }}>{b}</p>
+              <p style={{ fontSize: 9, color: "#64748b", letterSpacing: 1, textTransform: "uppercase", marginTop: 2, margin: 0 }}>{b}</p>
             </div>
           ))}
         </div>
@@ -2875,7 +2882,7 @@ function CombinedFooter({ addToast }) {
           <h4 style={{ fontSize: 14, fontWeight: 700, color: "#fff", textTransform: "uppercase", letterSpacing: 1, margin: 0 }}>
             Connect with SwiftCart
           </h4>
-          <p style={{ color: "#a8a29e", fontSize: 13, lineHeight: 1.5, margin: 0 }}>
+          <p style={{ color: "#94a3b8", fontSize: 13, lineHeight: 1.5, margin: 0 }}>
             Follow us to stay updated on web3 fashion, developer drops, and new AI capabilities.
           </p>
           <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
@@ -2917,27 +2924,27 @@ function CombinedFooter({ addToast }) {
                 rel="noopener noreferrer"
                 title={social.name}
                 style={{
-                  color: "#a8a29e",
+                  color: "#94a3b8",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   width: 36,
                   height: 36,
                   borderRadius: "50%",
-                  border: "1px solid #292524",
-                  background: "#171513",
+                  border: "1px solid #334155",
+                  background: "#0f172a",
                   transition: "all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
                 }}
                 onMouseEnter={e => {
                   e.currentTarget.style.color = "#fff";
-                  e.currentTarget.style.borderColor = "#c47d2a";
-                  e.currentTarget.style.background = "#c47d2a";
+                  e.currentTarget.style.borderColor = "#2563eb";
+                  e.currentTarget.style.background = "#2563eb";
                   e.currentTarget.style.transform = "scale(1.15)";
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.color = "#a8a29e";
-                  e.currentTarget.style.borderColor = "#292524";
-                  e.currentTarget.style.background = "#171513";
+                  e.currentTarget.style.color = "#94a3b8";
+                  e.currentTarget.style.borderColor = "#334155";
+                  e.currentTarget.style.background = "#0f172a";
                   e.currentTarget.style.transform = "scale(1)";
                 }}
               >
@@ -2952,7 +2959,7 @@ function CombinedFooter({ addToast }) {
           <h4 style={{ fontSize: 14, fontWeight: 700, color: "#fff", textTransform: "uppercase", letterSpacing: 1, margin: 0 }}>
             Subscribe to our Newsletter
           </h4>
-          <p style={{ color: "#a8a29e", fontSize: 13, lineHeight: 1.5, margin: 0 }}>
+          <p style={{ color: "#94a3b8", fontSize: 13, lineHeight: 1.5, margin: 0 }}>
             Get notifications on new fashion drops, exclusive collections, and AI shopping integrations.
           </p>
           <form onSubmit={handleSubmit} style={{ display: "flex", gap: 8, maxWidth: 360, margin: 0 }}>
@@ -2964,22 +2971,22 @@ function CombinedFooter({ addToast }) {
               onChange={e => setEmail(e.target.value)}
               style={{
                 flex: 1,
-                background: "#171513",
+                background: "#0f172a",
                 color: "#fff",
-                border: "1px solid #292524",
+                border: "1px solid #334155",
                 borderRadius: 8,
                 padding: "8px 12px",
                 fontSize: 13,
                 outline: "none",
                 transition: "border-color 0.2s",
               }}
-              onFocus={e => e.currentTarget.style.borderColor = "#f97316"}
-              onBlur={e => e.currentTarget.style.borderColor = "#292524"}
+              onFocus={e => e.currentTarget.style.borderColor = "#2563eb"}
+              onBlur={e => e.currentTarget.style.borderColor = "#334155"}
             />
             <button
               type="submit"
               style={{
-                background: "#f97316",
+                background: "#2563eb",
                 color: "#fff",
                 border: "none",
                 borderRadius: 8,
@@ -2989,8 +2996,8 @@ function CombinedFooter({ addToast }) {
                 cursor: "pointer",
                 transition: "background 0.2s, transform 0.15s",
               }}
-              onMouseEnter={e => e.currentTarget.style.background = "#ea6c0a"}
-              onMouseLeave={e => e.currentTarget.style.background = "#f97316"}
+              onMouseEnter={e => e.currentTarget.style.background = "#1d4ed8"}
+              onMouseLeave={e => e.currentTarget.style.background = "#2563eb"}
               onMouseDown={e => e.currentTarget.style.transform = "scale(0.96)"}
               onMouseUp={e => e.currentTarget.style.transform = "scale(1)"}
             >
@@ -3002,21 +3009,21 @@ function CombinedFooter({ addToast }) {
 
       {/* Bottom Copyright Bar */}
       <div style={{
-        borderTop: "1px solid #292524",
+        borderTop: "1px solid #334155",
         paddingTop: 18,
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
         flexWrap: "wrap",
         gap: 12,
-        color: "#57534e",
+        color: "#64748b",
         fontSize: 11,
       }}>
         <p style={{ margin: 0 }}>
           &copy; {new Date().getFullYear()} SwiftCart. All rights reserved.
         </p>
         <p style={{ margin: 0, display: "flex", alignItems: "center", gap: 4 }}>
-          Powered by <span style={{ color: "#c47d2a", fontWeight: 600 }}>Arc Blockchain</span>
+          Powered by <span style={{ color: "#60a5fa", fontWeight: 600 }}>Arc Blockchain</span>
         </p>
       </div>
     </footer>
@@ -3035,6 +3042,7 @@ export default function SwiftCart() {
   const [agentOpen, setAgentOpen] = useState(false);
   // Ref that AgentChat registers a callback into so CheckoutModal can post success back to chat
   const agentNotifyRef = useRef(null);
+  const toastTimeoutRef = useRef(null);
   const [wallet, setWallet] = useState(null);
   const [walletDropdownOpen, setWalletDropdownOpen] = useState(false);
   const [toasts, setToasts] = useState([]);
@@ -3515,11 +3523,28 @@ export default function SwiftCart() {
     return () => window.removeEventListener("click", handleOutsideClick);
   }, [walletDropdownOpen]);
 
-  // Toast system
+  // Toastify notification system — single active toast
   const addToast = (msg, type = "info") => {
-    const id = Date.now();
-    setToasts(t => [...t, { id, msg, type }]);
-    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3000);
+    toast.dismiss(); // Dismiss previous toast so strictly 1 pop-up is active
+    const options = {
+      position: "top-right",
+      autoClose: 2400,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      theme: darkMode ? "dark" : "light",
+    };
+
+    if (type === "success") {
+      toast.success(msg, options);
+    } else if (type === "error") {
+      toast.error(msg, options);
+    } else if (type === "agent") {
+      toast.info(msg, { ...options, icon: "🤖" });
+    } else {
+      toast.info(msg, options);
+    }
   };
 
   // Wallet connection
@@ -3678,8 +3703,8 @@ export default function SwiftCart() {
     <div data-theme={darkMode ? "dark" : "light"} style={{ minHeight: "100vh", background: "var(--color-bg)", fontFamily: "var(--font-sans)", colorScheme: darkMode ? "dark" : "light" }}>
 
       {/* ── TOP BAR ── */}
-      <div style={{ background: "#1c1917", padding: "6px 0", textAlign: "center", overflow: "hidden", whiteSpace: "nowrap" }}>
-        <p className="topbar-text" style={{ fontSize: 13, color: "#fde68a", letterSpacing: 0.5, display: "inline-block" }}>
+      <div style={{ background: "linear-gradient(135deg, #0b1329, #0f172a)", padding: "7px 0", textAlign: "center", overflow: "hidden", whiteSpace: "nowrap", borderBottom: "1px solid #1e293b" }}>
+        <p className="topbar-text" style={{ fontSize: 13, color: "#e2e8f0", fontWeight: 600, letterSpacing: 0.5, display: "inline-block" }}>
           🎉 Free shipping on orders over 150 USDC · Pay with USDC on Arc Blockchain
         </p>
       </div>
@@ -3688,13 +3713,13 @@ export default function SwiftCart() {
       <nav
         aria-label="Main navigation"
         style={{
-          position: "sticky", top: 0, zIndex: 900,
+          position: "sticky", top: 0, zIndex: 1500,
           background: scrolled
-            ? (darkMode ? "rgba(15,14,13,0.97)" : "rgba(255,255,255,0.97)")
-            : "var(--color-bg)",
+            ? "rgba(15, 23, 42, 0.97)"
+            : "#0f172a",
           backdropFilter: scrolled ? "blur(12px)" : "none",
-          borderBottom: "1px solid var(--color-border)",
-          boxShadow: scrolled ? "0 2px 16px rgba(0,0,0,0.06)" : "none",
+          borderBottom: "1px solid #1e293b",
+          boxShadow: scrolled ? "0 4px 20px rgba(0,0,0,0.3)" : "none",
           transition: "all .3s",
         }}
       >
@@ -3706,7 +3731,7 @@ export default function SwiftCart() {
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
             <LogoImage />
             <div className="desktop-only" style={{ flexDirection: "column" }}>
-              <p style={{ fontSize: 9, color: "#c47d2a", fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", margin: 0 }}>
+              <p style={{ fontSize: 9, color: "#60a5fa", fontWeight: 600, letterSpacing: 2, textTransform: "uppercase", margin: 0 }}>
 
               </p>
             </div>
@@ -3717,7 +3742,7 @@ export default function SwiftCart() {
             className="nav-desktop"
             role="tablist"
             aria-label="Shop by gender"
-            style={{ gap: 0, background: "#f5f3f0", borderRadius: 6, padding: 3, border: "1px solid #e7e4e0" }}
+            style={{ gap: 0, background: "#1e293b", borderRadius: 8, padding: 3, border: "1px solid #334155" }}
           >
             {Object.keys(CATALOGUE).map(k => {
               const s = CATALOGUE[k];
@@ -3730,11 +3755,14 @@ export default function SwiftCart() {
                   aria-selected={isActive}
                   onClick={() => { setSection(k); setActiveCat(null); }}
                   style={{
-                    background: isActive ? "#1c1917" : "transparent",
-                    color: isActive ? "#fff" : "#78716c",
+                    background: isActive ? "#2563eb" : "transparent",
+                    color: isActive ? "#fff" : "#94a3b8",
+                    borderRadius: 6,
+                    fontWeight: isActive ? 700 : 600,
+                    transition: "all 0.2s ease"
                   }}
-                  onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = "#e7e4e0"; e.currentTarget.style.color = "#1c1917"; } }}
-                  onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#78716c"; } }}
+                  onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = "rgba(255,255,255,0.1)"; e.currentTarget.style.color = "#fff"; } }}
+                  onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#94a3b8"; } }}
                 >
                   <span style={{ fontSize: 14 }}>{s.icon}</span>{s.label}
                 </button>
@@ -3777,8 +3805,8 @@ export default function SwiftCart() {
                   aria-haspopup="true"
                   style={{
                     cursor: "pointer",
-                    border: walletDropdownOpen ? "1px solid var(--color-brand)" : "1px solid var(--color-border)",
-                    background: "var(--color-surface)",
+                    border: walletDropdownOpen ? "1px solid #2563eb" : "1px solid #334155",
+                    background: "#1e293b",
                     display: "flex",
                     alignItems: "center",
                     gap: "5px",
@@ -3788,8 +3816,8 @@ export default function SwiftCart() {
                   }}
                 >
                   <div className="wallet-chip__dot" aria-hidden="true" />
-                  <span className="wallet-chip__address">{trunc(wallet)}</span>
-                  <span style={{ fontSize: 8, color: "#a8a29e", marginLeft: 2, display: "inline-block", transform: walletDropdownOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
+                  <span className="wallet-chip__address" style={{ color: "#60a5fa" }}>{trunc(wallet)}</span>
+                  <span style={{ fontSize: 8, color: "#94a3b8", marginLeft: 2, display: "inline-block", transform: walletDropdownOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
                 </button>
                 {walletDropdownOpen && (
                   <>
@@ -3809,7 +3837,7 @@ export default function SwiftCart() {
                         marginTop: 10,
                         zIndex: 999,
                         animation: "walletDropdownIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards",
-                        filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.08))"
+                        filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.3))"
                       }}
                     >
                       {/* Triangle Arrow */}
@@ -3820,16 +3848,16 @@ export default function SwiftCart() {
                         transform: "translateX(-50%) rotate(45deg)",
                         width: 10,
                         height: 10,
-                        background: "#fff",
-                        borderLeft: "1px solid var(--color-border)",
-                        borderTop: "1px solid var(--color-border)",
+                        background: "#1e293b",
+                        borderLeft: "1px solid #334155",
+                        borderTop: "1px solid #334155",
                         zIndex: 1
                       }} />
 
                       {/* Inner Container */}
                       <div style={{
-                        background: "#fff",
-                        border: "1px solid var(--color-border)",
+                        background: "#1e293b",
+                        border: "1px solid #334155",
                         borderRadius: "var(--radius-md)",
                         minWidth: "155px",
                         position: "relative",
@@ -3850,7 +3878,7 @@ export default function SwiftCart() {
                             gap: "8px",
                             padding: "10px 16px",
                             fontSize: "11px",
-                            color: "#c41e3a",
+                            color: "#f87171",
                             background: "none",
                             border: "none",
                             cursor: "pointer",
@@ -3860,12 +3888,12 @@ export default function SwiftCart() {
                             fontFamily: "inherit"
                           }}
                           onMouseEnter={e => {
-                            e.currentTarget.style.background = "#fff5f5";
-                            e.currentTarget.style.color = "#b91c1c";
+                            e.currentTarget.style.background = "rgba(239,68,68,0.15)";
+                            e.currentTarget.style.color = "#ef4444";
                           }}
                           onMouseLeave={e => {
                             e.currentTarget.style.background = "none";
-                            e.currentTarget.style.color = "#c41e3a";
+                            e.currentTarget.style.color = "#f87171";
                           }}
                         >
                           🔌 Disconnect Wallet
@@ -3879,8 +3907,9 @@ export default function SwiftCart() {
               <button
                 onClick={connectWallet}
                 className="desktop-only nav-action-btn"
-                onMouseEnter={e => { e.currentTarget.style.background = "#7c4a1a"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#7c4a1a"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.color = "#1c1917"; e.currentTarget.style.borderColor = "#e7e4e0"; }}
+                style={{ background: "#2563eb", color: "#fff", borderColor: "#2563eb" }}
+                onMouseEnter={e => { e.currentTarget.style.background = "#1d4ed8"; e.currentTarget.style.borderColor = "#1d4ed8"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "#2563eb"; e.currentTarget.style.borderColor = "#2563eb"; }}
               >
                 <span aria-hidden="true">◎</span> Connect Wallet
               </button>
@@ -3891,12 +3920,13 @@ export default function SwiftCart() {
               onClick={() => setWishlistOpen(true)}
               className="desktop-only nav-action-btn"
               aria-label={`Open wishlist — ${wishlist.length} items`}
-              onMouseEnter={e => { e.currentTarget.style.background = "#f5f3f0"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#fff"; }}
+              style={{ background: "#1e293b", color: "#e2e8f0", borderColor: "#334155" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#334155"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#1e293b"; }}
             >
               ❤️ Wishlist
               {wishlist.length > 0 && (
-                <span style={{ background: "#c41e3a", color: "#fff", borderRadius: "50%", width: 16, height: 16, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 800 }}>
+                <span style={{ background: "#ef4444", color: "#fff", borderRadius: "50%", width: 16, height: 16, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 800 }}>
                   {wishlist.length}
                 </span>
               )}
@@ -3907,12 +3937,13 @@ export default function SwiftCart() {
               onClick={() => setOrdersOpen(true)}
               className="desktop-only nav-action-btn"
               aria-label={`Open order history — ${orders.length} orders`}
-              onMouseEnter={e => { e.currentTarget.style.background = "#f5f3f0"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#fff"; }}
+              style={{ background: "#1e293b", color: "#e2e8f0", borderColor: "#334155" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#334155"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#1e293b"; }}
             >
               📦 Orders
               {orders.length > 0 && (
-                <span style={{ background: "#1c1917", color: "#fff", borderRadius: "50%", width: 16, height: 16, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 800 }}>
+                <span style={{ background: "#2563eb", color: "#fff", borderRadius: "50%", width: 16, height: 16, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 800 }}>
                   {orders.length}
                 </span>
               )}
@@ -3924,12 +3955,13 @@ export default function SwiftCart() {
               onClick={() => setCartOpen(true)}
               className="nav-action-btn cart-btn-accent"
               aria-label={`Open cart — ${cartCount} item${cartCount !== 1 ? "s" : ""}`}
-              onMouseEnter={e => { e.currentTarget.style.background = "#7c4a1a"; e.currentTarget.style.borderColor = "#7c4a1a"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#f97316"; e.currentTarget.style.borderColor = "#f97316"; }}
+              style={{ background: "#2563eb", borderColor: "#2563eb", color: "#fff" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#1d4ed8"; e.currentTarget.style.borderColor = "#1d4ed8"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#2563eb"; e.currentTarget.style.borderColor = "#2563eb"; }}
             >
               🛒<span className="cart-btn-text"> Cart</span>
               {cartCount > 0 && (
-                <span style={{ background: "#fff", color: "#f97316", borderRadius: "50%", width: 16, height: 16, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 800 }}>
+                <span style={{ background: "#fff", color: "#2563eb", borderRadius: "50%", width: 16, height: 16, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 800 }}>
                   {cartCount}
                 </span>
               )}
@@ -3942,7 +3974,7 @@ export default function SwiftCart() {
           className="nav-mobile-tabs hide-scrollbar"
           role="tablist"
           aria-label="Shop by gender"
-          style={{ display: "none", gap: 6, overflowX: "auto", padding: "8px 12px 10px", borderTop: "1px solid #f0ede8", flexWrap: "nowrap" }}
+          style={{ display: "none", gap: 6, overflowX: "auto", padding: "8px 12px 10px", borderTop: "1px solid #1e293b", flexWrap: "nowrap" }}
         >
           {Object.keys(CATALOGUE).map(k => {
             const s = CATALOGUE[k];
@@ -3954,9 +3986,9 @@ export default function SwiftCart() {
                 aria-selected={isActive}
                 onClick={() => { setSection(k); setActiveCat(null); }}
                 style={{
-                  background: isActive ? "#1c1917" : "#f5f3f0",
-                  color: isActive ? "#fff" : "#78716c",
-                  border: "none", cursor: "pointer",
+                  background: isActive ? "#2563eb" : "#1e293b",
+                  color: isActive ? "#fff" : "#94a3b8",
+                  border: "1px solid #334155", cursor: "pointer",
                   padding: "8px 18px", borderRadius: 20,
                   fontSize: 12, fontWeight: 600,
                   display: "flex", alignItems: "center", gap: 5,
@@ -3974,36 +4006,41 @@ export default function SwiftCart() {
       <section
         className="hero-section"
         aria-label="Hero"
-        style={{ background: "#1c1917", padding: "44px 5% 38px", position: "relative", overflow: "hidden" }}
+        style={{
+          background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+          padding: "44px 5% 38px",
+          position: "relative",
+          overflow: "hidden"
+        }}
       >
         {/* Background glow */}
-        <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle at 15% 50%, rgba(196,125,42,0.15) 0%, transparent 55%), radial-gradient(circle at 85% 20%, rgba(249,115,22,0.08) 0%, transparent 50%)", pointerEvents: "none" }} aria-hidden="true" />
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle at 15% 50%, rgba(37,99,235,0.15) 0%, transparent 55%), radial-gradient(circle at 85% 20%, rgba(59,130,246,0.1) 0%, transparent 50%)", pointerEvents: "none" }} aria-hidden="true" />
 
         <div style={{ maxWidth: "100%", position: "relative" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }}>
 
             {/* Copy */}
             <div style={{ maxWidth: 640 }}>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(249,115,22,0.15)", border: "1px solid rgba(249,115,22,0.25)", borderRadius: 20, padding: "4px 12px", marginBottom: 14 }}>
-                <div style={{ width: 5, height: 5, background: "#22c55e", borderRadius: "50%", animation: "pulse 2s infinite" }} aria-hidden="true" />
-                <span style={{ fontSize: 9, color: "#fb923c", fontWeight: 700, letterSpacing: 2, textTransform: "uppercase" }}>AI Agent · Live on Arc</span>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.25)", borderRadius: 20, padding: "4px 12px", marginBottom: 14 }}>
+                <div style={{ width: 6, height: 6, background: "#10b981", borderRadius: "50%", animation: "pulse 2s infinite" }} aria-hidden="true" />
+                <span style={{ fontSize: 9, color: "#93c5fd", fontWeight: 700, letterSpacing: 2, textTransform: "uppercase" }}>AI Agent · Live on Arc</span>
               </div>
               <h1 style={{ fontFamily: "var(--font-serif)", fontSize: "clamp(26px,4vw,48px)", fontWeight: 700, color: "#fff", lineHeight: 1.15, marginBottom: 10 }}>
                 Shop with SwiftCart
               </h1>
-              <p style={{ fontSize: 13, color: "#78716c", lineHeight: 1.65, marginBottom: 22 }}>
-                {sec.label}&apos;s collection — shirts, trousers, belts, headwear &amp; footwear · Pay with USDC on Arc
+              <p style={{ fontSize: 13, color: "#cbd5e1", lineHeight: 1.65, marginBottom: 22 }}>
+                Why Shop When Agents Can? Pay with USDC on Arc
               </p>
               <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
                 <button
                   onClick={() => setAgentOpen(true)}
-                  style={{ background: "#f97316", color: "#fff", border: "none", borderRadius: 10, padding: "11px 22px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 6px 20px rgba(249,115,22,0.3)", display: "flex", alignItems: "center", gap: 7 }}
+                  style={{ background: "linear-gradient(135deg, #2563eb, #3b82f6)", color: "#fff", border: "none", borderRadius: 10, padding: "11px 22px", fontSize: 12, fontWeight: 700, cursor: "pointer", boxShadow: "0 6px 20px rgba(37,99,235,0.45)", display: "flex", alignItems: "center", gap: 7 }}
                 >
                   ◎ Shop with AI Agent
                 </button>
                 <button
                   onClick={() => document.getElementById("products")?.scrollIntoView({ behavior: "smooth" })}
-                  style={{ color: "#d4cfc8", border: "1px solid #44403c", background: "transparent", borderRadius: 10, padding: "11px 22px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
+                  style={{ color: "#ffffff", border: "1px solid rgba(255,255,255,0.3)", background: "rgba(255,255,255,0.08)", borderRadius: 10, padding: "11px 22px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}
                 >
                   Browse ↓
                 </button>
@@ -4015,11 +4052,11 @@ export default function SwiftCart() {
                 width: "100%",
                 maxWidth: 480,
                 marginTop: 24,
-                background: darkMode ? "#1c1917" : "#fff",
+                background: "#fff",
                 borderRadius: 10,
                 overflow: "hidden",
-                border: `1px solid ${darkMode ? "#292524" : "#e7e4e0"}`,
-                boxShadow: "0 10px 25px rgba(0,0,0,0.2)"
+                border: "1px solid #bfdbfe",
+                boxShadow: "0 10px 25px rgba(15,23,42,0.25)"
               }}>
                 <input
                   type="text"
@@ -4032,14 +4069,14 @@ export default function SwiftCart() {
                     outline: "none",
                     padding: "12px 16px",
                     fontSize: 13,
-                    color: "var(--color-ink)",
+                    color: "#0f172a",
                     background: "transparent",
                   }}
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    style={{ background: "none", border: "none", cursor: "pointer", padding: "0 12px", fontSize: 14, color: "#a8a29e" }}
+                    style={{ background: "none", border: "none", cursor: "pointer", padding: "0 12px", fontSize: 14, color: "#64748b" }}
                     aria-label="Clear search"
                   >
                     ✕
@@ -4048,7 +4085,7 @@ export default function SwiftCart() {
                 <button
                   onClick={() => document.getElementById("products")?.scrollIntoView({ behavior: "smooth" })}
                   style={{
-                    background: "#f97316",
+                    background: "#2563eb",
                     color: "#fff",
                     border: "none",
                     padding: "0 24px",
@@ -4059,8 +4096,8 @@ export default function SwiftCart() {
                     letterSpacing: 1,
                     transition: "background 0.2s"
                   }}
-                  onMouseEnter={e => e.currentTarget.style.background = "#7c4a1a"}
-                  onMouseLeave={e => e.currentTarget.style.background = "#f97316"}
+                  onMouseEnter={e => e.currentTarget.style.background = "#1d4ed8"}
+                  onMouseLeave={e => e.currentTarget.style.background = "#2563eb"}
                 >
                   Search
                 </button>
@@ -4071,8 +4108,8 @@ export default function SwiftCart() {
             <div className="hero-stats" style={{ gap: 20, flexWrap: "wrap" }}>
               {[["7", "Categories"], ["100+", "Products"], ["USDC", "Payment"], ["Arc", "Blockchain"]].map(([v, l]) => (
                 <div key={l} className="stat-item">
-                  <p className="stat-item__value">{v}</p>
-                  <p className="stat-item__label">{l}</p>
+                  <p className="stat-item__value" style={{ color: "#ffffff" }}>{v}</p>
+                  <p className="stat-item__label" style={{ color: "#94a3b8" }}>{l}</p>
                 </div>
               ))}
             </div>
@@ -4296,7 +4333,7 @@ export default function SwiftCart() {
           className="fab-agent"
           onClick={() => setAgentOpen(true)}
           aria-label="Open AI shopping agent"
-          style={{ position: "fixed", bottom: 28, right: 28, background: "linear-gradient(135deg,#c47d2a,#f97316)", color: "#fff", border: "none", borderRadius: "50%", width: 52, height: 52, fontSize: 24, cursor: "pointer", boxShadow: "0 6px 20px rgba(249,115,22,0.4)", zIndex: 700, display: "flex", alignItems: "center", justifyContent: "center", animation: "glow 2.5s infinite" }}
+          style={{ position: "fixed", bottom: 28, right: 28, background: "linear-gradient(135deg, #2563eb, #3b82f6)", color: "#fff", border: "none", borderRadius: "50%", width: 52, height: 52, fontSize: 24, cursor: "pointer", boxShadow: "0 6px 20px rgba(37, 99, 235, 0.45)", zIndex: 700, display: "flex", alignItems: "center", justifyContent: "center", animation: "glow 2.5s infinite" }}
         >
           ◎
         </button>
@@ -4496,7 +4533,19 @@ export default function SwiftCart() {
         />
       )}
 
-      <Toasts list={toasts} />
+      <ToastContainer
+        position="top-right"
+        autoClose={2400}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable
+        pauseOnHover={false}
+        theme={darkMode ? "dark" : "light"}
+        limit={1}
+      />
     </div>
   );
 }
